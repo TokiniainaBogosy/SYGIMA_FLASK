@@ -1,0 +1,23 @@
+from marshmallow import Schema, fields
+
+
+class LigneDemandeBaseSchema(Schema):
+    demande_id = fields.Int(required=True)
+    materiel_id = fields.Int(required=True)
+    qte_demandee = fields.Int(required=True)
+
+
+class LigneDemandeCreateSchema(Schema):
+    type_materiel = fields.Str(required=True)
+    quantite = fields.Int(required=True)
+
+
+class LigneDemandeResponseSchema(LigneDemandeBaseSchema):
+    id = fields.Int(dump_only=True)
+    qte_accordee = fields.Int(dump_only=True)
+
+
+class CreateDemandeGlobalSchema(Schema):
+    justification = fields.Str(required=True)
+    date_souhaitee = fields.Str(required=True)
+    lignes = fields.List(fields.Nested(LigneDemandeCreateSchema), required=True)  # ← équivalent de List[LigneDemandeCreate]

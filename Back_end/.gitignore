@@ -1,0 +1,50 @@
+# Environnement virtuel
+venv/
+.venv/
+env/
+
+# Variables d'environnement (contient vos mots de passe !)
+# .env
+# .env.local
+# .env.production
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# Base de données locale
+*.db
+*.sqlite
+*.sqlite3
+
+# Alembic (optionnel - certains préfèrent versionner les migrations)
+# alembic/versions/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+
+# Logs
+*.log
+logs/
+
+# Tests
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# OS
+.DS_Store         # Mac
+Thumbs.db         # Windows
+desktop.ini       # Windows

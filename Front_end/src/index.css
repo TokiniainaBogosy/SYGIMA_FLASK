@@ -1,0 +1,8 @@
+@import "tailwindcss";
+@theme {
+  /* On définit les couleurs du projet */
+  --color-asecna-blue: #00b4e5;
+  --color-asecna-yellow: #fde910;
+  --color-asecna-bronze: #9b855d;
+  --color-asecna-black: #1a1a18;
+}
