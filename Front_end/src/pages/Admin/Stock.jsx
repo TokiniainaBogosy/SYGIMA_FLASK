@@ -17,7 +17,8 @@ export default function Stock() {
   const [newUnite, setNewUnite] = useState("");
   const [data,setData] = useState([])
   const [newDesignation, setNewDesignation] = useState("");
-
+  const [newName,setNewName] = useState("");
+  const [newDescription,setNewDescription] = useState("");
   // ✅ Correction 2 : Ne pas faire setData en dehors d'un useEffect
   // Utilisez directement stocklist au lieu de créer un state séparé
   const materiels = stocklist || []

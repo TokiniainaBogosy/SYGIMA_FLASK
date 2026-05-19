@@ -10,10 +10,10 @@ export default function DashBoard(){
     const {user} = useAuth()
     return (
     <div>
-      {user?.role === 'Admin' && <DashboardAdmin/>}
-      {user?.role === 'Responsable' && <DashboardResponsable />}
-      {user?.role === 'Magasinier' && <DashboardMagasinier />}
-      {user?.role === 'Employe' && <DashboardEmploye />}
+      {user?.role === 'ADMIN' && <DashboardAdmin/>}
+      {user?.role === 'RESPONSABLE' && <DashboardResponsable />}
+      {user?.role === 'MAGASINIER' && <DashboardMagasinier />}
+      {user?.role === 'EMPLOYE' && <DashboardEmploye />}
     </div>
   )
 }

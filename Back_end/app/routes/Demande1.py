@@ -5,7 +5,8 @@ from app.schemas.demande import DemandeResponseSchema, DemandeListResponseSchema
 from app.services.create_demande_service import create_demande
 from app.services.answer_demande_service import modifier_statut_demande
 from app.services.read_demande_list_service import read_demande_list, read_demande_list_departement
-from app.utils.auth import get_current_user
+from app.utils.auth import get_current_user , get_current_user_entreprise
+
 
 demande_bp = Blueprint("demande", __name__, url_prefix="/demande")
 
@@ -13,8 +14,9 @@ demande_bp = Blueprint("demande", __name__, url_prefix="/demande")
 @demande_bp.route("/", methods=["POST"])
 def create_demande_route():
     current_user = get_current_user()
+    current_user_entreprise = get_current_user_entreprise()
     data = CreateDemandeGlobalSchema().load(request.get_json())
-    result = create_demande(data, current_user)
+    result = create_demande(data, current_user, current_user_entreprise)
     return jsonify(DemandeResponseSchema().dump(result)), 201
 
 
@@ -38,4 +40,7 @@ def answer_demande_route():
     current_user = get_current_user()
     data = StatusUpdateSchema().load(request.get_json())
     result = modifier_statut_demande(data, current_user)
-    return jsonify(result), 200
+    
+    # Sérialisation propre via Marshmallow
+    # Remplacez DemandeSchema par le nom de votre schéma existant
+    return jsonify(DemandeListResponseSchema().dump(result)), 200

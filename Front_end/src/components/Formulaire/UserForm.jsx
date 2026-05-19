@@ -22,18 +22,7 @@ export default function UserForm() {
     Authorization: `Bearer ${localStorage.getItem("token")}`,
   };
 
-  useEffect(() => {
-    const fetchDepartements = async () => {
-      try {
-        const res = await fetch("http://localhost:8000/departement/", { headers });
-        const data = await res.json();
-        setDepartements(data);
-      } catch (e) {
-        console.error("Erreur chargement départements", e);
-      }
-    };
-    fetchDepartements();
-  }, []);
+  const { data: departements } = useApi("/departement/")
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -41,36 +30,17 @@ export default function UserForm() {
     setSuccess(false);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    setSuccess(false);
+  const { post, loading, error } = useApi()
 
-    try {
-      const res = await fetch("http://localhost:8000/users", {
-        method: "POST",
-        headers,
-        body: JSON.stringify({
-          ...form,
-          departement_id: parseInt(form.departement_id),
-        }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.detail || "Erreur lors de la création");
-      }
-
-      setSuccess(true);
-      setForm({ nom: "", prenom: "", email: "", password: "", role: "", departement_id: "" });
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+const handleSubmit = async (e) => {
+  e.preventDefault()
+  setSuccess(false)
+  try {
+    await post("/users", { ...form, departement_id: parseInt(form.departement_id) })
+    setSuccess(true)
+    setForm({ nom: "", prenom: "", email: "", password: "", role: "", departement_id: "" })
+  } catch (err) { /* error géré par le hook */ }
+}
   const inputClass = "w-full px-4 py-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition placeholder-gray-400";
 
   return (

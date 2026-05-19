@@ -3,24 +3,25 @@ import React, { useState, useEffect } from 'react';
 const MaterielManager = ({ selectedMateriel, setSelectedMateriel, setMateriels, newReference, setNewReference, newDesignation, setNewDesignation, newCategorie, setNewCategorie, newUnite, setNewUnite }) => {
 
   // 3. Envoyer la modification (PATCH)
-  const handleUpdate = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await fetch(`http://127.0.0.1:8000/api/v1/materiel/materiel/update/${selectedMateriel.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reference: newReference, designation: newDesignation, categorie: newCategorie, unite: newUnite }),
-      });
+  const { patch } = useApi()
 
-      if (response.ok) {
-        setSelectedMateriel(null); // Fermer le modal
-        setMateriels(prev => prev.map(m => m.id === selectedMateriel.id ? { ...m, reference: newReference, designation: newDesignation, categorie: newCategorie, unite: newUnite } : m)); // Rafraîchir la liste
-      }
-    } catch (error) {
-      console.error("Erreur:", error);
-    }
-  };
-
+const handleUpdate = async (e) => {
+  e.preventDefault()
+  try {
+    await patch(
+      `/materiel/materiel/update/${selectedMateriel.id}`,
+      { reference: newReference, designation: newDesignation, categorie: newCategorie, unite: newUnite }
+    )
+    setMateriels(prev =>
+      prev.map(m =>
+        m.id === selectedMateriel.id
+          ? { ...m, reference: newReference, designation: newDesignation, categorie: newCategorie, unite: newUnite }
+          : m
+      )
+    )
+    setSelectedMateriel(null)
+  } catch (err) { /* error géré par le hook */ }
+}
   return (
     <div className="p-6">
       <h2 className="text-xl font-bold mb-4">Gestion des Matériaux</h2>
@@ -56,7 +57,7 @@ const MaterielManager = ({ selectedMateriel, setSelectedMateriel, setMateriels, 
           <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
             <h3 className="text-lg font-bold mb-4">Modifier le matériel</h3>
             <form onSubmit={handleUpdate}>
-              <div className="mb-4">
+              {/* <div className="mb-4">
                 <label className="block text-sm font-medium mb-1">Référence</label>
                 <input 
                   type="text"
@@ -65,7 +66,7 @@ const MaterielManager = ({ selectedMateriel, setSelectedMateriel, setMateriels, 
                   onChange={(e) => setNewReference(e.target.value)}
                   autoFocus
                 />
-              </div>
+              </div> */}
               <div className="mb-4">
                 <label className="block text-sm font-medium mb-1">Designation</label>
                 <input 

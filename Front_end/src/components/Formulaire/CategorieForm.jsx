@@ -1,137 +1,68 @@
 import { useState, useEffect } from "react";
+import { useApi } from "../../hooks/useApi"; // ✅ import
 
 const SECTIONS = ["Catégorie", "Matériel"];
 
 export default function CategorieForm() {
   const [active, setActive] = useState(0);
 
-  // Formulaires
   const [categorie, setCategorie] = useState({ nom: "", description: "" });
   const [materiel, setMateriel] = useState({ reference: "", designation: "", categorie: "", unite: "" });
 
-  // Données distantes
-  const [categories, setCategories] = useState([]);
-  const [materiels, setMateriels] = useState([]);
-  const [departements, setDepartements] = useState([]);
-
-  // États
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const headers = {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
-  };
+  // ✅ GET automatiques — remplace useEffect + fetch + les 3 useState
+  const { data: categories, loading: loadingCat }    = useApi("/materiel/categorie")
+  const { data: materiels,  loading: loadingMat }    = useApi("/materiel/materiel")
+  const { data: departements }                       = useApi("/departement/")
 
-  // 🔧 Fonction pour générer une référence automatique
-  const generateReference = () => {
-    const date = new Date();
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-    return `MAT-${year}${month}${day}-${random}`;
-  };
+  // ✅ Pour les POST
+  const { post, loading, error } = useApi()
 
-  // 🔧 Générer référence basée sur le dernier ID
+  // Générer référence basée sur le dernier ID
   const generateReferenceFromLastId = () => {
-    const lastId = materiels.length > 0 ? Math.max(...materiels.map(m => {
-      const id = parseInt(m.id);
-      return isNaN(id) ? 0 : id;
-    })) : 0;
-    const newId = (lastId + 1).toString().padStart(5, '0');
-    return `MAT-${newId}`;
-  };
+    const list = materiels || []
+    const lastId = list.length > 0
+      ? Math.max(...list.map(m => { const id = parseInt(m.id); return isNaN(id) ? 0 : id }))
+      : 0
+    return `MAT-${(lastId + 1).toString().padStart(5, "0")}`
+  }
 
+  // Quand on ouvre la section Matériel, générer une référence auto
   useEffect(() => {
-    const load = async () => {
-      try {
-        const [c, m, d] = await Promise.all([
-          fetch("http://localhost:8000/materiel/categorie", { headers }).then(r => r.json()),
-          fetch("http://localhost:8000/materiel/materiel", { headers }).then(r => r.json()),
-          fetch("http://localhost:8000/departement/", { headers }).then(r => r.json()),
-        ]);
-        setCategories(c || []);
-        console.log("Catégories chargées:", c);
-        setMateriels(m || []);
-        setDepartements(d || []);
-      } catch (e) {
-        console.error("Erreur chargement données", e);
-      }
-    };
-    load();
-  }, []);
-
-  // 🔧 Quand on ouvre la section Matériel, générer une référence auto
-  useEffect(() => {
-    if (active === 1) { // Section Matériel
-      const autoRef = generateReferenceFromLastId();
-      setMateriel(prev => ({ ...prev, reference: autoRef }));
+    if (active === 1 && materiels) {
+      setMateriel(prev => ({ ...prev, reference: generateReferenceFromLastId() }))
     }
-  }, [active, materiels]);
+  }, [active, materiels])
 
-  const reset = () => {
-    setError("");
-    setSuccess("");
-  };
+  const reset = () => setSuccess("")
 
   const handleSubmitCategorie = async (e) => {
-    e.preventDefault();
-    setLoading(true); reset();
+    e.preventDefault()
+    reset()
     try {
-      const res = await fetch("http://localhost:8000/materiel/categorie", {
-        method: "POST", headers,
-        body: JSON.stringify(categorie),
-      });
-      if (!res.ok) throw new Error((await res.json()).detail || "Erreur");
-      const created = await res.json();
-      setCategories([...categories, created]);
-      setCategorie({ nom: "", description: "" });
-      setSuccess("Catégorie créée avec succès !");
-    } catch (err) { setError(err.message); }
-    finally { setLoading(false); }
-  };
+      await post("/materiel/categorie", categorie)
+      setCategorie({ nom: "", description: "" })
+      setSuccess("Catégorie créée avec succès !")
+    } catch (err) { /* error géré par le hook */ }
+  }
 
   const handleSubmitMateriel = async (e) => {
-    e.preventDefault();
-    setLoading(true); 
-    reset();
+    e.preventDefault()
+    reset()
     try {
-      const res = await fetch("http://localhost:8000/materiel/materiel", {
-        method: "POST", 
-        headers,
-        body: JSON.stringify({
-          reference: materiel.reference, // Référence auto
-          designation: materiel.designation,
-          categorie: materiel.categorie,
-          unite: materiel.unite
-        }),
-      });
+      await post("/materiel/materiel", {
+        reference:   materiel.reference,
+        designation: materiel.designation,
+        categorie:   materiel.categorie,
+        unite:       materiel.unite,
+      })
+      setMateriel({ reference: generateReferenceFromLastId(), designation: "", categorie: "", unite: "" })
+      setSuccess("Matériel créé avec succès !")
+    } catch (err) { /* error géré par le hook */ }
+  }
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.detail || "Erreur lors de la création");
-      }
-
-      const created = await res.json();
-      
-      // Mise à jour de la liste locale
-      setMateriels([...materiels, created]);
-      
-      // Générer nouvelle référence pour le prochain
-      const newRef = generateReferenceFromLastId();
-      setMateriel({ reference: newRef, designation: "", categorie: "", unite: "" });
-      setSuccess("Matériel créé avec succès !");
-    } catch (err) { 
-      setError(err.message); 
-    } finally { 
-      setLoading(false); 
-    }
-  };
-
-  const inputClass = "w-full px-4 py-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition placeholder-gray-400";
-
+  const inputClass = "w-full px-4 py-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition placeholder-gray-400"
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-lg">

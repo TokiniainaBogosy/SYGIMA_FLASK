@@ -57,7 +57,7 @@ export default function DashBoardAdmin() {
   const { data: stats, loading: statsLoading, error: statsError } = 
     useApi("/stats/dashboard")
   const { data: demandes, loading: demandesLoading, error: demandesError } = 
-    useApi("/v1/demande/")
+    useApi("/demande/")
     // const STATS_DEMANDES = demandes.
 
   useEffect(() => {

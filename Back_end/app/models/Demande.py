@@ -39,7 +39,7 @@ class Demande(db.Model):  # ← changement
     departement_id: Mapped[int] = mapped_column(Integer, ForeignKey("departements.id"), index=True)
     responsable_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("users.id"))
     traite_par: Mapped[int | None] = mapped_column(Integer, ForeignKey("users.id"))
-    statut: Mapped[StatutDemande] = mapped_column(Enum(StatutDemande), default=StatutDemande.BROUILLON)
+    statut: Mapped[StatutDemande] = mapped_column(Enum(StatutDemande,values_callable=lambda x: [e.value for e in x]), default=StatutDemande.BROUILLON)
     justification: Mapped[str | None] = mapped_column(String(500))
     motif_rejet: Mapped[str | None] = mapped_column(String(500))
     date_soumission: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

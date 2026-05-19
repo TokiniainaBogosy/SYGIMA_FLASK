@@ -1,61 +1,33 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import MaterielForm from '../../components/Formulaire/MaterielForm';
+import { useApi } from '../../hooks/useApi';
 
 export default function Stock() {
-  // State pour afficher/masquer le formulaire d'ajout
   const [showForm, setShowForm] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [searchCategorie, setsearchCategorie] = useState('')
 
-  const [data,setData] = useState([])
+  // ✅ Remplace tout le useEffect + fetch + useState([])
+  const { data, loading, error } = useApi('/api/v1/materiel/stockList')
 
-  const headers = {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
-  };
+  const materiels = data || []  // évite le crash si data est null au départ
 
-  useEffect (()=>{
-    const fetchData = async () =>{
-      try{
-        const response = await fetch('http://127.0.0.1:8000/api/v1/materiel/stockList',{
-          method: 'GET', headers});
-        const result = await response.json();
-        setData(result)
-      }
-      catch(error){
-        console.error("Erreur lors de la récupération:", error);
-      }
-    }
-    fetchData();
-  },[])
-
-  // Fausses données de stock (on remplacera par des vraies plus tard)
-  const materiels = [...data]
-
-  // Fonction pour déterminer le style de la quantité
-  // Rouge si en dessous du seuil, vert sinon
   const getQuantiteStyle = (quantite, seuil) => {
-    if (quantite <= seuil) {
-      return 'text-red-600 font-bold' // ⚠️ Alerte stock bas
-    }
-    return 'text-green-600 font-bold' // ✅ Stock OK
+    if (quantite <= seuil) return 'text-red-600 font-bold'
+    return 'text-green-600 font-bold'
   }
-  const filteredMateriels = materiels
-  .filter((mat) => {
-    // Filtre recherche (tu l'as déjà)
-    const matchSearch = mat.designation
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase())
-    
-    // Filtre catégorie (à compléter)
-    const matchCategorie = mat.categorie
-    .toLowerCase()
-    .includes(searchCategorie.toLowerCase()) // À toi de coder !
-    
-    // Les deux doivent être vrais
+
+  const filteredMateriels = materiels.filter((mat) => {
+    const matchSearch = mat.designation.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchCategorie = mat.categorie.toLowerCase().includes(searchCategorie.toLowerCase())
     return matchSearch && matchCategorie
   })
+
   const categories = [...new Set(materiels.map(mat => mat.categorie))]
+
+  // Optionnel mais recommandé : gérer loading et error
+  if (loading) return <p>Chargement...</p>
+  if (error) return <p>Erreur : {error}</p>
 
   return (
     <div>

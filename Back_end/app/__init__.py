@@ -18,7 +18,11 @@ def create_app():
     from app.routes.Entreprise import entreprise_bp
     from app.routes.Materiel import materiel_bp
     from app.routes.User import user_bp
+    from app.routes.Stats import stats_bp
+    from app.routes.Current_user import current_user_bp
 
+    app.register_blueprint(current_user_bp)
+    app.register_blueprint(stats_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(departement_bp)
     app.register_blueprint(demande_bp)

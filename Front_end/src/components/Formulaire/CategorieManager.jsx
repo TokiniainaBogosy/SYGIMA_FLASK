@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
+import { useApi } from '../../hooks/useApi';
 const CategorieManager = ({ selectedCategorie , setSelectedCategorie , setCategories , newName, setNewName, newDescription, setNewDescription }) => {
 //   const [categories, setCategories] = useState([]);
 //   const [editingCategorie, setEditingCategorie] = useState(null); // Stocke la catégorie en cours de modif
@@ -21,23 +21,23 @@ const CategorieManager = ({ selectedCategorie , setSelectedCategorie , setCatego
 //   };
 
   // 3. Envoyer la modification (PATCH)
-  const handleUpdate = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await fetch(`http://127.0.0.1:8000/materiel/categorie/update/${selectedCategorie.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nom: newName , description: newDescription }),
-      });
+  const { patch } = useApi()
 
-      if (response.ok) {
-        setSelectedCategorie(null); // Fermer le modal
-        setCategories(prev => prev.map(cat => cat.id === selectedCategorie.id ? { ...cat, nom: newName } : cat)); // Rafraîchir la liste
-      }
-    } catch (error) {
-      console.error("Erreur:", error);
-    }
-  };
+const handleUpdate = async (e) => {
+  e.preventDefault()
+  try {
+    await patch(
+      `/materiel/categorie/update/${selectedCategorie.id}`,
+      { nom: newName, description: newDescription }
+    )
+    setCategories(prev =>
+      prev.map(cat =>
+        cat.id === selectedCategorie.id ? { ...cat, nom: newName } : cat
+      )
+    )
+    setSelectedCategorie(null)
+  } catch (err) { /* error géré par le hook */ }
+}
 
   return (
     <div className="p-6">

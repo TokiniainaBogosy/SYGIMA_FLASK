@@ -5,7 +5,7 @@ from app.models.Materiel import Materiel
 from app.models.User import User
 
 
-def create_stock(data: dict, current_user: User):
+def create_stock(data: dict, current_user: User,current_user_entreprise):
 
     materiel = Materiel.query.filter(Materiel.designation == data.get("materiel")).first()
     # if not materiel:
@@ -33,7 +33,8 @@ def create_stock(data: dict, current_user: User):
     db_stock = Stock(
         quantite_actuelle=quantite_ajoutee,
         materiel_id=materiel.id,
-        departement_id=current_user.departement_id
+        departement_id=current_user.departement_id,
+        entreprise_id=current_user_entreprise.entreprise_id
     )
 
     try:

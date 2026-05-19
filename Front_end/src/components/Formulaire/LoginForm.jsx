@@ -11,33 +11,16 @@ export default function LoginForm() {
     setError("");
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
+  const { post, loading, error } = useApi()
 
-    try {
-      const response = await fetch("http://localhost:8000/api/v1/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.detail || "Identifiants incorrects");
-      }
-
-      const data = await response.json();
-      localStorage.setItem("token", data.access_token);
-      window.location.href = "/dashboard";
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+const handleSubmit = async (e) => {
+  e.preventDefault()
+  try {
+    const data = await post("/api/v1/auth/login", form)
+    localStorage.setItem("token", data.access_token)
+    window.location.href = "/dashboard"
+  } catch (err) { /* error géré par le hook */ }
+}
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="w-full max-w-md">

@@ -5,9 +5,10 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
-  const savedUser = localStorage.getItem('user');
-  return savedUser ? JSON.parse(savedUser) : null;
-});
+    const savedUser = localStorage.getItem('user');
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -30,27 +31,28 @@ export function AuthProvider({ children }) {
   }, []);
 
  const login = async (email, password) => {
-  try {
-    console.log('Tentative connexion avec:', email);
-    setError(null);
-    const response = await api.post('/auth/login', { email, password });
-    console.log('Réponse serveur:', response.data);
-    const { access_token, user } = response.data;
-    
-    localStorage.setItem('token', access_token);
-    localStorage.setItem('user', JSON.stringify(user));
-    setUser(user);
-    
-    return user;
-  } catch (err) {
-    console.error('Erreur complète:', err); // ← Important
-    console.error('Status:', err.response?.status); // ← Et ça
-    console.error('Message:', err.response?.data); // ← Et ça
-    const errorMsg = err.response?.data?.detail || 'Erreur de connexion';
-    setError(errorMsg);
-    throw err;
-  }
-};
+    try {
+      console.log('Tentative connexion avec:', email);
+      setError(null);
+      const response = await api.post('/auth/login', { email, password });
+      console.log('Réponse serveur:', response.data);
+      const { access_token, user } = response.data;
+      
+      localStorage.setItem('token', access_token);
+      localStorage.setItem('user', JSON.stringify(user));
+      setUser(user);
+      
+      return user;
+    } catch (err) {
+      console.error('Erreur complète:', err); // ← Important
+      console.error('Status:', err.response?.status); // ← Et ça
+      console.error('Message:', err.response?.data); // ← Et ça
+      const errorMsg = err.response?.data?.detail || 'Erreur de connexion';
+      setError(errorMsg);
+      throw err;
+    }
+  };
+  
  const registerAuth= async (email,nom,prenom,password,role,departement) => {
   try {
     console.log('Tentative inscription avec:', email);

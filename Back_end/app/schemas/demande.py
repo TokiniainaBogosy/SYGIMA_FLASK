@@ -51,7 +51,7 @@ class DemandeListResponseSchema(Schema):
     reference = fields.Str(dump_only=True)
     demandeur = fields.Str(dump_only=True)
     departement = fields.Str(dump_only=True)
-    statut = fields.Str(dump_only=True)
+    statut = EnumField(StatutDemande, load_default=None)
     date = fields.DateTime(dump_only=True)
     materiels = fields.Str(dump_only=True)
 

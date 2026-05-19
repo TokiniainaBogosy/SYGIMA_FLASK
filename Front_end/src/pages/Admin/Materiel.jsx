@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 import { useApi } from '../../hooks/useApi'
 import { Search, Plus, Pencil, Trash2, Package, Tag } from 'lucide-react'
 import CategorieManager from '../../components/Formulaire/CategorieManager'
@@ -11,18 +11,28 @@ export default function Materiel() {
   const [searchMat, setSearchMat] = useState('')
   const [selectedCategorie, setSelectedCategorie] = useState(null)
   const [selectedMateriel, setSelectedMateriel] = useState(null)
+  const [newUnite, setNewUnite] = useState("");
+  const [newDesignation, setNewDesignation] = useState("");
+  const [data,setData] = useState([])
+  const [newName,setNewName] = useState("");
+  const [newDescription,setNewDescription] = useState("");
 
   // ─── GET avec useApi ──────────────────────────────
   const { data: categories, loading: catLoading } = useApi('/materiel/categorie')
   const { data: materiels, loading: matLoading } = useApi('/materiel/materielList')
-
+  useEffect(() => {
+    setCategoriesData(categories || [])
+    setMaterielsData(materiels || [])
+  }, [categories, materiels]) // On peut faire un useEffect pour logger les données si besoin
+  const [categoriesData, setCategoriesData] = useState([])
+  const [materielsData, setMaterielsData] = useState([])
   // ─── DELETE avec useApi ───────────────────────────
   const { del } = useApi()
 
   const handleDelete = async (id, type) => {
     if (!window.confirm("Supprimer ?")) return
     try {
-      await del(`/v1/materiel/${type}/${id}`)
+      await del(`/materiel/${type}/${id}`)
       window.location.reload() // ou re-fetch
     } catch (e) {
       alert("Erreur suppression")
@@ -30,11 +40,11 @@ export default function Materiel() {
   }
 
   // Filtres
-  const filteredCategories = categories?.filter(c => 
+  const filteredCategories = categoriesData?.filter(c => 
     c.nom.toLowerCase().includes(searchCat.toLowerCase())
   ) || []
 
-  const filteredMateriels = materiels?.filter(m => 
+  const filteredMateriels = materielsData?.filter(m => 
     m.designation.toLowerCase().includes(searchMat.toLowerCase()) ||
     m.reference.toLowerCase().includes(searchMat.toLowerCase())
   ) || []
@@ -205,12 +215,26 @@ export default function Materiel() {
         <CategorieManager 
           selectedCategorie={selectedCategorie} 
           setSelectedCategorie={setSelectedCategorie}
+          newName={newName}
+          setNewName={setNewName}
+          newDescription={newDescription}
+          setNewDescription={setNewDescription}
+          setCategories={setCategoriesData}
+          setMateriels={setMaterielsData}
+
         />
       )}
       {selectedMateriel && (
         <MaterielManager 
           selectedMateriel={selectedMateriel} 
           setSelectedMateriel={setSelectedMateriel}
+          newDesignation={newDesignation}
+          setNewDesignation={setNewDesignation}
+          newUnite={newUnite}
+          setNewUnite={setNewUnite}
+          categories={categories}
+          setCategories={setCategoriesData}
+          setMateriels={setMaterielsData}
         />
       )}
     </div>

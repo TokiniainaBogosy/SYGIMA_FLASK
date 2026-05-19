@@ -84,6 +84,15 @@ def register():
     )
     db.session.add(new_user)
     db.session.flush()
+    
+    if new_user.role == RoleUser.RESPONSABLE:
+        # Si l'utilisateur est un responsable, on crée aussi une entrée dans ResponsableDepartement
+        from app.models.ResponsableDepartement import ResponsableDepartement
+        responsable = ResponsableDepartement(
+            user_id=new_user.id,
+            departement_id=departement.id
+        )
+        db.session.add(responsable)
 
     # 4. Lier à l'entreprise du département
     lien = UserEntreprise(

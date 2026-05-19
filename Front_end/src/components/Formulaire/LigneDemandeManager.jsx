@@ -3,23 +3,23 @@ import React, { useState, useEffect } from 'react';
 const LigneDemandeManager = ({ selectedDemande, setSelectedDemande, setDemandes, newDesignation, setNewDesignation, newUnite, setNewUnite }) => {
 
   // 3. Envoyer la modification (PATCH)
-  const handleUpdate = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await fetch(`http://127.0.0.1:8000/api/v1/materiel/stock/update/${selectedStock.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ LigneRef: newDesignation, qte_accordee: newUnite }),
-      });
+  const { patch } = useApi()
 
-      if (response.ok) {
-        setSelectedStock(null); // Fermer le modal
-        setStocks(prev => prev.map(s => s.id === selectedDemande.id? { ...s, LigneRef: newDesignation, qte_accordee: newUnite } : s)); // Rafraîchir la liste
-      }
-    } catch (error) {
-      console.error("Erreur:", error);
-    }
-  };
+const handleUpdate = async (e) => {
+  e.preventDefault()
+  try {
+    await patch(
+      `/api/v1/materiel/stock/update/${selectedStock.id}`,
+      { LigneRef: newDesignation, qte_accordee: newUnite }
+    )
+    setStocks(prev =>
+      prev.map(s =>
+        s.id === selectedStock.id ? { ...s, LigneRef: newDesignation, qte_accordee: newUnite } : s
+      )
+    )
+    setSelectedStock(null)
+  } catch (err) { /* error géré par le hook */ }
+}
 
   return (
     <div className="p-6">

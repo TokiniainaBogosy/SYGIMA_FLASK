@@ -1,15 +1,12 @@
-import { useEffect, useState } from 'react'
-import api from '../../api'
+import { useState } from 'react'
+import { useApi } from '../../hooks/useApi';
 
 const ligneParcDefaut = {
   type_materiel: '',
   quantite: 1,
 }
 
-const headers = {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
-  };
+
 
 function DemandeMateriel() {
   const [entete, setEntete] = useState({
@@ -39,37 +36,22 @@ function DemandeMateriel() {
     setLignes(lignes.filter((_, i) => i !== index))
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    try {
-      const response = await api.post('demande/', { ...entete, lignes })
-      const numero = response.data.numero_demande
-      setMessage({ type: 'succes', texte: `Demande envoyée ! Votre numéro : ${numero}` })
-      // Réinitialisation sans nom ni service
-      setEntete({ date_souhaitee: '', justification: '' })
-      setLignes([{ ...ligneParcDefaut }])
-    } catch (error) {
-      setMessage({ type: 'erreur', texte: "Erreur lors de l'envoi. Réessayez." })
-    }
+const { post } = useApi()
+
+const handleSubmit = async (e) => {
+  e.preventDefault()
+  try {
+    const result = await post('demande/', { ...entete, lignes })
+    setMessage({ type: 'succes', texte: `Demande envoyée ! Votre numéro : ${result.numero_demande}` })
+    setEntete({ date_souhaitee: '', justification: '' })
+    setLignes([{ ...ligneParcDefaut }])
+  } catch (error) {
+    setMessage({ type: 'erreur', texte: "Erreur lors de l'envoi. Réessayez." })
   }
+}
 
-  const [materiels, setMateriels] = useState([]);
-  const [demande, setDemande] = useState({ materiel_id: "", quantite: "" });
-
-  useEffect(()=>{
-    const load = async ()=>{
-      try{
-        const response = await fetch('http://127.0.0.1:8000/materiel/materiel',{
-            method: 'GET', headers});
-          const result = await response.json();
-          setMateriels(result);
-      }
-      catch(error){
-          console.error("Erreur lors de la récupération:", error);
-      }
-    }
-    load()
-  },[])
+  const [demande, setDemande] = useState({ materiel_id: "", quantite: "" }); // celui-ci est OK
+  const { data: materiels } = useApi('/materiel/materiel')
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
@@ -159,17 +141,13 @@ function DemandeMateriel() {
                       className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="">Sélectionner un materiel</option>
-                      {materiels.map((m, index, tableauEntier) => {
-                        const elementPrecedent = tableauEntier[index - 1];
-                        const isDuplicate = index > 0 && m.designation === elementPrecedent.designation;
+                      {(materiels || []).map((m, index, tableauEntier) => {  // ✅ || [] pour éviter le crash
+                        const elementPrecedent = tableauEntier[index - 1]
+                        const isDuplicate = index > 0 && m.designation === elementPrecedent.designation
                         if (!isDuplicate) {
-                          return (
-                            <option key={m.id} value={m.designation}>
-                              {m.designation}
-                            </option>
-                          );
+                          return <option key={m.id} value={m.designation}>{m.designation}</option>
                         }
-                        return null; 
+                        return null
                       })}
                     </select>
                   </div>

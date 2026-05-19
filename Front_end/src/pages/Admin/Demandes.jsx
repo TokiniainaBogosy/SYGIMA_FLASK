@@ -1,204 +1,108 @@
-import { useState,useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
+import { useApi } from '../../hooks/useApi'
 import DemandeMateriel from '../../components/Formulaire/DemandeMatériel'
 
-
 export default function Demandes() {
-  // State pour afficher/masquer le formulaire
   const [showForm, setShowForm] = useState(false)
-
-  // State pour bar de recherche
   const { user } = useAuth()
   const [searchTerm, setSearchTerm] = useState('')
   const [searchStatus, setSearchStatus] = useState('')
   const [searchDepartement, setSearchDepartement] = useState('')
+  const [rejectingId, setRejectingId] = useState(null)
+  const [demandeID, setDemandeID] = useState(null)
+  const [tempMotif, setTempMotif] = useState('')
+  const [form, setForm] = useState({ reference: "", status: "", motif: "" })
 
-  // Fausses données de demandes
-  const [demandes,setDemandes] = useState([])
-  const [data,setData] = useState([])
+  // ✅ GET via useApi
+  const url = user
+    ? user.role === 'Magasinier' || user.role === 'Admin'
+      ? '/demande/'
+      : `/demande/?departement=${user.departement}`
+    : null
 
-  const [form, setForm] = useState({
-    reference: "",
-    status: "",
-    motif: ""
-  })
-  // State pour selectionner les demandes azz
-  const [rejectingId, setRejectingId] = useState(null);
-  const [demandeID, setDemandeID] = useState(null);
-  const [tempMotif, setTempMotif] = useState('');
+  const { data: demandesApi } = useApi(url)
 
-  
-  const updateStatus = (ref, newStatus, motif = '') => {
-    setDemandes(demandes.map(req => 
-      req.ligne_id === ref ? { ...req, statut_ligne: newStatus, motif_rejet: motif } : req
-    ));
-    setRejectingId(null);
-    setTempMotif('');
-  };
-
-  const headers = {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${localStorage.getItem("token")}`
-  };
+  // ✅ State local pour permettre les mises à jour optimistes
+  const [demandes, setDemandes] = useState([])
 
   useEffect(() => {
-  const fetchData = async () => {
+    if (demandesApi) setDemandes(demandesApi)
+  }, [demandesApi])
+
+  // ✅ Un seul patch
+  const { patch } = useApi()
+
+  const updateStatus = (ref, newStatus, motif = '') => {
+    setDemandes(demandes.map(req =>
+      req.ligne_id === ref ? { ...req, statut_ligne: newStatus, motif_rejet: motif } : req
+    ))
+    setRejectingId(null)
+    setTempMotif('')
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
     try {
-      // On construit l'URL dynamiquement
-      let url = 'http://127.0.0.1:8000/demande';
-      
-      // Si ce n'est pas un magasinier, on ajoute le filtre département dans l'URL
-      if (user?.role !== 'Magasinier' && user?.role !== 'Admin') {
-        url += `?departement=${user.departement}`;
-      }
+      await patch('/demande/answer', form)
+      setForm({ reference: "", status: "", motif: "" })
+    } catch (err) { }
+  }
 
-      const response = await fetch(url, { method: 'GET', headers });
-      const result = await response.json();
-      setDemandes(result);
-    } catch (error) {
-      console.error("Erreur lors de la récupération:", error);
+  const handleAction = async (reference, id, nouveauStatut, motif = "") => {
+    let statutFinal = nouveauStatut
+
+    if (nouveauStatut === 'REJETEE') {
+      statutFinal = user?.role === 'Magasinier' ? 'REJETEE2' : 'REJETEE1'
+    } else if (nouveauStatut === 'APPROUVEE') {
+      statutFinal = user?.role === 'Magasinier' ? 'APPROUVEE2' : 'APPROUVEE1'
+    } else if (nouveauStatut === 'STOCK_INSUFFISANT') {
+      statutFinal = 'EN_ATTENTE_STOCK'
+    } else if (nouveauStatut === 'LIVREE') {
+      statutFinal = 'LIVREE'
+    } else if (nouveauStatut === 'ANNULER') {
+      statutFinal = 'BROULLION'
     }
-  };
 
-  if (user) fetchData();
-}, [user]);
+    updateStatus(id, nouveauStatut, motif)
 
-  
-    const filteredDemandes = demandes
-  .filter((dem) => {
-    // Filtre recherche (tu l'as déjà)
-    const matchSearch = dem.materiels
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase())
-    
-    // Filtre catégorie (à compléter)
-    const matchStatus = dem.statut
-    .toLowerCase()
-    .includes(searchStatus.toLowerCase()) // À toi de coder !
-    const matchDepartement = dem.departement
-    .toLowerCase()
-    .includes(searchDepartement.toLowerCase()) // À toi de coder !
-    
-    // Les deux doivent être vrais
+    try {
+      await patch('/demande/answer', { reference, ligne_id: id, status: statutFinal, motif })
+      setRejectingId(null)
+      setTempMotif("")
+    } catch (err) { }
+  }
+
+  const filteredDemandes = demandes.filter((dem) => {
+    const matchSearch = dem.materiels?.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchStatus = dem.statut?.toLowerCase().includes(searchStatus.toLowerCase())
+    const matchDepartement = dem.departement?.toLowerCase().includes(searchDepartement.toLowerCase())
     return matchSearch && matchStatus && matchDepartement
   })
+
   const statuts = [...new Set(demandes.map(dem => dem.statut))]
   const departements = [...new Set(demandes.map(dem => dem.departement))]
-  
-  
-  const handleSubmit = async (e)=>{
-    e.preventDefault();
-    try{
-          const response = await fetch('http://127.0.0.1:8000/demande/answer',{
-            method: 'PATCH', headers,body: JSON.stringify(form)});
-          if (!response.ok) {
-          const data = await response.json();
-          throw new Error(data.detail || "Erreur lors de la création");
-          }
-          setForm({reference:"",status:""});
-        }
-    catch (err) {
-      console.log(err)
-    } 
-  }
-  
-  
-  // Style du badge statut
-  const getStatutStyle = (statut) => {
-    const styles = {
-      SOUMISE: 'bg-blue-100 text-blue-800',
-      EN_TRAITEMENT: 'bg-yellow-100 text-yellow-800',
-      APPROUVEE1: 'bg-green-100 text-green-800',
-      APPROUVEE: 'bg-green-100 text-green-800',
-      REJETEE1: 'bg-red-100 text-red-800',
-      REJETEE: 'bg-red-100 text-red-800',
-      EN_ATTENTE_STOCK: 'bg-orange-100 text-orange-800',
-      LIVREE: 'bg-gray-100 text-gray-800',
-    }
-    return styles[statut] || 'bg-gray-100 text-gray-800'
-  }
-
-  // Texte du statut plus lisible
-  const getStatutLabel = (statut) => {
-    const labels = {
-      SOUMISE: 'Soumise',
-      EN_TRAITEMENT: 'En traitement',
-      APPROUVEE: 'Approuvée',
-      REJETEE: 'Rejetée',
-      EN_ATTENTE_STOCK: 'En attente stock',
-      LIVREE: 'Livrée',
-    }
-    return labels[statut] || statut
-  }
-
-  const handleAction = async (reference, id , nouveauStatut, motif = "") => {
-  // 1. Déterminer le statut final à envoyer au backend
-  let statutFinal = nouveauStatut;
-
-  if (nouveauStatut === 'REJETEE') {
-    // Si c'est un rejet, on garde ta logique REJETEE1 (ou tu peux aussi différencier par rôle ici)
-    statutFinal = user?.role === 'Magasinier' ? 'REJETEE2' : 'REJETEE1';
-  } else if (nouveauStatut === 'APPROUVEE') {
-    // LOGIQUE DE RÔLE :
-    // Si c'est le magasinier qui approuve, ça passe en APPROUVEE2
-    // Sinon (Responsable/Admin), ça reste en APPROUVEE1
-    statutFinal = user?.role === 'Magasinier' ? 'APPROUVEE2' : 'APPROUVEE1';
-  }else if (nouveauStatut === 'STOCK_INSUFFISANT') {
-    // Nouveau statut pour le magasinier
-    statutFinal = 'EN_ATTENTE_STOCK';
-  }else if (nouveauStatut === 'LIVREE') {
-    // Nouveau statut pour le magasinier
-    statutFinal = 'LIVREE';
-  }else if (nouveauStatut === 'ANNULER') {
-    // Statut final pour l'annulation par l'employé
-    statutFinal = 'BROULLION';
-  }
-
-
-  // 2. Mise à jour locale de l'UI
-  updateStatus(id,nouveauStatut, motif)
-
-  // 3. Préparation du payload avec le statut calculé
-  const payload = {
-    reference: reference,
-    ligne_id: id,
-    status: statutFinal, // Utilise la variable calculée ici
-    motif: motif
-  };
-
-  // 4. Appel API
-  try {
-    const response = await fetch('http://127.0.0.1:8000/demande/answer', {
-      method: 'PATCH',
-      headers: { 
-        'Content-Type': 'application/json',
-        // N'oublie pas tes headers d'autorisation si nécessaire
-        ...headers 
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error("Erreur détaillée :", errorData.detail);
-      // Optionnel : recharger les données pour annuler l'update local
-    } else {
-      setRejectingId(null);
-      setTempMotif("");
-    }
-  } catch (err) {
-    console.error("Erreur réseau :", err);
-  }
-  };
-
-  // On crée un dictionnaire des comptes
   const referenceCounts = demandes.reduce((acc, curr) => {
-    acc[curr.reference] = (acc[curr.reference] || 0) + 1;
-    return acc;
-  }, {});
+    acc[curr.reference] = (acc[curr.reference] || 0) + 1
+    return acc
+  }, {})
+  const renderedReferences = new Set()
 
-  // Pour savoir si on a déjà affiché la cellule pour cette référence
-  const renderedReferences = new Set();
+  const getStatutStyle = (statut) => {
+  const styles = {
+    SOUMISE:          'bg-blue-100 text-blue-800',
+    EN_TRAITEMENT:    'bg-yellow-100 text-yellow-800',
+    APPROUVEE1:       'bg-green-100 text-green-800',
+    APPROUVEE2:       'bg-green-100 text-green-800',
+    REJETEE1:         'bg-red-100 text-red-800',
+    REJETEE2:         'bg-red-100 text-red-800',
+    EN_ATTENTE_STOCK: 'bg-orange-100 text-orange-800',
+    EN_ATTENTE:       'bg-yellow-100 text-yellow-800',
+    LIVREE:           'bg-gray-100 text-gray-800',
+    BROULLION:        'bg-gray-100 text-gray-500',
+  }
+  return styles[statut] || 'bg-gray-100 text-gray-800'
+}
 
   return (
     <div className="w-full px-6 lg:px-10 py-8 space-y-8">
@@ -285,7 +189,7 @@ export default function Demandes() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase border-r border-gray-200 ">
                   Id ligne
                 </th>
-                {user?.role == 'Magasinier' && (
+                {user?.role == 'MAGASINIER' && (
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase border-r border-gray-200 ">
                     Département
                   </th>
@@ -308,18 +212,18 @@ export default function Demandes() {
 
             <tbody className="divide-y divide-gray-200">
               {filteredDemandes.filter((demande) => {
-                    if (user?.role === 'Responsable') {
+                    if (user?.role === 'RESPONSABLE') {
                       // Le responsable voit ce qu'il doit traiter (SOUMISE) 
                       // ET ce qu'il a déjà traité (APPROUVEE1 ou REJETEE1)
                       return ['SOUMISE', 'APPROUVEE1', 'REJETEE1'].includes(demande.statut);
                     }
 
-                    if (user?.role === 'Magasinier') {
+                    if (user?.role === 'MAGASINIER') {
                       // Le magasinier voit ce qu'il doit traiter (APPROUVEE1) 
                       // ET ce qu'il a validé (APPROUVEE2)
                       return ['APPROUVEE1', 'APPROUVEE2','REJETEE2','LIVREE'].includes(demande.statut);
                     }
-                    if (user?.role === 'Employe') {
+                    if (user?.role === 'EMPLOYE') {
                       // Le magasinier voit ce qu'il doit traiter (APPROUVEE1) 
                       // ET ce qu'il a validé (APPROUVEE2)
                     return ['APPROUVEE1','SOUMISE','REJETEE1','BROULLION'].includes(demande.statut);
@@ -403,7 +307,7 @@ export default function Demandes() {
                       )}
 
                       {/* Boutons d'approbation visible seulement pour responsable/admin */}
-                      {(user?.role === 'Responsable' || user?.role === 'Magasinier') &&
+                      {(user?.role === 'RESPONSABLE' || user?.role === 'Magasinier') &&
                         (
                           <>
                           {demande.statut_ligne === 'EN_ATTENTE' && (

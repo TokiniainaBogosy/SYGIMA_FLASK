@@ -1,43 +1,25 @@
-import { useState, useEffect } from 'react' // Importé useEffect
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useAuth } from '../../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
-import axios from 'axios' // NE PAS OUBLIER L'IMPORT D'AXIOS
+import { useApi } from '../../hooks/useApi'  // ✅ import
 
-// Constantes de validation
 const REGEX_EMAIL = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
 const REGEX_NAME = /[A-ZÀ-ÿ][a-zà-ÿ' -]+$/
 
 export default function RegisterParDepartement() {
-  const [departements, setDepartements] = useState([])
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [isLoadingDeps, setIsLoadingDeps] = useState(true) // AJOUTÉ : État pour le chargement des départements
-  
+
   const { registerAuth, error } = useAuth()
   const navigate = useNavigate()
-  
-  useEffect(() => {
-    const fetchDepartements = async () => {
-      try {
-        // 1. Récupérer le token
-        const token = localStorage.getItem('token');
-        // 2. Envoyer la requête avec le header Authorization
-        const response = await axios.get('http://127.0.0.1:8000/departement/', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }});
-        setDepartements(response.data) 
-      } catch (err) {
-        console.error("Impossible de charger les départements", err)
-      } finally {
-        setIsLoadingDeps(false) // Maintenant défini
-      }
-    }
-    fetchDepartements()
-  }, [])
+
+  // ✅ GET automatique — remplace useEffect + axios + useState(departements) + useState(isLoadingDeps)
+  const { data: departements, loading: isLoadingDeps } = useApi('/departement/')
+
+  // ✅ Pour le POST du formulaire
+  const { post, loading: isLoading } = useApi()
 
   const {
     register,
@@ -49,22 +31,18 @@ export default function RegisterParDepartement() {
   const password = watch('password')
 
   const onSubmit = async (data) => {
-    setIsLoading(true)
     try {
-      // CORRECTION : On utilise data.departement_id (le nom mis dans register)
       await registerAuth(
-        data.email, 
-        data.nom, 
-        data.prenom, 
-        data.password, 
-        data.role, 
+        data.email,
+        data.nom,
+        data.prenom,
+        data.password,
+        data.role,
         data.departement_id
       )
       navigate('/dashboard')
     } catch (error) {
       // Erreur gérée par le context
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -103,7 +81,7 @@ export default function RegisterParDepartement() {
               disabled={isLoading || isLoadingDeps}
             >
               <option value="">-- Choisissez un département --</option>
-              {departements.map((dep) => (
+              {(departements || []).map((dep) => (
                 <option key={dep.id} value={dep.id}>
                   {dep.nom}
                 </option>

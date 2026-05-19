@@ -1,0 +1,46 @@
+from flask import Blueprint, jsonify
+from datetime import datetime, timedelta
+from app.database import db
+from app.models.Materiel import Materiel
+from app.models.Demande import Demande, StatutDemande
+from app.models.Stock import Stock
+
+stats_bp = Blueprint("stats", __name__, url_prefix="/stats")
+
+
+@stats_bp.route("/dashboard", methods=["GET"])
+def show_stats():
+    total_materiels = db.session.query(Materiel).count()
+    total_demandes = db.session.query(Demande).count()
+    demandes_approuvees = db.session.query(Demande).filter(
+        Demande.statut == StatutDemande.APPROUVEE1
+    ).count()
+    alertes_stock = db.session.query(Stock).filter(
+        Stock.quantite_actuelle <= Stock.seuil_alerte
+    ).count()
+
+    # ─── ACTIVITÉ HEBDO ───────────────────────────────
+    il_y_a_7_jours = datetime.now() - timedelta(days=7)
+
+    demandes_recentes = db.session.query(Demande).filter(
+        Demande.date_soumission >= il_y_a_7_jours
+    ).all()
+
+    jours = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"]
+    compte = {j: 0 for j in jours}
+
+    for d in demandes_recentes:
+        jour_idx = d.date_soumission.weekday()
+        compte[jours[jour_idx]] += 1
+
+    activite_hebdo = [
+        {"label": j, "value": compte[j]} for j in jours
+    ]
+
+    return jsonify({
+        "total_materiels": total_materiels,
+        "total_demandes": total_demandes,
+        "demandes_approuvees": demandes_approuvees,
+        "alertes_stock": alertes_stock,
+        "activite_hebdo": activite_hebdo,
+    }), 200

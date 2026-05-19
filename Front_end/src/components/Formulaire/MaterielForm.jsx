@@ -1,194 +1,103 @@
 import { useState, useEffect } from "react";
+import { useApi } from "../../hooks/useApi";
 
-const SECTIONS = ["Stock", "Catégorie", "Matériel"]; // Ajout des autres sections
+const SECTIONS = ["Stock"];
 
 export default function MaterielForm() {
   const [active, setActive] = useState(0);
 
-  // Formulaires
-  const [stock, setStock] = useState({ materiel_id: "", departement_id: "", quantite: "" });
+  const [stock, setStock]         = useState({ materiel_id: "", departement_id: "", quantite: "" });
   const [categorie, setCategorie] = useState({ nom: "", description: "" });
-  const [materiel, setMateriel] = useState({ 
-    reference: "", 
-    designation: "", 
-    categorie_id: "", 
-    prix_unitaire: "", 
-    description: "" 
-  });
+  const [materiel, setMateriel]   = useState({ reference: "", designation: "", categorie_id: "", prix_unitaire: "", description: "" });
+  const [success, setSuccess]     = useState("");
 
-  // Données distantes
-  const [categories, setCategories] = useState([]);
-  const [materiels, setMateriels] = useState([]);
-  const [departements, setDepartements] = useState([]);
+  const { data: categories }     = useApi("/materiel/categorie")
+  const { data: materiels }      = useApi("/materiel/materiel")
+  const { data: departements }   = useApi("/departement/")
+  const { post, loading, error } = useApi()
 
-  // États
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-
-  const headers = {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
-  };
-
-  // 🔧 Fonction pour générer une référence automatique
-  const generateReference = (prefix = "MAT") => {
-    const date = new Date();
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-    
-    return `${prefix}-${year}${month}${day}-${random}`;
-  };
-
-  // 🔧 Générer référence unique basée sur le dernier ID
   const generateReferenceFromLastId = (lastId, prefix = "MAT") => {
-    const newId = (lastId + 1).toString().padStart(5, '0');
-    return `${prefix}-${newId}`;
-  };
+    return `${prefix}-${(lastId + 1).toString().padStart(5, '0')}`
+  }
+
+  const generateReference = (prefix = "MAT") => {
+    const lastId = (materiels || []).length > 0
+      ? Math.max(...(materiels || []).map(m => parseInt(m.id) || 0))
+      : 0
+    return generateReferenceFromLastId(lastId, prefix)
+  }
 
   useEffect(() => {
-    const load = async () => {
-      try {
-        const [c, m, d] = await Promise.all([
-          fetch("http://localhost:8000/materiel/categorie", { headers }).then(r => r.json()),
-          fetch("http://localhost:8000/materiel/materiel", { headers }).then(r => r.json()),
-          fetch("http://localhost:8000/departement", { headers }).then(r => r.json()),
-        ]);
-        setCategories(c || []);
-        setMateriels(m || []);
-        setDepartements(d || []);
-      } catch (e) {
-        console.error("Erreur chargement données", e);
-      }
-    };
-    load();
-  }, []);
-
-  // 🔧 Quand on ouvre le formulaire matériel, générer auto une référence
-  useEffect(() => {
-    if (active === 2) { // Section Matériel
-      // Option 1 : Générer une référence aléatoire
-      const autoRef = generateReference("MAT");
-      
-      // Option 2 : Basée sur le dernier ID existant
-      const lastId = materiels.length > 0 ? Math.max(...materiels.map(m => parseInt(m.id) || 0)) : 0;
-      const autoRefFromId = generateReferenceFromLastId(lastId, "MAT");
-      
-      setMateriel(prev => ({ ...prev, reference: autoRefFromId }));
+    if (active === 2 && materiels) {
+      const lastId = materiels.length > 0 ? Math.max(...materiels.map(m => parseInt(m.id) || 0)) : 0
+      setMateriel(prev => ({ ...prev, reference: generateReferenceFromLastId(lastId, "MAT") }))
     }
-  }, [active, materiels]);
+  }, [active, materiels])
 
-  const reset = () => {
-    setError("");
-    setSuccess("");
-  };
+  const reset = () => setSuccess("")
 
-  // 🔧 Soumission catégorie
   const handleSubmitCategorie = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    reset();
+    e.preventDefault()
+    reset()
     try {
-      const res = await fetch("http://localhost:8000/materiel/categorie", {
-        method: "POST",
-        headers,
-        body: JSON.stringify(categorie),
-      });
-      if (!res.ok) throw new Error((await res.json()).detail || "Erreur");
-      setCategorie({ nom: "", description: "" });
-      setSuccess("Catégorie ajoutée avec succès !");
-      // Recharger les catégories
-      const updated = await fetch("http://localhost:8000/materiel/categorie", { headers }).then(r => r.json());
-      setCategories(updated || []);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+      await post("/materiel/categorie", categorie)
+      setCategorie({ nom: "", description: "" })
+      setSuccess("Catégorie ajoutée avec succès !")
+    } catch (err) { }
+  }
 
-  // 🔧 Soumission matériel (avec référence auto)
   const handleSubmitMateriel = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    reset();
+    e.preventDefault()
+    reset()
     try {
-      const res = await fetch("http://localhost:8000/materiel/materiel", {
-        method: "POST",
-        headers,
-        body: JSON.stringify({
-          reference: materiel.reference, // Référence automatique
-          designation: materiel.designation,
-          categorie_id: parseInt(materiel.categorie_id),
-          prix_unitaire: parseFloat(materiel.prix_unitaire) || 0,
-          description: materiel.description,
-        }),
-      });
-      if (!res.ok) throw new Error((await res.json()).detail || "Erreur");
-      setMateriel({ reference: "", designation: "", categorie_id: "", prix_unitaire: "", description: "" });
-      setSuccess("Matériel ajouté avec succès !");
-      // Recharger les matériels
-      const updated = await fetch("http://localhost:8000/materiel/materiel", { headers }).then(r => r.json());
-      setMateriels(updated || []);
-      // Générer nouvelle référence pour le prochain
-      const lastId = updated.length > 0 ? Math.max(...updated.map(m => parseInt(m.id) || 0)) : 0;
-      setMateriel(prev => ({ ...prev, reference: generateReferenceFromLastId(lastId, "MAT") }));
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+      await post("/materiel/materiel", {
+        reference:     materiel.reference,
+        designation:   materiel.designation,
+        categorie_id:  parseInt(materiel.categorie_id),
+        prix_unitaire: parseFloat(materiel.prix_unitaire) || 0,
+        description:   materiel.description,
+      })
+      const lastId = (materiels || []).length > 0
+        ? Math.max(...(materiels || []).map(m => parseInt(m.id) || 0))
+        : 0
+      setMateriel({ reference: generateReferenceFromLastId(lastId + 1, "MAT"), designation: "", categorie_id: "", prix_unitaire: "", description: "" })
+      setSuccess("Matériel ajouté avec succès !")
+    } catch (err) { }
+  }
 
-  // 🔧 Soumission stock
   const handleSubmitStock = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    reset();
+    e.preventDefault()
+    reset()
     try {
-      const res = await fetch("http://localhost:8000/materiel/stock", {
-        method: "POST",
-        headers,
-        body: JSON.stringify({
-          materiel: stock.materiel_id,
-          departement_id: parseInt(stock.departement_id),
-          quantite: parseInt(stock.quantite),
-        }),
-      });
-      if (!res.ok) throw new Error((await res.json()).detail || "Erreur");
-      setStock({ materiel_id: "", departement_id: "", quantite: "" });
-      setSuccess("Stock ajouté avec succès !");
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+      await post("/materiel/stock", {
+        materiel:       stock.materiel_id,
+        departement_id: parseInt(stock.departement_id),
+        quantite:       parseInt(stock.quantite),
+      })
+      setStock({ materiel_id: "", departement_id: "", quantite: "" })
+      setSuccess("Stock ajouté avec succès !")
+    } catch (err) { }
+  }
 
-  const inputClass = "w-full px-4 py-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition placeholder-gray-400";
+  const inputClass = "w-full px-4 py-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition placeholder-gray-400"
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-lg">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-          {/* Header */}
+
           <div className="mb-6">
             <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">Gestion des matériels</h1>
             <p className="text-sm text-gray-500 mt-1">Créez une catégorie, un matériel ou ajoutez du stock</p>
           </div>
 
-          {/* Tabs */}
           <div className="flex gap-1 bg-gray-100 p-1 rounded-xl mb-6">
             {SECTIONS.map((s, i) => (
               <button
                 key={i}
                 onClick={() => { setActive(i); reset(); }}
                 className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-                  active === i
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "text-gray-500 hover:text-gray-700"
+                  active === i ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
                 }`}
               >
                 {s}
@@ -196,7 +105,6 @@ export default function MaterielForm() {
             ))}
           </div>
 
-          {/* Feedback */}
           {success && (
             <div className="mb-5 px-4 py-3 bg-green-50 border border-green-100 rounded-xl flex items-center gap-2">
               <svg className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -239,7 +147,7 @@ export default function MaterielForm() {
             </form>
           )}
 
-          {/* Section Matériel AVEC RÉFÉRENCE AUTO */}
+          {/* Section Matériel */}
           {active === 2 && (
             <form onSubmit={handleSubmitMateriel} className="space-y-5">
               <div>
@@ -273,7 +181,7 @@ export default function MaterielForm() {
                   className={inputClass}
                 >
                   <option value="">Sélectionner une catégorie</option>
-                  {categories.map(c => (
+                  {(categories || []).map(c => (
                     <option key={c.id} value={c.id}>{c.nom}</option>
                   ))}
                 </select>
@@ -300,12 +208,12 @@ export default function MaterielForm() {
                   className={inputClass}
                 />
               </div>
-              <Buttons loading={loading} onReset={() => setMateriel({ 
-                reference: generateReference("MAT"), 
-                designation: "", 
-                categorie_id: "", 
-                prix_unitaire: "", 
-                description: "" 
+              <Buttons loading={loading} onReset={() => setMateriel({
+                reference: generateReference("MAT"),
+                designation: "",
+                categorie_id: "",
+                prix_unitaire: "",
+                description: ""
               })} />
             </form>
           )}
@@ -322,7 +230,7 @@ export default function MaterielForm() {
                   className={inputClass}
                 >
                   <option value="">Sélectionner un matériel</option>
-                  {materiels.map(m => (
+                  {(materiels || []).map(m => (
                     <option key={m.id} value={m.designation}>
                       {m.designation} — {m.reference}
                     </option>

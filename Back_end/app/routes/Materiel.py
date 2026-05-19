@@ -48,8 +48,9 @@ def read_categorie_route():
 @materiel_bp.route("/stock", methods=["POST"])
 def create_stock_route():
     current_user = get_current_user()
+    current_user_entreprise = get_current_user_entreprise()
     data = StockCreateSchema().load(request.get_json())
-    result = create_stock(data, current_user)
+    result = create_stock(data, current_user, current_user_entreprise)
     return jsonify(StockResponseSchema().dump(result)), 201
 
 

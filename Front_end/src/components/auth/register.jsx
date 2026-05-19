@@ -5,16 +5,19 @@ import {
   Building2, Hash, MapPin, Image as ImageIcon, 
   ArrowRight, Loader2, Boxes, User, Mail, Lock, Eye, EyeOff, ChevronLeft 
 } from 'lucide-react'
+import { useApi } from '../../hooks/useApi'  // ✅ import
 
 const REGEX_EMAIL = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
 
 export default function RegisterEntreprise({ inModal = false }) {
   const [step, setStep] = useState(1)
-  const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [enterpriseData, setEnterpriseData] = useState(null)
   
   const navigate = useNavigate()
+
+  // ✅ Remplace useState(isLoading) + fetch manuel
+  const { post, loading, error } = useApi()
 
   const {
     register,
@@ -25,16 +28,12 @@ export default function RegisterEntreprise({ inModal = false }) {
 
   const password = watch('password')
 
-  // Validation de l'étape 1 (Entreprise)
   const onStepOneSubmit = (data) => {
     setEnterpriseData(data)
     setStep(2)
   }
 
-  // Validation finale (Entreprise + Admin)
   const onFinalSubmit = async (adminData) => {
-  setIsLoading(true);
-  try {
     const fullPayload = {
       entreprise: {
         nom: enterpriseData.nom,
@@ -49,28 +48,17 @@ export default function RegisterEntreprise({ inModal = false }) {
         password: adminData.password,
         role: 'Admin'
       }
-    };
-
-    const response = await fetch('http://127.0.0.1:8000/entreprises/setup-entreprise', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(fullPayload),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.detail || "Erreur lors de la création");
     }
 
-    navigate('/dashboard');
-  } catch (error) {
-    alert(error.message);
-  } finally {
-    setIsLoading(false);
+    try {
+      // ✅ Remplace le fetch POST manuel
+      await post('/entreprises/setup-entreprise', fullPayload)
+      navigate('/dashboard')
+    } catch (e) {
+      // L'erreur est déjà stockée dans `error` par le hook
+      alert(error || e.message)
+    }
   }
-};
 
   return (
     <div className={`${inModal ? '' : 'min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-blue-50/30 to-indigo-50/30 px-4 py-8'} rounded-2xl`}>

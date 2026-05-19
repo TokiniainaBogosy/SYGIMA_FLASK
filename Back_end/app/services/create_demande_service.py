@@ -6,10 +6,11 @@ from app.models.Materiel import Materiel
 from app.models.User import User
 from app.models.Departement import Departement
 from app.models.ResponsableDepartement import ResponsableDepartement
+from app.models.Demande import StatutDemande
 import uuid
 
 
-def create_demande(data: dict, current_user: User):
+def create_demande(data: dict, current_user,current_user_entreprise):
     results = (
         db.session.query(
             User.id,
@@ -32,7 +33,8 @@ def create_demande(data: dict, current_user: User):
             demandeur_id=current_user.id,
             departement_id=current_user.departement_id,
             responsable_id=results.responsable_id,
-            statut="SOUMISE"
+            statut=StatutDemande.SOUMISE.value,
+            entreprise_id=current_user_entreprise.entreprise_id
         )
         db.session.add(db_demande)
         db.session.flush()  # Récupère l'ID sans valider la transaction globale

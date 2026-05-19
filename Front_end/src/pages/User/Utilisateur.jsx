@@ -1,4 +1,5 @@
-import { useState,useEffect } from 'react'
+import { useState} from 'react'
+import { useApi } from '../../hooks/useApi'  
 
 export default function Utilisateur() {
   // State pour afficher/masquer le formulaire
@@ -6,30 +7,9 @@ export default function Utilisateur() {
   const [editingUser, setEditingUser] = useState(null)
   const [deletingUser, setDeleteUser] = useState(null)
 
-const [data,setData] = useState([])
-
-  const headers = {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
-  };
-
-  useEffect (()=>{
-      const fetchData = async () =>{
-        try{
-          const response = await fetch('http://127.0.0.1:8000/api/v1/user',{
-            method: 'GET', headers});
-          const result = await response.json();
-          setData(result)
-        }
-        catch(error){
-          console.error("Erreur lors de la récupération:", error);
-        }
-      }
-      fetchData();
-    },[])  
-
+  const { data } = useApi('/api/v1/user')
   // Fausses données utilisateurs (on remplacera par des vraies depuis le Backend)
-  const utilisateurs = [...data]
+  const utilisateurs = data || []  
 
   // Fonction pour ouvrir le formulaire de modification
   const handleEdit = (user) => {
