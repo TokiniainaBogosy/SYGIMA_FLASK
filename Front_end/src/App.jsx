@@ -4,28 +4,17 @@ import Login from './components/auth/login'
 import Register from './components/auth/register'
 import DashBoard from './pages/Dashboard'
 import ProtectedRoute from './components/ProtectedRoute'
-// import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import MaterielForm from './components/Formulaire/MaterielForm'
-// import Login from './pages/Login';
 import Accueil from './pages/User/Accueil';
 import AdminDashboard from './pages/Admin/AdminDashboardToki';
 import SoumettreDemande from './pages/User/SoumettreDemande'
-
 import './index.css'
-
-// import LoginForm from './components/Formulaire/LoginForm';
 import { useEffect, useState } from 'react';
 import TraitementDemande from './pages/Fournisseur/TraitementDemande';
 import ListDepartement from './pages/Admin/ListDepartement';
 import CategorieMateriel from './pages/Fournisseur/CategorieMateriel';
-// import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-// import { AuthProvider } from './context/AuthContext'
-// import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
-// import ProtectedRoute from './components/ProtectedRoute'
 import Navbar from './components/Header/Navbar';
-
-
 import Layout from './components/layout/Layout'
 import Stock from './pages/Admin/Stock'
 import Demandes from './pages/Admin/Demandes'
@@ -38,6 +27,8 @@ import LandingLayout from './pages/Landing/layout/layout'
 import Features from './pages/Landing/features'
 import Pricing from './pages/Landing/Pricing'
 import RegisterParDepartement from './components/auth/registerParDepartement'
+
+
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
