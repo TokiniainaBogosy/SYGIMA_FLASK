@@ -3,7 +3,7 @@ from app.database import db
 from app.models.Departement import Departement
 
 
-def read_departement(current_user):
+def read_departement(current_user: dict):
     departements = Departement.query.filter(
         Departement.entreprise_id == current_user.entreprise_id
     ).all()

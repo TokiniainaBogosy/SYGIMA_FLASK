@@ -16,7 +16,7 @@ class CategoriesMateriel(db.Model):  # ← hérite de db.Model au lieu de Base
     __tablename__ = "categories_materiel"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    entreprise_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("entreprises.id"), index=True)
+    entreprise_id: Mapped[int] = mapped_column(Integer, ForeignKey("entreprises.id"), index=True)
     nom: Mapped[str] = mapped_column(String(100))
     description: Mapped[str | None] = mapped_column(String(500))
     is_global: Mapped[bool] = mapped_column(Boolean, default=False)

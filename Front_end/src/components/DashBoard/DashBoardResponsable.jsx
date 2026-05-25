@@ -55,7 +55,7 @@ export default function DashBoardResponsable() {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   // const [stats, setStats] = useState(null)
   const { data: stats, loading: statsLoading, error: statsError } = 
-    useApi("/stats/dashboard")
+    useApi("/dashboard/stats")
   const { data: demandes, loading: demandesLoading, error: demandesError } = 
     useApi("/demande/")
     // const STATS_DEMANDES = demandes.
@@ -103,7 +103,7 @@ export default function DashBoardResponsable() {
 
   const quickStats = [
     { label: 'Matériels en stock', value: stats?.total_materiels ?? 0, icon: Package, color: 'blue', trend: 'up', trendValue: '+5%' },
-    { label: 'Demandes en cours', value: stats?.total_demandes ?? 0, icon: ClipboardList, color: 'orange', trend: null, trendValue: '3 urgents' },
+    { label: 'Total des demandes', value: stats?.total_demandes ?? 0, icon: ClipboardList, color: 'orange', trend: null, trendValue: '3 urgents' },
     { label: 'Demandes approuvées', value: stats?.demandes_approuvees ?? 0, icon: CheckCircle2, color: 'green', trend: 'up', trendValue: '+12%' },
     { label: 'Alertes stock', value: stats?.alertes_stock ?? 0, icon: AlertTriangle, color: 'red', trend: 'down', trendValue: '-1' },
   ];

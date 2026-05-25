@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-
+import { useApi } from '../../hooks/useApi';
 const StockManager = ({ selectedStock, setSelectedStock, setStocks, newDesignation, setNewDesignation, newUnite, setNewUnite }) => {
 
   // 3. Envoyer la modification (PATCH)
-  const { patch } = useApi()
+  const { patch } = useApi();
 
 const handleUpdate = async (e) => {
   e.preventDefault()

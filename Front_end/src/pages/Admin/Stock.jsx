@@ -11,8 +11,8 @@ export default function Stock() {
   // ✅ Correction 1 : useApi retourne déjà les données
   const { data: stocklist, loading: stocklistLoading, error: stocklistError } = 
     useApi('materiel/stockList')
-  const [searchCategorie, setsearchCategorie] = useState('')
-  const [searchDepartement, setearchDepartement] = useState('')
+  const [searchCategorie, setSearchCategorie] = useState('')
+  const [searchDepartement, setSearchDepartement] = useState('')
   const [selectedStock, setSelectedStock] = useState(null)
   const [newUnite, setNewUnite] = useState("");
   const [data,setData] = useState([])
@@ -63,7 +63,7 @@ export default function Stock() {
     )
   }
   
-
+  console.log(materiels);
   return (
     <div className="p-6">
       {/* En-tête de la page */}

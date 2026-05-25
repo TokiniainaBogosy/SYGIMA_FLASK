@@ -3,7 +3,7 @@ from app.database import db
 from app.models.CategoriesMateriel import CategoriesMateriel
 
 
-def create_categorie(data: dict):
+def create_categorie(data: dict,current_user_entreprise):
     existing = CategoriesMateriel.query.filter(
         CategoriesMateriel.nom == data.get("nom")
     ).first()
@@ -13,7 +13,8 @@ def create_categorie(data: dict):
 
     db_categorie = CategoriesMateriel(
         nom=data.get("nom"),
-        description=data.get("description")
+        description=data.get("description"),
+        entreprise_id=current_user_entreprise.id
     )
 
     try:

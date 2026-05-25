@@ -4,6 +4,7 @@ from app.schemas.ligneDemande import CreateDemandeGlobalSchema
 from app.schemas.demande import DemandeResponseSchema, DemandeListResponseSchema, StatusUpdateSchema
 from app.services.create_demande_service import create_demande
 from app.services.answer_demande_service import modifier_statut_demande
+from app.services.read_demande_list_Departement import read_demande_global
 from app.services.read_demande_list_service import read_demande_list, read_demande_list_departement
 from app.utils.auth import get_current_user , get_current_user_entreprise
 
@@ -23,16 +24,25 @@ def create_demande_route():
 @demande_bp.route("/", methods=["GET"])
 def read_demande_list_route():
     current_user = get_current_user()
+    current_user_entreprise = get_current_user_entreprise()
     limit = request.args.get("limit", None, type=int)  # ← query param optionnel
-    result = read_demande_list(current_user, limit)
+    result = read_demande_list(current_user, current_user_entreprise, limit)
     return jsonify(DemandeListResponseSchema(many=True).dump(result)), 200
 
 
 @demande_bp.route("/departement", methods=["GET"])
 def read_demande_list_departement_route():
     current_user = get_current_user()
-    result = read_demande_list_departement(current_user)
+    current_user_entreprise = get_current_user_entreprise()
+    result = read_demande_list_departement(current_user, current_user_entreprise)
     return jsonify(DemandeListResponseSchema(many=True).dump(result)), 200
+
+@demande_bp.route("/departement/global", methods=["GET"])
+def read_demande_list_departement_global_route():
+    current_user = get_current_user()
+    current_user_entreprise = get_current_user_entreprise()
+    result = read_demande_global(current_user, current_user_entreprise)
+    return jsonify(result), 200
 
 
 @demande_bp.route("/answer", methods=["PATCH"])

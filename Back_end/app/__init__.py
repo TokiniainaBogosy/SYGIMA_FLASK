@@ -20,11 +20,13 @@ def create_app():
     from app.routes.User import user_bp
     from app.routes.Stats import stats_bp
     from app.routes.Current_user import current_user_bp
+    from app.routes.Dashboard import dashboard_bp
 
     app.register_blueprint(current_user_bp)
     app.register_blueprint(stats_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(departement_bp)
+    app.register_blueprint(dashboard_bp)
     app.register_blueprint(demande_bp)
     app.register_blueprint(entreprise_bp)
     app.register_blueprint(materiel_bp)

@@ -55,7 +55,7 @@ export default function DashBoardEmploye() {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   // const [stats, setStats] = useState(null)
   const { data: stats, loading: statsLoading, error: statsError } = 
-    useApi("/stats/dashboard")
+    useApi("/dashboard/stats")
   const { data: demandes, loading: demandesLoading, error: demandesError } = 
     useApi("/v1/demande/")
     // const STATS_DEMANDES = demandes.

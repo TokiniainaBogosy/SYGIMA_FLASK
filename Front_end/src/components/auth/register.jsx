@@ -184,10 +184,10 @@ export default function RegisterEntreprise({ inModal = false }) {
             <div className="flex flex-col gap-3">
               <button
                 type="submit"
-                disabled={isLoading}
+                disabled={loading}
                 className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 group"
               >
-                {isLoading ? (
+                {loading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
                   <>

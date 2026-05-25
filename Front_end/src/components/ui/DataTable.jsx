@@ -1,4 +1,5 @@
 import { ChevronLeft, ChevronRight, Package } from 'lucide-react';
+import { useApi } from '../../hooks/useApi';
 import StatusBadge from './StatusBadge';
 
 export default function DataTable({ 
@@ -11,6 +12,7 @@ export default function DataTable({
   emptyMessage = "Aucune donnée disponible",
   maxRows = 5 
 }) {
+
   if (loading) {
     return (
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -43,11 +45,6 @@ export default function DataTable({
           <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
           {subtitle && <p className="text-sm text-gray-500 mt-0.5">{subtitle}</p>}
         </div>
-        {data.length > 0 && (
-          <span className="text-sm text-gray-500 bg-gray-50 px-3 py-1 rounded-full">
-            {data.length} au total
-          </span>
-        )}
       </div>
 
       {data.length === 0 ? (
@@ -74,15 +71,60 @@ export default function DataTable({
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {data.slice(0, maxRows).map((row, i) => (
-                  <tr key={row.id || i} className="hover:bg-gray-50/50 transition-colors">
-                    {columns.map((col, j) => (
-                      <td key={j} className={`px-6 py-4 ${col.className || 'text-sm text-gray-900'}`}>
-                        {col.render ? col.render(row) : row[col.key]}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
+                {data.slice(0, maxRows).map((row, i, array) => {
+
+                  // Vérifie si c'est la première ligne du groupe
+                  const isFirstRow =
+                    i === 0 ||
+                    array[i - 1].reference !== row.reference
+
+                  // Nombre de lignes ayant la même référence
+                  const rowSpanCount = array.filter(
+                    item => item.reference === row.reference
+                  ).length
+
+                  return (
+                    <tr
+                      key={row.id || i}
+                      className="hover:bg-gray-50/50 transition-colors"
+                    >
+
+                      {columns.map((col, j) => {
+
+                        // Cas spécial pour la colonne reference
+                        if (col.key === "reference") {
+
+                          // Afficher seulement sur la première ligne
+                          if (!isFirstRow) return null
+
+                          return (
+                            <td
+                              key={j}
+                              rowSpan={rowSpanCount}
+                              className={`px-6 py-4  ${
+                                col.className || 'text-sm text-gray-900'
+                              }`}
+                            >
+                              {row.reference}
+                            </td>
+                          )
+                        }
+
+                        // Colonnes normales
+                        return (
+                          <td
+                            key={j}
+                            className={`px-6 py-4 ${
+                              col.className || 'text-sm text-gray-900'
+                            }`}
+                          >
+                            {col.render ? col.render(row) : row[col.key]}
+                          </td>
+                        )
+                      })}
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>

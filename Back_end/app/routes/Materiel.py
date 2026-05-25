@@ -7,7 +7,7 @@ from app.services.read_categorie_service import read_categorie
 from app.services.create_materiel_service import create_materiel
 from app.services.read_materiel_service import read_materiel, read_materiel_list
 from app.services.create_stock_service import create_stock
-from app.services.read_stock_service import read_stock_list
+from app.services.read_stock_list_service import read_stock_list
 from app.services.delete_material_service import delete_materiel
 from app.services.delete_categorie_service import delete_categorie
 from app.services.update_categorie_service import update_categorie
@@ -22,7 +22,7 @@ materiel_bp = Blueprint("materiel", __name__, url_prefix="/materiel")
 @materiel_bp.route("/categorie", methods=["POST"])
 def create_categorie_route():
     data = CategorieBaseSchema().load(request.get_json())
-    result = create_categorie(data)
+    result = create_categorie(data,get_current_user_entreprise())
     return jsonify(CategorieBaseSchema().dump(result)), 201
 
 
@@ -35,13 +35,15 @@ def create_materiel_route():
 
 @materiel_bp.route("/materiel", methods=["GET"])
 def read_materiel_route():
-    result = read_materiel()
+    user_entreprise = get_current_user_entreprise()
+    result = read_materiel(user_entreprise)
     return jsonify(MaterielResponseSchema(many=True).dump(result)), 200
 
 
 @materiel_bp.route("/categorie", methods=["GET"])
 def read_categorie_route():
-    result = read_categorie()
+    current_user_entreprise = get_current_user_entreprise()
+    result = read_categorie(current_user_entreprise)
     return jsonify(CategorieResponseSchema(many=True).dump(result)), 200
 
 
@@ -64,14 +66,15 @@ def update_stock_route(stock_id: int):
 @materiel_bp.route("/stockList", methods=["GET"])
 def read_stock_list_route():
     current_user = get_current_user()
-    result = read_stock_list(current_user)
+    current_user_entreprise = get_current_user_entreprise()
+    result = read_stock_list(current_user, current_user_entreprise)
     return jsonify(StockListResponseSchema(many=True).dump(result)), 200
 
 
 @materiel_bp.route("/materielList", methods=["GET"])
 def read_materiel_list_route():
-    current_user = get_current_user()
-    result = read_materiel_list()
+    current_user_entreprise = get_current_user_entreprise()
+    result = read_materiel_list(current_user_entreprise)
     return jsonify(MaterielListResponseSchema(many=True).dump(result)), 200
 
 

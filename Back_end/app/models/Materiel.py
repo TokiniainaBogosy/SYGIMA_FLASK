@@ -23,7 +23,7 @@ class Materiel(db.Model):  # ← changement
     entreprise_id: Mapped[int] = mapped_column(Integer, ForeignKey("entreprises.id"), index=True)
     categorie_id: Mapped[int] = mapped_column(Integer, ForeignKey("categories_materiel.id"), index=True)
     departement_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("departements.id"), index=True)
-    reference: Mapped[str] = mapped_column(String(50), unique=True, index=True)
+    reference: Mapped[str] = mapped_column(String(50), index=True)
     designation: Mapped[str] = mapped_column(String(255))
     unite: Mapped[str] = mapped_column(String(50))
     is_global: Mapped[bool] = mapped_column(Boolean, default=False)

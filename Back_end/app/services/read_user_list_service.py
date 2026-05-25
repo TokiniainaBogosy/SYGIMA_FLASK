@@ -3,7 +3,7 @@ from app.models.User import User
 from app.models.Departement import Departement
 
 
-def read_user_list(current_user: User):
+def read_user_list(current_user: User, current_user_entreprise: dict):
     results = (
         db.session.query(
             User.id,
@@ -16,6 +16,7 @@ def read_user_list(current_user: User):
             Departement.nom.label("departement"),
         )
         .join(Departement, Departement.id == User.departement_id)  # ← bug corrigé (était User.id)
+        .filter(User.entreprise_id == current_user_entreprise.id)
         .all()
     )
 

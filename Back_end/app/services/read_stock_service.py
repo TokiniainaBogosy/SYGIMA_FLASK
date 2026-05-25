@@ -14,7 +14,7 @@ def read_stock():
     return stocks
 
 
-def read_stock_list(current_user: User):
+def read_stock_list(current_user: User, current_user_entreprise: dict):
     results = (
         db.session.query(
             Stock.id,
@@ -30,6 +30,7 @@ def read_stock_list(current_user: User):
         .join(CategoriesMateriel, Materiel.categorie_id == CategoriesMateriel.id)
         .join(Departement, Stock.departement_id == Departement.id)
         .filter(Stock.departement_id == current_user.departement_id)
+        .filter(Stock.entreprise_id == current_user_entreprise.id)
         .all()
     )
 

@@ -8,7 +8,7 @@ from app.models.LigneDemande import LigneDemande
 from sqlalchemy import case
 
 
-def read_demande_list_departement(current_user: User):
+def read_demande_list_departement(current_user: User, current_user_entreprise):
     results = (
         db.session.query(
             Demande.id,
@@ -22,15 +22,17 @@ def read_demande_list_departement(current_user: User):
             Demande.reference,
             User.nom.label("demandeur"),
             Demande.statut,
-            Demande.date_soumission.label("date"),
+            Demande.date_soumission,
             Departement.nom.label("departement"),
-            Materiel.designation.label("materiels")
+            Materiel.designation.label("materiels"),
+            Demande.date_traitement
         )
         .join(User, Demande.demandeur_id == User.id)
         .join(LigneDemande, Demande.id == LigneDemande.demande_id)
         .join(Materiel, LigneDemande.materiel_id == Materiel.id)
         .join(Departement, Demande.departement_id == Departement.id)
         .filter(Demande.departement_id == current_user.departement_id)
+        .filter(Demande.entreprise_id == current_user_entreprise.entreprise_id)
         .all()
     )
 
@@ -38,3 +40,6 @@ def read_demande_list_departement(current_user: User):
     #     abort(404, description="Aucune demande trouvée pour ce département.")
 
     return [dict(row._mapping) for row in results]
+
+def read_demande_global(current_user: User, current_user_entreprise: dict):
+    return Demande.query.filter(Demande.departement_id == current_user.departement_id, Demande.entreprise_id == current_user_entreprise.entreprise_id).all()

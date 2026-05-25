@@ -100,7 +100,7 @@ export default function DashBoardAdmin() {
     logout();
     navigate('/login');
   };
-
+  
   const quickStats = [
     { label: 'Matériels en stock', value: stats?.total_materiels ?? 0, icon: Package, color: 'blue', trend: 'up', trendValue: '+5%' },
     { label: 'Demandes en cours', value: stats?.total_demandes ?? 0, icon: ClipboardList, color: 'orange', trend: null, trendValue: '3 urgents' },
@@ -221,8 +221,8 @@ export default function DashBoardAdmin() {
             </div>
             <div className="p-6">
               {stats?.activite_hebdo && (
-  <ActivityChart data={stats.activite_hebdo} height={220} />
-)}
+              <ActivityChart data={stats.activite_hebdo} height={220} />
+            )}
             </div>
           </div>
         </div>

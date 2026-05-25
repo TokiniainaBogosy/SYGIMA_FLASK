@@ -5,11 +5,12 @@ from app.models.User import User
 from app.models.Materiel import Materiel
 from app.models.Departement import Departement
 from app.models.LigneDemande import LigneDemande
+from app.models.UserEntreprise import UserEntreprise
 from sqlalchemy import case
 from typing import Optional
 
 
-def read_demande_list_departement(current_user: User):
+def read_demande_list_departement(current_user: User,current_user_entreprise: dict):
     results = (
         db.session.query(
             Demande.id,
@@ -23,15 +24,20 @@ def read_demande_list_departement(current_user: User):
             Demande.reference,
             User.nom.label("demandeur"),
             Demande.statut,
-            Demande.date_soumission.label("date"),
+            Demande.date_soumission,
+            Demande.date_soumission.label("date_soumission"),
+            Demande.date_traitement,
+            Demande.entreprise_id,
             Departement.nom.label("departement"),
             Materiel.designation.label("materiels")
         )
         .join(User, Demande.demandeur_id == User.id)
+        .join(UserEntreprise, User.id == UserEntreprise.user_id)
         .join(LigneDemande, Demande.id == LigneDemande.demande_id)
         .join(Materiel, LigneDemande.materiel_id == Materiel.id)
         .join(Departement, Demande.departement_id == Departement.id)
-        .filter(Demande.departement_id == current_user.departement_id)
+        .filter(Demande.departement_id == current_user.departement_id,Demande.entreprise_id == current_user_entreprise.entreprise_id)
+        .filter(Demande.entreprise_id == current_user_entreprise.entreprise_id)
         .all()
     )
 
@@ -41,7 +47,7 @@ def read_demande_list_departement(current_user: User):
     return [dict(row._mapping) for row in results]
 
 
-def read_demande_list(current_user: User, limit: Optional[int] = None):
+def read_demande_list(current_user: User, current_user_entreprise: dict, limit: Optional[int] = None):
     query = (
         db.session.query(
             Demande.id,
@@ -55,14 +61,18 @@ def read_demande_list(current_user: User, limit: Optional[int] = None):
             Demande.reference,
             User.nom.label("demandeur"),
             Demande.statut,
+            Demande.date_soumission,
             Demande.date_soumission.label("date"),
+            Demande.date_traitement,
             Departement.nom.label("departement"),
-            Materiel.designation.label("materiels")
+            Materiel.designation.label("materiels"),
+            Demande.entreprise_id
         )
         .join(User, Demande.demandeur_id == User.id)
         .join(LigneDemande, Demande.id == LigneDemande.demande_id)
         .join(Materiel, LigneDemande.materiel_id == Materiel.id)
         .join(Departement, Demande.departement_id == Departement.id)
+        .filter(Demande.entreprise_id == current_user_entreprise.entreprise_id)
         .order_by(Demande.date_soumission.desc())
     )
 

@@ -22,6 +22,7 @@ class MaterielListResponseSchema(Schema):
     reference = fields.Str(dump_only=True)
     designation = fields.Str(dump_only=True)
     unite = fields.Str(dump_only=True)
+    entreprise_id = fields.Int(dump_only=True)
 
 
 class MaterielUpdateSchema(Schema):
