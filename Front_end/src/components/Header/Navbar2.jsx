@@ -86,7 +86,12 @@ const Navbar2 = () => {
       {
         id: "utilisateurs", label: "Utilisateurs", path: '/utilisateur',
         roles: ['Admin']
+      },
+      {
+        id: "materielAdmin", label: "MaterielAdmin", path: '/MaterielAdmin',
+        roles: ['Admin']
       }
+
     ]
     
       // ━━━━━━━━━━━━━━━━━━━━━━━━━

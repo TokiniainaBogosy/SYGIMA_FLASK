@@ -59,6 +59,12 @@ export default function Navbar({ onLogout, user }) {
       path: '/departements', 
       roles: ['ADMIN']
     },
+    {
+      icon: Boxes, 
+      label: 'MaterielAdmin', 
+      path: '/MaterielAdmin', 
+      roles: ['ADMIN']
+    }
   ];
 
   // Filtrer les menus selon le rôle de l'utilisateur

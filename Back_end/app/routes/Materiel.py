@@ -3,7 +3,7 @@ from app.schemas.categorie import CategorieBaseSchema, CategorieResponseSchema, 
 from app.schemas.materiel import MaterielBaseSchema, MaterielResponseSchema, MaterielListResponseSchema, MaterielUpdateSchema
 from app.schemas.stock import StockCreateSchema, StockUpdateSchema, StockResponseSchema, StockListResponseSchema
 from app.services.create_categorie_service import create_categorie
-from app.services.read_categorie_service import read_categorie
+from app.services.read_categorie_service import read_categorie , read_categorie_par_admin
 from app.services.create_materiel_service import create_materiel
 from app.services.read_materiel_service import read_materiel, read_materiel_list
 from app.services.create_stock_service import create_stock
@@ -44,6 +44,12 @@ def read_materiel_route():
 def read_categorie_route():
     current_user_entreprise = get_current_user_entreprise()
     result = read_categorie(current_user_entreprise)
+    return jsonify(CategorieResponseSchema(many=True).dump(result)), 200
+
+@materiel_bp.route("/categorie/admin", methods=["GET"])
+def read_categorie_par_admin_route():
+    current_user_entreprise = get_current_user_entreprise()
+    result = read_categorie_par_admin(current_user_entreprise)
     return jsonify(CategorieResponseSchema(many=True).dump(result)), 200
 
 

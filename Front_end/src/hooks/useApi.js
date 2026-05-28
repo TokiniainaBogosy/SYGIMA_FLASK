@@ -65,5 +65,5 @@ export function useApi(url = null) {
   }
 }, [])
 
-  return { data, loading, error, patch, post ,del }
+  return { data, loading, error, setData, patch, post ,del }
 }

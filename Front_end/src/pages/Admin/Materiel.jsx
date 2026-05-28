@@ -20,6 +20,7 @@ export default function Materiel() {
   // ─── GET avec useApi ──────────────────────────────
   const { data: categories, loading: catLoading } = useApi('/materiel/categorie')
   const { data: materiels, loading: matLoading } = useApi('/materiel/materielList')
+  console.log(materiels)
   useEffect(() => {
     setCategoriesData(categories || [])
     setMaterielsData(materiels || [])

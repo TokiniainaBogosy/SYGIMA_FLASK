@@ -27,6 +27,7 @@ import LandingLayout from './pages/Landing/layout/layout'
 import Features from './pages/Landing/features'
 import Pricing from './pages/Landing/Pricing'
 import RegisterParDepartement from './components/auth/registerParDepartement'
+import MaterielAdmin from './pages/Admin/MaterielAdmin'
 
 
 export default function App() {
@@ -148,6 +149,16 @@ export default function App() {
                 </Layout>
               </ProtectedRoute>
             }
+          />
+          <Route 
+            path="/materielAdmin" 
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <MaterielAdmin/>
+                </Layout>
+              </ProtectedRoute>
+            } 
           />
 
           <Route path="/SoumettreDemande" element={<SoumettreDemande />} />

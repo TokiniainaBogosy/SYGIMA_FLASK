@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useApi } from '../../hooks/useApi';
 
 const MaterielManager = ({ selectedMateriel, setSelectedMateriel, setMateriels, newReference, setNewReference, newDesignation, setNewDesignation, newCategorie, setNewCategorie, newUnite, setNewUnite }) => {
 
