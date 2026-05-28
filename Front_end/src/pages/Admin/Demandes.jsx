@@ -282,7 +282,7 @@ export default function Demandes() {
                         👁️ Voir
                       </button>
                       {/* ACTION EMPLOYE : Annuler sa propre demande */}
-                      {user?.role === 'Employe' && demande.statut === 'SOUMISE' && (
+                      {user?.role === 'EMPLOYE' && demande.statut === 'SOUMISE' && (
                         <button 
                           onClick={() => {
                             if(window.confirm("Êtes-vous sûr de vouloir annuler cette demande ?")) {
@@ -295,7 +295,7 @@ export default function Demandes() {
                         </button>
                       )}
                       {/* ACTION EMPLOYE : Annuler sa propre demande */}
-                      {user?.role === 'Employe' && demande.statut === 'BROULLION' && (
+                      {user?.role === 'EMPLOYE' && demande.statut === 'BROULLION' && (
                         <button 
                           onClick={() => {
                               handleAction(demande.reference,demande.ligne_id, 'SOUMISE');

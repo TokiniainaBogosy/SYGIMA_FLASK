@@ -19,7 +19,7 @@ def read_demande_list_departement(current_user: User,current_user_entreprise: di
             case(
                 (LigneDemande.qte_accordee >= 1, "APPROUVEE"),
                 (LigneDemande.qte_accordee == 0, "REFUSEE"),
-                else_="EN_ATTENTE"
+                else_="SOUMISE"
             ).label("statut_ligne"),
             Demande.reference,
             User.nom.label("demandeur"),

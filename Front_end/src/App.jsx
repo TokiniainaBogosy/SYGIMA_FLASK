@@ -28,6 +28,7 @@ import Features from './pages/Landing/features'
 import Pricing from './pages/Landing/Pricing'
 import RegisterParDepartement from './components/auth/registerParDepartement'
 import MaterielAdmin from './pages/Admin/MaterielAdmin'
+import StockAdmin from './pages/Admin/StockAdmin'
 
 
 export default function App() {
@@ -156,6 +157,17 @@ export default function App() {
               <ProtectedRoute>
                 <Layout>
                   <MaterielAdmin/>
+                </Layout>
+              </ProtectedRoute>
+            } 
+          />
+
+          <Route 
+            path="/StockAdmin" 
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <StockAdmin/>
                 </Layout>
               </ProtectedRoute>
             } 

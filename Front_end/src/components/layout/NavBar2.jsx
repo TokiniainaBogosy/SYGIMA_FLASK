@@ -33,13 +33,25 @@ export default function Navbar({ onLogout, user }) {
       icon: Package, 
       label: 'Stock', 
       path: '/stock', 
-      roles: ['ADMIN', 'RESPONSABLE', 'MAGASINIER']
+      roles: ['RESPONSABLE', 'MAGASINIER']
+    },
+    { 
+      icon: Package, 
+      label: 'StockAdmin', 
+      path: '/StockAdmin', 
+      roles: ['ADMIN']
+    },
+    {
+      icon: Boxes, 
+      label: 'MaterielAdmin', 
+      path: '/MaterielAdmin', 
+      roles: ['ADMIN']
     },
     { 
       icon: Boxes, 
       label: 'Matériels', 
       path: '/materiels', 
-      roles: ['ADMIN','RESPONSABLE','MAGASINIER']
+      roles: ['RESPONSABLE','MAGASINIER']
     },
     { 
       icon: ClipboardList, 
@@ -58,13 +70,8 @@ export default function Navbar({ onLogout, user }) {
       label: 'Départements', 
       path: '/departements', 
       roles: ['ADMIN']
-    },
-    {
-      icon: Boxes, 
-      label: 'MaterielAdmin', 
-      path: '/MaterielAdmin', 
-      roles: ['ADMIN']
     }
+    
   ];
 
   // Filtrer les menus selon le rôle de l'utilisateur

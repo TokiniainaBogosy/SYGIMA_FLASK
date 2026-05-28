@@ -25,5 +25,26 @@ def read_stock_list(current_user: User,current_user_entreprise: dict):
         .filter(Stock.entreprise_id == current_user_entreprise.entreprise_id)
         .all()
     )
-    print(results)
+    return [dict(row._mapping) for row in results]
+
+def read_stock_list_par_admin(current_user_entreprise):
+    results = (
+        db.session.query(
+            Stock.id,
+            Stock.materiel_id,
+            Materiel.reference,
+            Materiel.designation,
+            CategoriesMateriel.nom.label("categorie"),
+            Stock.quantite_actuelle,
+            Stock.seuil_alerte,
+            Departement.nom.label("departement"),
+            Stock.entreprise_id
+        )
+        .join(Materiel, Stock.materiel_id == Materiel.id)
+        .join(CategoriesMateriel, Materiel.categorie_id == CategoriesMateriel.id)
+        .join(Departement, Stock.departement_id == Departement.id)
+        .filter(Stock.entreprise_id == current_user_entreprise.entreprise_id)
+        .all()
+    )
+    
     return [dict(row._mapping) for row in results]

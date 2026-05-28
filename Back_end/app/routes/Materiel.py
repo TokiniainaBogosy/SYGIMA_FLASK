@@ -7,7 +7,7 @@ from app.services.read_categorie_service import read_categorie , read_categorie_
 from app.services.create_materiel_service import create_materiel
 from app.services.read_materiel_service import read_materiel, read_materiel_list
 from app.services.create_stock_service import create_stock
-from app.services.read_stock_list_service import read_stock_list
+from app.services.read_stock_list_service import read_stock_list , read_stock_list_par_admin
 from app.services.delete_material_service import delete_materiel
 from app.services.delete_categorie_service import delete_categorie
 from app.services.update_categorie_service import update_categorie
@@ -74,6 +74,12 @@ def read_stock_list_route():
     current_user = get_current_user()
     current_user_entreprise = get_current_user_entreprise()
     result = read_stock_list(current_user, current_user_entreprise)
+    return jsonify(StockListResponseSchema(many=True).dump(result)), 200
+
+@materiel_bp.route("/stockList/Admin", methods=["GET"])
+def read_stock_list_par_admin_route():
+    current_user_entreprise = get_current_user_entreprise()
+    result = read_stock_list_par_admin(current_user_entreprise)
     return jsonify(StockListResponseSchema(many=True).dump(result)), 200
 
 

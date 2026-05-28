@@ -26,6 +26,7 @@ class StockListResponseSchema(Schema):
     designation = fields.Str(dump_only=True)
 
 
+
 class StockUpdateSchema(Schema):
     quantite_actuelle = fields.Int(load_default=None)
     designation = fields.Str(load_default=None)

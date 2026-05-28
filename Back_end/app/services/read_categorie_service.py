@@ -6,7 +6,7 @@ from app.database import db
 
 def read_categorie(current_user_entreprise):
     categories = CategoriesMateriel.query.filter(CategoriesMateriel.entreprise_id == current_user_entreprise.entreprise_id).all()
-    print(categories)
+    
     # if not categories:
     #     abort(404, description="Il n'y a aucune catégorie.")
     return categories

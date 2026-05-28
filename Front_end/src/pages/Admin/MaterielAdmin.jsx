@@ -33,6 +33,7 @@ export default function MaterielAdmin() {
       alert("Erreur suppression")
     }
   }
+  
 
   return (
     <>
@@ -41,7 +42,7 @@ export default function MaterielAdmin() {
               {/* Header */}
               <div className="flex justify-between items-center">
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Stock</h1>
+                  <h1 className="text-2xl font-bold text-gray-900">Categories et Materiels existants</h1>
                   <p className="text-gray-500">Gestion des matériels et catégories</p>
                 </div>
                 <button
@@ -64,14 +65,6 @@ export default function MaterielAdmin() {
                     <option key={dep.nom} value={dep.nom}>{dep.nom}</option>
                   ))} 
                 </select>
-        
-                <input
-                  type="text"
-                  placeholder="Rechercher un matériel..."
-                  // value={searchTerm}
-                  // onChange={(e) => setSearchTerm(e.target.value)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 flex-1"
-                />
               </div>
         
               {/* {showForm && <CategorieForm />} */}
@@ -243,7 +236,7 @@ export default function MaterielAdmin() {
                   setNewDesignation={setNewDesignation}
                   newUnite={newUnite}
                   setNewUnite={setNewUnite}
-                  NewCategorie={categoriesData}
+                  newCategorie={categoriesData}
                   setNewCategorie={setCategoriesData}
                   setMateriels={setMaterielsData}
                 />

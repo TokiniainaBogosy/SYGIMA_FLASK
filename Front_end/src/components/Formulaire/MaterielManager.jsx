@@ -3,9 +3,10 @@ import { useApi } from '../../hooks/useApi';
 
 const MaterielManager = ({ selectedMateriel, setSelectedMateriel, setMateriels, newReference, setNewReference, newDesignation, setNewDesignation, newCategorie, setNewCategorie, newUnite, setNewUnite }) => {
 
+  console.log(newCategorie) // Debug : vérifier les données reçues
   // 3. Envoyer la modification (PATCH)
   const { patch } = useApi()
-
+console.log(newCategorie) // Debug : vérifier les données reçues
 const handleUpdate = async (e) => {
   e.preventDefault()
   try {

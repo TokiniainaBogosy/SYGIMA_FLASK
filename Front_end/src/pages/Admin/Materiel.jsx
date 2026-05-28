@@ -56,7 +56,7 @@ export default function Materiel() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Stock</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Categories et Materiels existants</h1>
           <p className="text-gray-500">Gestion des matériels et catégories</p>
         </div>
         <button
