@@ -14,7 +14,7 @@ def create_categorie(data: dict,current_user_entreprise):
     db_categorie = CategoriesMateriel(
         nom=data.get("nom"),
         description=data.get("description"),
-        entreprise_id=current_user_entreprise.id
+        entreprise_id=current_user_entreprise.entreprise_id
     )
 
     try:

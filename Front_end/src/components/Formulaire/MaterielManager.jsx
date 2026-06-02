@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext';
 import { useApi } from '../../hooks/useApi';
 
-const MaterielManager = ({ selectedMateriel, setSelectedMateriel, setMateriels, newReference, setNewReference, newDesignation, setNewDesignation, newCategorie, setNewCategorie, newUnite, setNewUnite }) => {
-
+const MaterielManager = ({ selectedMateriel, setSelectedMateriel, setMateriels, newReference, setNewReference, newDesignation, setNewDesignation, newCategorie, setNewCategorie, newUnite, setNewUnite,listCategorie }) => {
+  const { user } = useAuth()
   console.log(newCategorie) // Debug : vérifier les données reçues
   // 3. Envoyer la modification (PATCH)
   const { patch } = useApi()
@@ -91,13 +92,27 @@ const handleUpdate = async (e) => {
                 </div>
                 <div className="mb-4">
                 <label className="block text-sm font-medium mb-1">Categorie</label>
-                <input 
+                {/* <input 
                   type="text"
                   className="w-full border p-2 rounded"
                   value={newCategorie}
                   onChange={(e) => setNewCategorie(e.target.value)}
                   autoFocus
-                />
+                /> */}
+                <select 
+                  value={newCategorie}
+                  onChange = {(e)=>setNewCategorie(e.target.value)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg">
+                  <option value="">categorie</option>
+                  {listCategorie?.map((dep) => (
+      
+                      user?.role == "ADMIN" ? 
+                      <option key={dep.categorie} value={dep.categorie}>{dep.categorie}</option> 
+                      : 
+                      <option key={dep.nom} value={dep.nom}>{dep.nom}</option>
+                    
+                  ))}
+                </select>
                 </div>
               <div className="flex justify-end gap-2">
                 <button 

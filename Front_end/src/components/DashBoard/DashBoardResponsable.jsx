@@ -57,7 +57,7 @@ export default function DashBoardResponsable() {
   const { data: stats, loading: statsLoading, error: statsError } = 
     useApi("/dashboard/stats")
   const { data: demandes, loading: demandesLoading, error: demandesError } = 
-    useApi("/demande/")
+    useApi(`/demande/${user.departement_id}`)
     // const STATS_DEMANDES = demandes.
 
   useEffect(() => {

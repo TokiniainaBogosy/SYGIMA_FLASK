@@ -10,11 +10,15 @@ class CategorieCreateSchema(CategorieBaseSchema):
     pass
 
 
-class CategorieResponseSchema(CategorieBaseSchema):
+class CategorieResponseSchemaAdmin(CategorieBaseSchema):
     id = fields.Int(dump_only=True)  # lecture seule (équivalent à orm_mode)
     departement = fields.Str(dump_only=True)  # Champ pour le nom du département associé
     categorie_description = fields.Str(dump_only=True)  # Champ pour la description de la
     categorie = fields.Str(dump_only=True)  # Champ pour le nom de la catégorie
+
+class CategorieResponseSchema(CategorieBaseSchema):
+    id = fields.Int(dump_only=True)  # lecture seule (équivalent à orm_mode)
+    #departement = fields.Str(dump_only=True)  # Champ pour le nom du département associé
 
 
 class CategorieUpdateSchema(Schema):

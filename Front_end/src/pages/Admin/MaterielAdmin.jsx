@@ -6,6 +6,8 @@ import MaterielManager from '../../components/Formulaire/MaterielManager'
 import CategorieForm from '../../components/Formulaire/CategorieForm'
 
 export default function MaterielAdmin() {
+  const [showForm, setShowForm] = useState(false)
+
   const {data : departementList, loading: departementLoading} = useApi('/departement/')
   const {data : materielList, loading: materielLoading} = useApi('/materiel/materielList') 
   const {data : categorieList, loading: catLoading} = useApi('/materiel/categorie/admin')
@@ -36,8 +38,7 @@ export default function MaterielAdmin() {
   
 
   return (
-    <>
-        <div className="space-y-6">
+        <div className="space-y-6 w-full px-6 lg:px-10 py-8 space-y-8">
               
               {/* Header */}
               <div className="flex justify-between items-center">
@@ -46,7 +47,7 @@ export default function MaterielAdmin() {
                   <p className="text-gray-500">Gestion des matériels et catégories</p>
                 </div>
                 <button
-                  // onClick={() => setShowForm(!showForm)}
+                  onClick={() => setShowForm(!showForm)}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg flex items-center gap-2 hover:bg-blue-700"
                 >
                   <Plus className="w-4 h-4" />
@@ -67,7 +68,7 @@ export default function MaterielAdmin() {
                 </select>
               </div>
         
-              {/* {showForm && <CategorieForm />} */}
+              {showForm && <CategorieForm />} 
         
               {/* ─── DEUX COLONNES CÔTE À CÔTE ───────────────── */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -80,7 +81,7 @@ export default function MaterielAdmin() {
                       <Tag className="w-5 h-5 text-blue-600" />
                       <h2 className="font-semibold text-gray-900">Catégories</h2>
                       <span className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full">
-                        {/* {filteredCategories.length} */}
+                        {filteredCategories.length}
                       </span>
                     </div>
                     <div className="relative">
@@ -149,7 +150,7 @@ export default function MaterielAdmin() {
                       <Package className="w-5 h-5 text-green-600" />
                       <h2 className="font-semibold text-gray-900">Matériels</h2>
                       <span className="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full">
-                        {/* {filteredMateriels.length} */}
+                         {filteredMateriel.length} 
                       </span>
                     </div>
                     <div className="relative">
@@ -167,11 +168,11 @@ export default function MaterielAdmin() {
                   {/* Liste scrollable */}
                   <div className="flex-1 overflow-y-auto">
                     {
-                    // matLoading ? (
-                    //   <div className="flex justify-center py-8">
-                    //     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-600" />
-                    //   </div>
-                    // ) : 
+                      materielLoading ? (
+                        <div className="flex justify-center py-8">
+                          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-600" />
+                        </div>
+                      ) : 
                     (
                       <table className="w-full">
                         <thead className="bg-gray-50 sticky top-0">
@@ -228,6 +229,7 @@ export default function MaterielAdmin() {
         
                 />
               )} 
+
               {selectedMateriel && (
                 <MaterielManager 
                   selectedMateriel={selectedMateriel} 
@@ -237,11 +239,11 @@ export default function MaterielAdmin() {
                   newUnite={newUnite}
                   setNewUnite={setNewUnite}
                   newCategorie={categoriesData}
+                  listCategorie={filteredCategories}
                   setNewCategorie={setCategoriesData}
                   setMateriels={setMaterielsData}
                 />
               )} 
         </div>
-    </>
   )
 }

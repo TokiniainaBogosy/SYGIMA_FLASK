@@ -4,7 +4,7 @@ from app.models.Materiel import Materiel
 from app.models.CategoriesMateriel import CategoriesMateriel
 
 
-def create_materiel(data: dict, current_user):
+def create_materiel(data: dict,current_user,current_user_entreprise):
     existing = Materiel.query.filter(Materiel.reference == data.get("reference")).first()
     # if existing:
     #     abort(400, description="Ce matériel existe déjà.")
@@ -20,7 +20,8 @@ def create_materiel(data: dict, current_user):
         designation=data.get("designation"),
         categorie_id=categorie.id,
         unite=data.get("unite"),
-        entreprise_id=current_user.entreprise_id
+        departement_id=current_user.departement_id,
+        entreprise_id=current_user_entreprise.entreprise_id
     )
 
     try:

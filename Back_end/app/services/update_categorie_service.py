@@ -25,3 +25,5 @@ def update_categorie(categorie_id: int, data: dict):
         db.session.rollback()
         print(f"Erreur : {e}")
         abort(500, description="Erreur lors de la mise à jour.")
+
+    

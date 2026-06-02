@@ -16,6 +16,8 @@ export default function Materiel() {
   const [data,setData] = useState([])
   const [newName,setNewName] = useState("");
   const [newDescription,setNewDescription] = useState("");
+  const [newCategorie,setNewCategorie] = useState("")
+  const [newReference,setNewReference] = useState("")
 
   // ─── GET avec useApi ──────────────────────────────
   const { data: categories, loading: catLoading } = useApi('/materiel/categorie')
@@ -119,7 +121,7 @@ export default function Materiel() {
                       <td className="px-5 py-3 text-right">
                         <div className="flex justify-end gap-2">
                           <button 
-                            onClick={() => setSelectedCategorie(cat)}
+                            onClick={() => {setSelectedCategorie(cat);setNewName(cat.nom);setNewDescription(cat.description)}}
                             className="p-1.5 text-blue-600 hover:bg-blue-50 rounded"
                           >
                             <Pencil className="w-4 h-4" />
@@ -188,7 +190,7 @@ export default function Materiel() {
                       <td className="px-5 py-3 text-right">
                         <div className="flex justify-end gap-2">
                           <button 
-                            onClick={() => setSelectedMateriel(mat)}
+                            onClick={() => {setSelectedMateriel(mat);setNewDesignation(mat.designation);setNewUnite(mat.unite);setNewCategorie(mat.categorie);setNewReference(mat.reference)}}
                             className="p-1.5 text-blue-600 hover:bg-blue-50 rounded"
                           >
                             <Pencil className="w-4 h-4" />
@@ -228,12 +230,16 @@ export default function Materiel() {
       {selectedMateriel && (
         <MaterielManager 
           selectedMateriel={selectedMateriel} 
+          newReference={newReference}
+          setNewReference={setNewReference}
           setSelectedMateriel={setSelectedMateriel}
           newDesignation={newDesignation}
           setNewDesignation={setNewDesignation}
           newUnite={newUnite}
           setNewUnite={setNewUnite}
-          categories={categories}
+          newCategorie={newCategorie}
+          setNewCategorie={setNewCategorie}
+          listCategorie={categories}
           setCategories={setCategoriesData}
           setMateriels={setMaterielsData}
         />

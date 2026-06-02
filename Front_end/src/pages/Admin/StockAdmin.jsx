@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import MaterielForm from '../../components/Formulaire/MaterielForm';
 import { useApi } from '../../hooks/useApi';
 import StockManager from '../../components/Formulaire/StockManager';
+import { Search, Plus, Pencil, Trash2, Package, Tag } from 'lucide-react'
 
 export default function StockAdmin() {
     const [showForm, setShowForm] = useState(false)
@@ -33,9 +34,20 @@ export default function StockAdmin() {
       }
       return 'text-green-600 font-bold'
     }
+
+    const { del } = useApi()
+    const handleDelete = async (id, type) => {
+      if (!window.confirm("Supprimer ?")) return
+      try {
+        await del(`/materiel/${type}/${id}`)
+        window.location.reload() // ou re-fetch
+      } catch (e) {
+        alert("Erreur suppression")
+      }
+    }
     
   return (
-    <div className="p-6">
+    <div className="p-6 w-full px-6 lg:px-10 py-8 space-y-8">
       {/* En-tête de la page */}
       <div className="flex justify-between items-center mb-8">
         <div>
@@ -125,10 +137,16 @@ export default function StockAdmin() {
                   <td className="px-6 py-4 text-sm text-gray-500">{mat.departement}</td>
                   <td className="px-6 py-4 text-sm">
                     <div className="flex gap-2">
-                      <button className="px-3 py-1 bg-blue-100 text-blue-700 rounded text-xs hover:bg-blue-200"
+                      <button className="p-1.5 text-blue-600 hover:bg-blue-50 rounded"
                       onClick={() => {setSelectedStock(mat);console.log(mat);setNewDesignation(mat.designation);setNewUnite(mat.quantite_actuelle)}}>
-                        ✏️ Modifier
+                        <Pencil className="w-4 h-4" />
                       </button>
+                      <button 
+                        onClick={() => handleDelete(mat.id, 'materiel')}
+                        className="p-1.5 text-red-600 hover:bg-red-50 rounded"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>                       
                     </div>
                   </td>
                 </tr>

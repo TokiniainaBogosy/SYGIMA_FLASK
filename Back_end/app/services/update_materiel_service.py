@@ -13,13 +13,13 @@ def update_materiel(materiel_id: int, data: dict):
         abort(404, description="Matériel non trouvé")
 
     # 2. Résoudre la catégorie par nom si fournie
-    if data.get("categorie_id"):
+    if data.get("categorie"):
         db_categorie = CategoriesMateriel.query.filter(
-            CategoriesMateriel.nom == data.get("categorie_id")
+            CategoriesMateriel.nom == data.get("categorie")
         ).first()
         if db_categorie:
             db_obj.categorie_id = db_categorie.id
-        data.pop("categorie_id")  # éviter d'écraser avec la valeur string
+        data.pop("categorie")  # éviter d'écraser avec la valeur string
 
     # 3. Appliquer les changements dynamiquement (on ignore ce qui est None)
     for field, value in data.items():

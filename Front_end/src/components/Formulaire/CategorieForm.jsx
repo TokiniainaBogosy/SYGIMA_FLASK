@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+
 import { useApi } from "../../hooks/useApi"; // ✅ import
 
 const SECTIONS = ["Catégorie", "Matériel"];

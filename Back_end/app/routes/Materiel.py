@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app.schemas.categorie import CategorieBaseSchema, CategorieResponseSchema, CategorieUpdateSchema
+from app.schemas.categorie import CategorieBaseSchema, CategorieResponseSchemaAdmin, CategorieUpdateSchema, CategorieResponseSchema
 from app.schemas.materiel import MaterielBaseSchema, MaterielResponseSchema, MaterielListResponseSchema, MaterielUpdateSchema
 from app.schemas.stock import StockCreateSchema, StockUpdateSchema, StockResponseSchema, StockListResponseSchema
 from app.services.create_categorie_service import create_categorie
@@ -10,6 +10,7 @@ from app.services.create_stock_service import create_stock
 from app.services.read_stock_list_service import read_stock_list , read_stock_list_par_admin
 from app.services.delete_material_service import delete_materiel
 from app.services.delete_categorie_service import delete_categorie
+from app.services.delete_stock_service import delete_stock
 from app.services.update_categorie_service import update_categorie
 from app.services.update_materiel_service import update_materiel
 from app.services.update_stock_service import update_stock
@@ -29,7 +30,9 @@ def create_categorie_route():
 @materiel_bp.route("/materiel", methods=["POST"])
 def create_materiel_route():
     data = MaterielBaseSchema().load(request.get_json())
-    result = create_materiel(data, get_current_user_entreprise())
+    current_user = get_current_user()
+    current_user_entreprise = get_current_user_entreprise()
+    result = create_materiel(data,current_user,current_user_entreprise)
     return jsonify(MaterielResponseSchema().dump(result)), 201
 
 
@@ -50,7 +53,7 @@ def read_categorie_route():
 def read_categorie_par_admin_route():
     current_user_entreprise = get_current_user_entreprise()
     result = read_categorie_par_admin(current_user_entreprise)
-    return jsonify(CategorieResponseSchema(many=True).dump(result)), 200
+    return jsonify(CategorieResponseSchemaAdmin(many=True).dump(result)), 200
 
 
 @materiel_bp.route("/stock", methods=["POST"])
@@ -99,6 +102,11 @@ def delete_materiel_route(materiel_id: int):
 @materiel_bp.route("/categorie/<int:categorie_id>", methods=["DELETE"])
 def delete_categorie_route(categorie_id: int):
     delete_categorie(categorie_id)
+    return "", 204
+
+@materiel_bp.route("/stock/delete/<int:stock_id>", methods=["DELETE"])
+def delete_stock_route(stock_id: int):
+    result = delete_stock(stock_id)
     return "", 204
 
 

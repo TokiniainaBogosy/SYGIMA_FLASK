@@ -30,11 +30,11 @@ def read_demande_list_route():
     return jsonify(DemandeListResponseSchema(many=True).dump(result)), 200
 
 
-@demande_bp.route("/departement", methods=["GET"])
-def read_demande_list_departement_route():
+@demande_bp.route("/<int:departement_id>", methods=["GET"])
+def read_demande_list_departement_route(departement_id: int):
     current_user = get_current_user()
     current_user_entreprise = get_current_user_entreprise()
-    result = read_demande_list_departement(current_user, current_user_entreprise)
+    result = read_demande_list_departement(current_user, current_user_entreprise,departement_id)
     return jsonify(DemandeListResponseSchema(many=True).dump(result)), 200
 
 @demande_bp.route("/departement/global", methods=["GET"])

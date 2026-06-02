@@ -212,7 +212,7 @@ export default function Demandes() {
 
             <tbody className="divide-y divide-gray-200">
               {filteredDemandes.filter((demande) => {
-                    if (user?.role === 'RESPONSABLE') {
+                    if (user?.role === 'RESPONSABLE' || user?.role === "ADMIN") {
                       // Le responsable voit ce qu'il doit traiter (SOUMISE) 
                       // ET ce qu'il a déjà traité (APPROUVEE1 ou REJETEE1)
                       return ['SOUMISE', 'APPROUVEE1', 'REJETEE1'].includes(demande.statut);
