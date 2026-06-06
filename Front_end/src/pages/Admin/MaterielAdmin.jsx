@@ -74,7 +74,7 @@ export default function MaterielAdmin() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 
                 {/* ═══ COLONNE GAUCHE : CATÉGORIES ═══ */}
-                <div className="bg-white rounded-xl border border-gray-200 flex flex-col h-[600px]">
+                <div className="bg-white rounded-xl border border-gray-200 flex flex-col ">
                   {/* Header */}
                   <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -139,11 +139,16 @@ export default function MaterielAdmin() {
                         </tbody>
                       </table>
                     )}
+                    {filteredCategories.length === 0 && (
+                      <div className="text-center py-8 text-gray-500">
+                        Aucune catégorie trouvée
+                      </div>
+                    )} 
                   </div>
                 </div>
         
                 {/* ═══ COLONNE DROITE : MATÉRIELS ═══ */}
-                <div className="bg-white rounded-xl border border-gray-200 flex flex-col h-[600px]">
+                <div className="bg-white rounded-xl border border-gray-200 flex flex-col ">
                   {/* Header */}
                   <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -210,6 +215,12 @@ export default function MaterielAdmin() {
                         </tbody>
                       </table>
                     )}
+                    {/* Message si aucun résultat */}
+                    {filteredMateriel.length === 0 && (
+                      <div className="text-center py-8 text-gray-500">
+                        Aucun matériel trouvé
+                      </div>
+                    )} 
                   </div>
                 </div>
         

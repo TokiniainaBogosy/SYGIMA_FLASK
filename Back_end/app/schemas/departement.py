@@ -12,3 +12,9 @@ class DepartementCreateSchema(DepartementBaseSchema):
 
 class DepartementResponseSchema(DepartementBaseSchema):
     id = fields.Int(dump_only=True)
+
+class DepartementWithResponsableSchema(DepartementBaseSchema):
+    id = fields.Int(dump_only=True)
+    nom = fields.Str(dump_only=True)
+    code = fields.Str(dump_only=True)
+    responsable_nom = fields.Str(dump_only=True)

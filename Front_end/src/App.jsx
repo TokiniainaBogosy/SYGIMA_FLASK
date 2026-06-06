@@ -29,6 +29,7 @@ import Pricing from './pages/Landing/Pricing'
 import RegisterParDepartement from './components/auth/registerParDepartement'
 import MaterielAdmin from './pages/Admin/MaterielAdmin'
 import StockAdmin from './pages/Admin/StockAdmin'
+import DepartementList from './components/Affichage/GestionDepartement'
 
 
 export default function App() {
@@ -85,7 +86,7 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Layout>
-                  <DepartementForm/>
+                  <DepartementList/>
                 </Layout>
               </ProtectedRoute>
             }

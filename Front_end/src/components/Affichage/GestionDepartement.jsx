@@ -1,30 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { UserPlus, Building2, ShieldCheck, Search } from 'lucide-react';
+import { Search, Plus, Pencil, Trash2, Package, Tag, UserPlus, Building2,ShieldCheck } from 'lucide-react'
+import {useApi} from '../../hooks/useApi';
+import DepartementForm from '../Formulaire/DepartementForm';
 
 const DepartementList = () => {
-  const [departements, setDepartements] = useState([
-    { id: 1, nom: 'Ressources Humaines', code: 'RH-01', responsable: null },
-    { id: 2, nom: 'Informatique', code: 'IT-05', responsable: { id: 10, nom: 'Jean Dupont' } },
-  ]);
-  const [users, setUsers] = useState([
-    { id: 10, nom: 'Jean Dupont' },
-    { id: 11, nom: 'Marie Curie' },
-    { id: 12, nom: 'Alan Turing' },
-  ]);
 
+  const { data: departements, loading: isLoadingDeps } = useApi('/departement/departement-and-responsable');
+  const [showForm, setShowForm] = useState(false);
+  
   const [editingId, setEditingId] = useState(null);
+  const { data: users, loading: isLoadingUsers, setData : setUsers } = useApi(`/user/${editingId ? `${editingId}` : ''}`);
+
   const [searchTerm, setSearchTerm] = useState("");
 
   const assignResponsable = (deptId, userId) => {
     const selectedUser = users.find(u => u.id === parseInt(userId));
     setDepartements(departements.map(d => 
-      d.id === deptId ? { ...d, responsable: selectedUser } : d
+      d.id === deptId ? { ...d, responsable_nom: selectedUser.nom } : d
     ));
     setEditingId(null);
     // Ici, vous ajouteriez l'appel API : api.patch(`/departements/${deptId}`, { responsable_id: userId })
   };
 
-  const filteredDepts = departements.filter(d => 
+  const filteredDepts = departements?.filter(d => 
     d.nom.toLowerCase().includes(searchTerm.toLowerCase()) || 
     d.code.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -48,8 +46,22 @@ const DepartementList = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
+            
           </div>
+          <button
+              onClick={() => setShowForm(!showForm)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg flex items-center gap-2 hover:bg-blue-700"
+           >
+              <Plus className="w-4 h-4" />
+                Nouveau
+          </button>
         </div>
+
+        { 
+          showForm && (
+            <DepartementForm/>
+          )
+        }
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <table className="w-full text-left border-collapse">
@@ -62,7 +74,7 @@ const DepartementList = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {filteredDepts.map((dept) => (
+              {filteredDepts?.map((dept) => (
                 <tr key={dept.id} className="hover:bg-gray-50/50 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
@@ -87,16 +99,16 @@ const DepartementList = () => {
                         defaultValue={dept.responsable?.id || ""}
                       >
                         <option value="">Choisir un responsable</option>
-                        {users.map(u => (
+                        {users?.map(u => (
                           <option key={u.id} value={u.id}>{u.nom}</option>
                         ))}
                       </select>
                     ) : (
                       <div className="flex items-center gap-2">
-                        {dept.responsable ? (
+                        {dept.responsable_nom ? (
                           <>
                             <ShieldCheck size={16} className="text-emerald-500" />
-                            <span className="text-sm text-gray-700">{dept.responsable.nom}</span>
+                            <span className="text-sm text-gray-700">{dept.responsable_nom}</span>
                           </>
                         ) : (
                           <span className="text-sm italic text-gray-400">Non assigné</span>
@@ -106,11 +118,11 @@ const DepartementList = () => {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <button 
-                      onClick={() => setEditingId(dept.id)}
+                      onClick={() => {setEditingId(dept.id)}}
                       className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors"
                     >
                       <UserPlus size={16} />
-                      {dept.responsable ? "Changer" : "Assigner"}
+                      {dept.responsable_nom ? "Changer" : "Assigner"}
                     </button>
                   </td>
                 </tr>

@@ -21,6 +21,7 @@ def create_app():
     from app.routes.Stats import stats_bp
     from app.routes.Current_user import current_user_bp
     from app.routes.Dashboard import dashboard_bp
+    from app.routes.Responsable import responsable_bp
 
     app.register_blueprint(current_user_bp)
     app.register_blueprint(stats_bp)
@@ -31,6 +32,7 @@ def create_app():
     app.register_blueprint(entreprise_bp)
     app.register_blueprint(materiel_bp)
     app.register_blueprint(user_bp)
+    app.register_blueprint(responsable_bp)
 
     with app.app_context():
         from app.models import (

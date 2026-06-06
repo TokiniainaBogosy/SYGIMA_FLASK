@@ -10,5 +10,5 @@ class ResponsableDepartementCreateSchema(ResponsableDepartementBaseSchema):
     departement_nom = fields.Str(required=True)
 
 
-class ResponsableDepartementResponseSchema(Schema):
-    departement = fields.Str(dump_only=True)
+class ResponsableDepartementResponseSchema(ResponsableDepartementCreateSchema):
+    pass
