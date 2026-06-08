@@ -8,7 +8,8 @@ import {
   Boxes,
   Menu,
   X,
-  ChevronDown
+  ChevronDown,
+  Building2
 } from 'lucide-react';
 import { NavLink, useNavigate } from "react-router-dom"
 
@@ -27,7 +28,7 @@ export default function Navbar({ onLogout, user }) {
       icon: LayoutDashboard, 
       label: 'Dashboard', 
       path: '/dashboard', 
-    roles: ['ADMIN', 'RESPONSABLE', 'MAGASINIER', 'EMPLOYE']
+      roles: ['ADMIN', 'RESPONSABLE', 'MAGASINIER', 'EMPLOYE']
     },
     { 
       icon: Package, 
@@ -66,7 +67,7 @@ export default function Navbar({ onLogout, user }) {
       roles: ['ADMIN']
     },
     { 
-      icon: Settings, 
+      icon: Building2, 
       label: 'Départements', 
       path: '/departements', 
       roles: ['ADMIN']
