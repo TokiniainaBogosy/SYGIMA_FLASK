@@ -23,8 +23,8 @@ def read_departement_and_responsable(current_user: dict):
             Departement.code,
             User.nom.label("responsable_nom"),
         )
-        .join(ResponsableDepartement, ResponsableDepartement.departement_id == Departement.id)
-        .join(User, ResponsableDepartement.user_id == User.id)
+        .outerjoin(ResponsableDepartement, ResponsableDepartement.departement_id == Departement.id)
+        .outerjoin(User, ResponsableDepartement.user_id == User.id)
         .filter(Departement.entreprise_id == current_user.entreprise_id)
         .all()
     )

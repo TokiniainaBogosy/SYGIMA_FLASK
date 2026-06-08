@@ -2,7 +2,7 @@ from marshmallow import Schema, fields
 
 
 class ResponsableDepartementBaseSchema(Schema):
-    nom = fields.Str(required=True)
+    nom = fields.Str()
 
 
 class ResponsableDepartementCreateSchema(ResponsableDepartementBaseSchema):
@@ -12,3 +12,9 @@ class ResponsableDepartementCreateSchema(ResponsableDepartementBaseSchema):
 
 class ResponsableDepartementResponseSchema(ResponsableDepartementCreateSchema):
     pass
+
+class ResponsableDepartementUpdateSchema(Schema):
+    user_id = fields.Int(required=True)
+    departement_id = fields.Int(required=True)
+    old_user_name = fields.Str(load_default=None)
+

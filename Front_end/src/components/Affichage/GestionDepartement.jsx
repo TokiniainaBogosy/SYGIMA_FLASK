@@ -5,20 +5,22 @@ import DepartementForm from '../Formulaire/DepartementForm';
 
 const DepartementList = () => {
 
-  const { data: departements, loading: isLoadingDeps } = useApi('/departement/departement-and-responsable');
+  const { data: departements, loading: isLoadingDeps, setData : setDepartements } = useApi('/departement/departement-and-responsable');
   const [showForm, setShowForm] = useState(false);
   
   const [editingId, setEditingId] = useState(null);
-  const { data: users, loading: isLoadingUsers, setData : setUsers } = useApi(`/user/${editingId ? `${editingId}` : ''}`);
-
+  const { data: users, loading: isLoadingUsers, setData : setUsers } = useApi(`/user/${editingId}`);
+  const {patch} = useApi();
   const [searchTerm, setSearchTerm] = useState("");
 
-  const assignResponsable = (deptId, userId) => {
+  const assignResponsable = (deptId, userId, oldUserName) => {
     const selectedUser = users.find(u => u.id === parseInt(userId));
     setDepartements(departements.map(d => 
       d.id === deptId ? { ...d, responsable_nom: selectedUser.nom } : d
     ));
     setEditingId(null);
+    console.log(`Assigning user ${userId} to department ${deptId}`);
+    patch(`/responsable/`, { departement_id: deptId, user_id: userId ,old_user_name: oldUserName})
     // Ici, vous ajouteriez l'appel API : api.patch(`/departements/${deptId}`, { responsable_id: userId })
   };
 
@@ -94,7 +96,7 @@ const DepartementList = () => {
                       <select 
                         autoFocus
                         className="text-sm border border-gray-300 rounded-lg px-2 py-1 outline-none focus:ring-2 focus:ring-blue-500"
-                        onChange={(e) => assignResponsable(dept.id, e.target.value)}
+                        onChange={(e) => assignResponsable(dept.id, e.target.value,dept?.responsable_nom)}
                         onBlur={() => setEditingId(null)}
                         defaultValue={dept.responsable?.id || ""}
                       >
