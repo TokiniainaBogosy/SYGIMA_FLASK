@@ -90,7 +90,7 @@ const DetailDemandes = ({ getStatutStyle, reference, demandeur, materiel, justif
                 </button>
                 <button 
                   disabled={!tempMotif.trim()}
-                  onClick={() => {setShow(false);handleAction(demandeID, rejectingId, 'REJETEE', tempMotif); setTempMotif(""); setDemandeID(null); setRejectingId(null); }}
+                  onClick={() => {handleAction(demandeID, rejectingId, 'REJETEE', tempMotif);setShow(false); }}
                   className="px-4 py-2 text-sm font-medium bg-rose-600 text-white hover:bg-rose-700 rounded-lg disabled:opacity-50"
                   type='button'
                 >

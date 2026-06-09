@@ -73,6 +73,7 @@ export default function Demandes() {
       await patch('/demande/answer', { reference, ligne_id: id, status: statutFinal, motif })
       setRejectingId(null)
       setTempMotif("")
+      setShowDetails(false)
     } catch (err) { }
   }
 
