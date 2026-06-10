@@ -53,7 +53,7 @@ export default function Materiel() {
   ) || []
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full px-6 lg:px-10 py-8 space-y-8">
       
       {/* Header */}
       <div className="flex justify-between items-center">

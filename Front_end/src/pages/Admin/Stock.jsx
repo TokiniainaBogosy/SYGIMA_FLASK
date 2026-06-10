@@ -2,10 +2,13 @@ import { useEffect, useState } from 'react'
 import MaterielForm from '../../components/Formulaire/MaterielForm';
 import { useApi } from '../../hooks/useApi';
 import StockManager from '../../components/Formulaire/StockManager';
+import { useAuth } from '../../context/AuthContext';
+import { Search, Plus, Pencil, Trash2, Package, Tag } from 'lucide-react'
 
 export default function Stock() {
   const [showForm, setShowForm] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
+  const { user } = useAuth()
 
 
   // ✅ Correction 1 : useApi retourne déjà les données
@@ -65,7 +68,7 @@ export default function Stock() {
   
   console.log(materiels);
   return (
-    <div className="p-6">
+    <div className="space-y-6 w-full px-6 lg:px-10 py-8 space-y-8">
       {/* En-tête de la page */}
       <div className="flex justify-between items-center mb-8">
         <div>
@@ -77,7 +80,7 @@ export default function Stock() {
           className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition flex items-center gap-2"
         >
           <span className="text-xl">+</span>
-          Nouveau matériel
+          Ajouter un matériel
         </button>
       </div>
 
@@ -93,17 +96,21 @@ export default function Stock() {
             <option key={cat} value={cat}>{cat}</option>
           ))}
         </select>
+        {
+          user?.role === 'ADMIN' && (
+            <select 
+            value={searchDepartement}
+            onChange={(e) => setSearchDepartement(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg"
+          >
+            <option value="">Tous les départements</option>
+            {departements.map((dep) => (
+              <option key={dep} value={dep}>{dep}</option>
+            ))}
+          </select>
+          )
+        }
         
-        <select 
-          value={searchDepartement}
-          onChange={(e) => setSearchDepartement(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg"
-        >
-          <option value="">Tous les départements</option>
-          {departements.map((dep) => (
-            <option key={dep} value={dep}>{dep}</option>
-          ))}
-        </select>
         
         <input
           type="text"
@@ -121,7 +128,7 @@ export default function Stock() {
       <div className="bg-white rounded-xl shadow-sm">
         <div className="px-6 py-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900">
-            Inventaire des matériels ({filteredMateriels.length})
+            Inventaire des matériels <span className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full">{filteredMateriels.length}</span>
           </h2>
         </div>
         {selectedStock && (<StockManager selectedStock={selectedStock} setSelectedStock={setSelectedStock} setStocks={setData} newDesignation={newDesignation} setNewDesignation={setNewDesignation} newUnite={newUnite} setNewUnite={setNewUnite}/>)}
@@ -153,9 +160,9 @@ export default function Stock() {
                   <td className="px-6 py-4 text-sm text-gray-500">{mat.departement}</td>
                   <td className="px-6 py-4 text-sm">
                     <div className="flex gap-2">
-                      <button className="px-3 py-1 bg-blue-100 text-blue-700 rounded text-xs hover:bg-blue-200"
+                      <button className="p-1.5 text-blue-600 hover:bg-blue-50 rounded"
                       onClick={() => {setSelectedStock(mat);console.log(mat);setNewDesignation(mat.designation);setNewUnite(mat.quantite_actuelle)}}>
-                        ✏️ Modifier
+                        <Pencil className="w-4 h-4" />
                       </button>
                     </div>
                   </td>

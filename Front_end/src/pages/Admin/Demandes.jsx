@@ -140,13 +140,15 @@ export default function Demandes() {
 
       {/* Filtres */}
       <div className="flex gap-4 mb-6">
-        <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm" value={searchDepartement} onChange={(e) => setSearchDepartement(e.target.value)}>
-
-          <option value="">Toutes les Departements</option>
-            {departements.map((dep) => (
-              <option key={dep} value={dep}>{dep}</option>
-            ))}
-        </select>
+        {
+          user.role === 'ADMIN' && (
+          <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm" value={searchDepartement} onChange={(e) => setSearchDepartement(e.target.value)}>
+            <option value="">Toutes les Departements</option>
+              {departements.map((dep) => (
+                <option key={dep} value={dep}>{dep}</option>
+              ))}
+          </select>)
+        }
         <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm" value={searchStatus} onChange={(e) => setSearchStatus(e.target.value)}>
 
           <option value="">Toutes les Status</option>
