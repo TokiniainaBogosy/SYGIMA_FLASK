@@ -7,6 +7,7 @@ from app.services.answer_demande_service import modifier_statut_demande
 from app.services.read_demande_list_Departement import read_demande_global
 from app.services.read_demande_list_service import read_demande_list, read_demande_list_departement
 from app.utils.auth import get_current_user , get_current_user_entreprise
+from app.utils.notifications import send_notification
 
 
 demande_bp = Blueprint("demande", __name__, url_prefix="/demande")
@@ -18,6 +19,7 @@ def create_demande_route():
     current_user_entreprise = get_current_user_entreprise()
     data = CreateDemandeGlobalSchema().load(request.get_json())
     result = create_demande(data, current_user, current_user_entreprise)
+    send_notification(current_user.id,current_user_entreprise.id,message=f"{current_user.nom} a soumis une demande",notification_type="info")
     return jsonify(DemandeResponseSchema().dump(result)), 201
 
 

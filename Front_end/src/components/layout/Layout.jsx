@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { Shield, FileText, Mail } from 'lucide-react'
+import { NotificationProvider } from '../../context/NotificationContext'
 
 export default function Layout({ children }) {
   const { user, logout } = useAuth()
@@ -18,8 +19,13 @@ export default function Layout({ children }) {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <NotificationProvider userId={user.id}>
+      
+    
       {/* ═══ NAVBAR ═══════════════════════════════════ */}
       <Navbar onLogout={handleLogout} user={user} />
+        {/* Reste de l'app */}
+    </NotificationProvider>
 
       {/* ═══ CONTENU PRINCIPAL ════════════════════════ */}
       <main className="flex-1">

@@ -2,6 +2,9 @@ from flask import Flask
 from app.core.config import Config
 from app.database import db
 from app.extensions import migrate, jwt
+from flask_socketio import SocketIO
+
+socketio = SocketIO() 
 
 def create_app():
     app = Flask(__name__)
@@ -11,6 +14,14 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
+    socketio.init_app(
+        app,
+        cors_allowed_origins="http://localhost:5173",
+        async_mode='eventlet',
+        logger=True,
+        engineio_logger=False
+    )
+    
 
     from app.routes.Auth import auth_bp
     from app.routes.Demande import departement_bp
@@ -22,6 +33,7 @@ def create_app():
     from app.routes.Current_user import current_user_bp
     from app.routes.Dashboard import dashboard_bp
     from app.routes.Responsable import responsable_bp
+    from app.routes.notifications import notifications_bp
 
     app.register_blueprint(current_user_bp)
     app.register_blueprint(stats_bp)
@@ -49,5 +61,8 @@ def create_app():
             MouvementStock,
             Notification,
         )
+    app.register_blueprint(notifications_bp, url_prefix='/api/notifications')
+    from app.socket_events import register_socket_events
+    register_socket_events(socketio)
 
     return app

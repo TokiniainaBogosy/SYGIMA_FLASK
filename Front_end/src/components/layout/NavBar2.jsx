@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import NotificationButton from '../NotificationButton';
 import { 
   LayoutDashboard, 
   Package, 
@@ -135,6 +136,7 @@ export default function Navbar({ onLogout, user }) {
           <div className="hidden md:flex items-center gap-4">
             {/* Bouton Ajouter utilisateur (admin only) */}
             {user?.role === 'ADMIN' && (
+              <>
               <button
                 onClick={handleRegister}
                 className="group w-9 h-9 rounded-xl bg-indigo-500/20 border border-indigo-500/30
@@ -151,6 +153,8 @@ export default function Navbar({ onLogout, user }) {
                     d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                 </svg>
               </button>
+              <NotificationButton/>
+              </>
             )}
             {/* Infos utilisateur avec badge rôle */}
             <div className="flex items-center gap-3">
