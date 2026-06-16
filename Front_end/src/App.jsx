@@ -31,6 +31,7 @@ import MaterielAdmin from './pages/Admin/MaterielAdmin'
 import StockAdmin from './pages/Admin/StockAdmin'
 import DepartementList from './components/Affichage/GestionDepartement'
 import DetailDemandes from './components/Affichage/DetailDemandes'
+import GestionUser from './pages/Admin/GestionUser'
 
 
 export default function App() {
@@ -174,7 +175,16 @@ export default function App() {
               </ProtectedRoute>
             } 
           />
-
+          <Route
+            path="/GestionUser"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <GestionUser/>
+                </Layout>
+              </ProtectedRoute>
+            }
+          />  
           <Route path="/SoumettreDemande" element={<SoumettreDemande />} />
           <Route path="/AdminDashboard" element={<AdminDashboard />} />
           <Route path="/TraitementDemande" element={<TraitementDemande />} />

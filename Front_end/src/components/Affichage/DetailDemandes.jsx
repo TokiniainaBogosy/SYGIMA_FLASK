@@ -1,8 +1,8 @@
 import React from 'react'
 import { useApi } from '../../hooks/useApi'
-
+import { useAuth } from '../../context/AuthContext'
 const DetailDemandes = ({ getStatutStyle, reference, demandeur, materiel, justification, stock, setShow, qte_demande, motif_rejet, qte_disponible, statut, departement,setDemandeID,setRejectingId,handleAction,ligne_id,demandeID,rejectingId,handleSubmit,tempMotif,setTempMotif }) => {
-    
+    const {user} = useAuth()
     
   return (
     <div>          
@@ -57,7 +57,8 @@ const DetailDemandes = ({ getStatutStyle, reference, demandeur, materiel, justif
                         </div>
                     </div>
                 </div>   
-                <div className="px-6 py-4 border-t border-slate-100 flex justify-end gap-3 bg-slate-50">
+                { (user?.role == "RESPONSABLE" || user?.role == "MAGASINIER") && statut === "SOUMISE" && (
+                    <div className="px-6 py-4 border-t border-slate-100 flex justify-end gap-3 bg-slate-50">
                     {/* <button className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 rounded-lg transition">Demander précision</button> */}
                     <button 
                     onClick={() => {setRejectingId(ligne_id);setDemandeID(reference)}}
@@ -66,6 +67,9 @@ const DetailDemandes = ({ getStatutStyle, reference, demandeur, materiel, justif
                     onClick={() =>  handleAction(reference,ligne_id,'APPROUVEE')}
                     className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition shadow-sm">Approuver la demande</button>
                 </div>
+                )
+                }
+                
             </div>
         </div>
         {demandeID && rejectingId && (

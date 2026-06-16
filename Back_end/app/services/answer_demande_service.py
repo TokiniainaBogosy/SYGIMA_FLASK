@@ -1,4 +1,4 @@
-from flask import abort
+from flask import jsonify
 from sqlalchemy import and_
 from datetime import datetime
 
@@ -12,7 +12,7 @@ from app.models.Materiel import Materiel
 from app.schemas.demande import StatusUpdateSchema
 
 
-def modifier_statut_demande(update_data: dict, current_user: User):
+def modifier_statut_demande(update_data: dict, current_user: User,current_user_entreprise):
 
     db_demande = Demande.query.filter(
         Demande.reference == update_data.get("reference")
@@ -28,17 +28,22 @@ def modifier_statut_demande(update_data: dict, current_user: User):
         )
     ).first()
 
-    # if not ligne_demande:
-    #     abort(404, description="Ligne introuvable")
+    if not ligne_demande:
+        return jsonify({
+            "error": "Ligne introuvable",
+            "details": f"Aucune ligne correspondante",
+            "code": "LIGNE DE DEMANDE INTROUVABLE"
+    }), 400  # Le 400 est le code HTTP
 
     status = update_data.get("status")
 
     # Validation partielle
     if status == "APPROUVEE1":
         ligne_demande.qte_accordee = ligne_demande.qte_demandee
-
+        ligne_demande.statut_ligne = status
     elif status == "REJETEE1":
         ligne_demande.qte_accordee = 0
+        ligne_demande.statut_ligne = status
         materiel = Materiel.query.filter(Materiel.id == ligne_demande.materiel_id).first()
         nom_affichable = materiel.designation if materiel else f"Matériel #{ligne_demande.materiel_id}"
 
@@ -61,40 +66,53 @@ def modifier_statut_demande(update_data: dict, current_user: User):
     else:
         db_demande.statut = "REJETEE1"
 
-    # Livraison
     if status == "LIVREE":
-        lignes = LigneDemande.query.filter(
-            LigneDemande.demande_id == db_demande.id
-        ).all()
+        # On ne travaille QUE sur la ligne spécifique validée
+        
+        # 1. Mise à jour du statut de la ligne courante
+        ligne_demande.statut_ligne = status
 
-        for ligne in lignes:
-            stock = Stock.query.filter(
-                Stock.materiel_id == ligne.materiel_id,
-                Stock.departement_id == current_user.departement_id
-            ).first()
+        # 2. Gestion du stock UNIQUEMENT pour cette ligne
+        stock = Stock.query.filter(
+            Stock.materiel_id == ligne_demande.materiel_id,
+            Stock.departement_id == current_user.departement_id
+        ).first()
 
-            # if not stock:
-            #     abort(400, description="Matériel non trouvé en stock")
+        if not stock:
+            return jsonify({
+                "error": "Materiel non trouvé en stokc",
+                "details":"",
+                "code": "Materiel introuvable"
+            }),400
+            
 
-            # if stock.quantite_actuelle < ligne.qte_accordee:
-            #     abort(400, description="Stock insuffisant")
-
-            stock.quantite_actuelle -= ligne.qte_accordee
+        # Vérification stricte (utilisation de >= pour gérer le cas où stock == qte)
+        if stock.quantite_actuelle >= ligne_demande.qte_accordee:
+            stock.quantite_actuelle -= ligne_demande.qte_accordee
 
             mouvement = MouvementStock(
-                materiel_id=ligne.materiel_id,
+                materiel_id=ligne_demande.materiel_id,
                 departement_id=current_user.departement_id,
-                quantite=-ligne.qte_accordee,
+                quantite=-ligne_demande.qte_accordee,
                 type_mouvement="SORTIE",
                 demande_id=db_demande.id,
-                user_id=current_user.id
+                user_id=current_user.id,
+                entreprise_id=current_user_entreprise.entreprise_id
             )
             db.session.add(mouvement)
-
+        else:
+            return jsonify({
+                "error": "Stock insuffisant",
+                "details": f"Il ne reste que {stock.quantite_actuelle} unités",
+                "code": "INSUFFICIENT_STOCK"
+            }), 400  # Le 400 est le code HTTP
     # Annulation sécurisée
     if status == "ANNULEE":
         if db_demande.demandeur_id != current_user.id:
-            abort(403, description="Action interdite")
+            return jsonify({
+                "error":"Action interdite",
+                "code":"FORBIDDEN_ACTION"
+            }),403
 
     db_demande.traite_par = current_user.id
     db_demande.date_traitement = datetime.now()
@@ -104,6 +122,8 @@ def modifier_statut_demande(update_data: dict, current_user: User):
         db.session.refresh(db_demande)
     except Exception as e:
         db.session.rollback()
-        abort(500, description=str(e))
+        return jsonify({
+            "error":str(e),
+        }),500
 
     return {"message": "Mise à jour réussie", "data": db_demande}

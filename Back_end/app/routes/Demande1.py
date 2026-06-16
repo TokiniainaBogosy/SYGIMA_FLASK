@@ -48,8 +48,9 @@ def read_demande_list_departement_global_route():
 @demande_bp.route("/answer", methods=["PATCH"])
 def answer_demande_route():
     current_user = get_current_user()
+    current_user_entreprise = get_current_user_entreprise()
     data = StatusUpdateSchema().load(request.get_json())
-    result = modifier_statut_demande(data, current_user)
+    result = modifier_statut_demande(data, current_user,current_user_entreprise)
     
     # Sérialisation propre via Marshmallow
     # Remplacez DemandeSchema par le nom de votre schéma existant
