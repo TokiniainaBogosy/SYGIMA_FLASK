@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useApi } from '../../hooks/useApi';
-const UserManager = ({ selectedUser , setSelectedUser , setCategories , newNom,newEmail,setNewEmail,setNewNom, newPrenom, setNewPrenom,setNewDepartement,newDepartement,newRole,setNewRole }) => {
+const UserManager = ({ selectedUser , setSelectedUser , setCategories , newNom,newEmail,setNewEmail,setNewNom, newPrenom, setNewPrenom,setNewDepartement,newDepartement,newRole,setNewRole,newActivity,setNewActivity,listRoles,listDepartements}) => {
 
   const { patch } = useApi()
 
@@ -87,33 +87,36 @@ const handleUpdate = async (e) => {
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-medium mb-1">Departement</label>
-                <input 
-                  type="text"
-                  className="w-full border p-2 rounded"
+                <select 
                   value={newDepartement}
-                  onChange={(e) => setNewDepartement(e.target.value)}
-                  autoFocus
-                />
+                  onChange = {(e)=>setNewDepartement(e.target.value)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg">
+                  {listDepartements?.map((dep) => ( 
+                      <option key={dep} value={dep}>{dep}</option>     
+                  ))}
+                </select>
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-medium mb-1">Compte active</label>
                 <input 
                   type="text"
                   className="w-full border p-2 rounded"
-                  // value={newActivity}
-                  // onChange={(e) => setNewActivity(e.target.value)}
+                  value={newActivity}
+                  onChange={(e) => setNewActivity(e.target.value)}
                   autoFocus
                 />
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-medium mb-1">Role</label>
-                <input 
-                  type="text"
-                  className="w-full border p-2 rounded"
+                <select 
                   value={newRole}
-                  onChange={(e) => setNewRole(e.target.value)}
-                  autoFocus
-                />
+                  onChange = {(e)=>setNewRole(e.target.value)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg">
+                
+                  <option key="EMPLOYE" value="EMPLOYE">EMPLOYE</option>     
+                  <option key="RESPONSABLE" value="REPSONSABLE">RESPONSABLE</option>
+                  
+                </select>
               </div>
               <div className="flex justify-end gap-2">
                 <button 

@@ -16,6 +16,7 @@ const GestionUser = () => {
   const [newDepartement,setNewDepartement] = useState('')
   const [newEmail,setNewEmail] = useState('')
   const [newRole,setNewRole] = useState('')
+  const [newActivity,setNewActivity] = useState('')
 
   const { data: users } = useApi("/user/")
 
@@ -35,6 +36,14 @@ const GestionUser = () => {
     const matchDepartement = util.departement?.toLowerCase().includes(searchDepartement.toLowerCase())
     return matchSearch && matchRoles && matchDepartement
   })
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    // try {
+    //   await patch('/demande/answer', form)
+    //   setForm({ reference: "", status: "", motif: "" })
+    // } catch (err) { }
+  }
 
 
    return (
@@ -92,9 +101,7 @@ const GestionUser = () => {
       {/* Tableau des demandes */}
       <div className="bg-white rounded-xl shadow-sm">
         <div className="overflow-x-auto">
-          <form 
-          // onSubmit={handleSubmit} className=""
-          >
+          <form onSubmit={handleSubmit} className="">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
@@ -146,7 +153,8 @@ const GestionUser = () => {
                   <td className="px-6 py-4 text-sm border-r border-gray-200">
                     <div className="flex justify-end gap-2">
                         <button 
-                          onClick={() => {setSelectedUser(demande)}}
+                          onClick={() => {setSelectedUser(demande);setNewNom(demande.nom);setNewPrenom(demande.prenom);setNewEmail(demande.email);setNewDepartement(demande.departement);setNewActivity(demande.is_active);setNewRole(demande.role)}}
+                          selectedUser={selectedUser} 
                           className="p-1.5 text-blue-600 hover:bg-blue-50 rounded"
                         >
                           <Pencil className="w-4 h-4" />
@@ -184,6 +192,10 @@ const GestionUser = () => {
           setNewRole={setNewRole}
           newDepartement={newDepartement}
           setNewDepartement={setNewDepartement}
+          newActivity = {newActivity}
+          setNewActivity = {setNewActivity}
+          listRoles = {roles}
+          listDepartements = {departements}
         />
             )}
     </div>
