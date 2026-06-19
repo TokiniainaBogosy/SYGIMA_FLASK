@@ -106,4 +106,5 @@ def modifier_statut_demande(update_data: dict, current_user: User):
         db.session.rollback()
         abort(500, description=str(e))
 
-    return {"message": "Mise à jour réussie", "data": db_demande}
+    # return {"message": "Mise à jour réussie", "data": db_demande}
+    return db_demande

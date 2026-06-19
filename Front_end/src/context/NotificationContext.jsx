@@ -11,23 +11,32 @@ export const NotificationProvider = ({ children, userId }) => {
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
-    // Connexion au serveur Socket.IO
+    if (!userId) {
+      console.warn('⚠️ userId non défini');
+      return;
+    }
+
+    // Connexion Socket.IO
     const newSocket = io('http://localhost:8000', {
-  transports: ['websocket', 'polling'],
-  autoConnect: true,
-  reconnection: true,
-  reconnectionDelay: 1000,
-  reconnectionAttempts: 5
-});
+      transports: ['websocket', 'polling'],
+      autoConnect: true,
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionAttempts: 5
+    });
 
     newSocket.on('connect', () => {
       console.log('✅ Connecté au serveur Socket.IO');
-      // Rejoindre la room de l'utilisateur
-      newSocket.emit('join', { userId });
+      newSocket.emit('join', { userId: parseInt(userId) });
+    });
+
+    newSocket.on('disconnect', () => {
+      console.log('❌ Déconnecté du serveur Socket.IO');
     });
 
     newSocket.on('new_notification', (notification) => {
       console.log('📬 Nouvelle notification reçue:', notification);
+      
       setNotifications(prev => [notification, ...prev]);
       setUnreadCount(prev => prev + 1);
       
@@ -43,46 +52,112 @@ export const NotificationProvider = ({ children, userId }) => {
     setSocket(newSocket);
 
     // Charger les notifications existantes
-    fetchNotifications(userId);
+    fetchNotifications();
 
-    // Demander permission pour les notifications navigateur
+    // Demander permission notifications
     if (Notification.permission === 'default') {
       Notification.requestPermission();
     }
 
-    return () => newSocket.close();
+    return () => {
+      console.log('🔌 Déconnexion Socket.IO');
+      newSocket.close();
+    };
   }, [userId]);
 
-  const fetchNotifications = async (userId) => {
+  const fetchNotifications = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/notifications/${userId}`);
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        console.error('❌ Token manquant');
+        return;
+      }
+
+      console.log('📥 Chargement des notifications...');
+      
+      // ✅ Utiliser /my-notifications au lieu de /${userId}
+      const response = await fetch('http://localhost:8000/api/notifications/my-notifications', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
       const data = await response.json();
-      setNotifications(data.notifications);
-      setUnreadCount(data.notifications.filter(n => !n.read).length);
+      console.log('✅ Notifications reçues:', data);
+
+      const notificationsList = data.notifications || [];
+      setNotifications(notificationsList);
+      setUnreadCount(notificationsList.filter(n => !n.read).length);
+      
     } catch (error) {
-      console.error('Erreur chargement notifications:', error);
+      console.error('❌ Erreur chargement notifications:', error);
     }
   };
 
   const markAsRead = async (notificationId) => {
     try {
-      await fetch(`http://localhost:5000/api/notifications/${notificationId}/read`, {
-        method: 'PUT'
-      });
+      const token = localStorage.getItem('token');
+      
+      const response = await fetch(
+        `http://localhost:8000/api/notifications/${notificationId}/read`, 
+        {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
       
       setNotifications(prev =>
         prev.map(n => n.id === notificationId ? { ...n, read: true } : n)
       );
       setUnreadCount(prev => Math.max(0, prev - 1));
+      
+      console.log(`✅ Notification ${notificationId} marquée comme lue`);
+      
     } catch (error) {
-      console.error('Erreur marquage notification:', error);
+      console.error('❌ Erreur marquage notification:', error);
     }
   };
 
-  const markAllAsRead = () => {
-    notifications.forEach(n => {
-      if (!n.read) markAsRead(n.id);
-    });
+  const markAllAsRead = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      const response = await fetch(
+        'http://localhost:8000/api/notifications/mark-all-read',
+        {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+      setUnreadCount(0);
+      
+      console.log('✅ Toutes les notifications marquées comme lues');
+      
+    } catch (error) {
+      console.error('❌ Erreur:', error);
+    }
   };
 
   return (
@@ -90,7 +165,8 @@ export const NotificationProvider = ({ children, userId }) => {
       notifications,
       unreadCount,
       markAsRead,
-      markAllAsRead
+      markAllAsRead,
+      refreshNotifications: fetchNotifications
     }}>
       {children}
     </NotificationContext.Provider>

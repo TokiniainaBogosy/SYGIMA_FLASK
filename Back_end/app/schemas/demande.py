@@ -56,6 +56,10 @@ class DemandeListResponseSchema(Schema):
     date_soumission = fields.DateTime(dump_only=True)
     date_traitement = fields.DateTime(dump_only=True)
     materiels = fields.Str(dump_only=True)
+    justification = fields.Str(dump_only=True)
+    qte_disponible = fields.Int(dump_only=True)
+    qte_demandee = fields.Int(dump_only=True)
+    motif_rejet = fields.Str(dump_only=True)
 
 
 class StatusUpdateSchema(Schema):

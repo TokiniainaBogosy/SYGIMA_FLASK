@@ -6,6 +6,7 @@ from app.models.Materiel import Materiel
 from app.models.Departement import Departement
 from app.models.LigneDemande import LigneDemande
 from app.models.UserEntreprise import UserEntreprise
+from app.models.Stock import Stock
 from sqlalchemy import case
 from typing import Optional
 
@@ -52,6 +53,7 @@ def read_demande_list(current_user: User, current_user_entreprise: dict, limit: 
         db.session.query(
             Demande.id,
             LigneDemande.id.label("ligne_id"),
+            LigneDemande.qte_demandee,
             LigneDemande.qte_accordee,
             case(
                 (LigneDemande.qte_accordee >= 1, "APPROUVEE"),
@@ -64,14 +66,18 @@ def read_demande_list(current_user: User, current_user_entreprise: dict, limit: 
             Demande.date_soumission,
             Demande.date_soumission.label("date"),
             Demande.date_traitement,
+            Demande.justification,
+            Demande.motif_rejet,
             Departement.nom.label("departement"),
             Materiel.designation.label("materiels"),
+            Stock.quantite_actuelle.label("qte_disponible"),
             Demande.entreprise_id
         )
         .join(User, Demande.demandeur_id == User.id)
         .join(LigneDemande, Demande.id == LigneDemande.demande_id)
         .join(Materiel, LigneDemande.materiel_id == Materiel.id)
         .join(Departement, Demande.departement_id == Departement.id)
+        .outerjoin(Stock, Stock.materiel_id == Materiel.id)
         .filter(Demande.entreprise_id == current_user_entreprise.entreprise_id)
         .order_by(Demande.date_soumission.desc())
     )

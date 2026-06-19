@@ -2,9 +2,12 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { useApi } from '../../hooks/useApi'
 import DemandeMateriel from '../../components/Formulaire/DemandeMatériel'
+import DetailDemandes from '../../components/Affichage/DetailDemandes'
 
 export default function Demandes() {
   const [showForm, setShowForm] = useState(false)
+  const [showDetails,setShowDetails] = useState(false)
+  const [detailData, setDetailData] = useState(null)
   const { user } = useAuth()
   const [searchTerm, setSearchTerm] = useState('')
   const [searchStatus, setSearchStatus] = useState('')
@@ -43,12 +46,12 @@ export default function Demandes() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    try {
-      await patch('/demande/answer', form)
-      setForm({ reference: "", status: "", motif: "" })
-    } catch (err) { }
+    // try {
+    //   await patch('/demande/answer', form)
+    //   setForm({ reference: "", status: "", motif: "" })
+    // } catch (err) { }
   }
-
+  
   const handleAction = async (reference, id, nouveauStatut, motif = "") => {
     let statutFinal = nouveauStatut
 
@@ -70,6 +73,7 @@ export default function Demandes() {
       await patch('/demande/answer', { reference, ligne_id: id, status: statutFinal, motif })
       setRejectingId(null)
       setTempMotif("")
+      setShowDetails(false)
     } catch (err) { }
   }
 
@@ -136,13 +140,15 @@ export default function Demandes() {
 
       {/* Filtres */}
       <div className="flex gap-4 mb-6">
-        <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm" value={searchDepartement} onChange={(e) => setSearchDepartement(e.target.value)}>
-
-          <option value="">Toutes les Departements</option>
-            {departements.map((dep) => (
-              <option key={dep} value={dep}>{dep}</option>
-            ))}
-        </select>
+        {
+          user.role === 'ADMIN' && (
+          <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm" value={searchDepartement} onChange={(e) => setSearchDepartement(e.target.value)}>
+            <option value="">Toutes les Departements</option>
+              {departements.map((dep) => (
+                <option key={dep} value={dep}>{dep}</option>
+              ))}
+          </select>)
+        }
         <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm" value={searchStatus} onChange={(e) => setSearchStatus(e.target.value)}>
 
           <option value="">Toutes les Status</option>
@@ -278,8 +284,10 @@ export default function Demandes() {
                 <td className="px-6 py-4 text-sm text-gray-500 border-r border-gray-200">{demande.date}</td>
                   <td className="px-6 py-4 text-sm border-r border-gray-200">
                     <div className="flex gap-2">
-                      <button className="px-3 py-1 bg-blue-100 text-blue-700 rounded text-xs hover:bg-blue-200">
-                        👁️ Voir
+                      <button 
+                        onClick={()=>{setShowDetails(!showDetails), setDetailData({reference: demande.reference, demandeur: demande.demandeur, materiel: demande.materiels, justification: demande.justification, stock: demande.qte_disponible,qte_demande: demande.qte_demandee, motif_rejet: demande.motif_rejet,qte_disponible : demande.qte_disponible, statut: demande.statut_ligne,departement: demande.departement,ligne_id: demande.ligne_id,rejectingId: demande.ligne_id, demandeID: demande.reference})}}
+                        className="px-3 py-1 bg-blue-100 text-blue-700 rounded text-xs hover:bg-blue-200">
+                          👁️ Voir
                       </button>
                       {/* ACTION EMPLOYE : Annuler sa propre demande */}
                       {user?.role === 'EMPLOYE' && demande.statut === 'SOUMISE' && (
@@ -354,7 +362,7 @@ export default function Demandes() {
           </form>
         </div>
       </div>
-
+      {showDetails && <DetailDemandes getStatutStyle={getStatutStyle} reference={detailData?.reference} demandeur={detailData?.demandeur} materiel={detailData?.materiel} justification={detailData?.justification} stock={detailData?.stock} setShow={setShowDetails} qte_demande={detailData?.qte_demande} motif_rejet={detailData?.motif_rejet} qte_disponible={detailData?.qte_disponible} statut={detailData?.statut} departement={detailData?.departement} handleAction={handleAction} setRejectingId={setRejectingId} setDemandeID={setDemandeID} ligne_id={detailData?.ligne_id} demandeID={detailData?.demandeId} rejectingId={detailData?.rejectingId} handleSubmit={handleSubmit} tempMotif={tempMotif} setTempMotif={setTempMotif}/>}
       {/* Modal de Rejet Simple */}
         {demandeID && rejectingId && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
@@ -371,14 +379,14 @@ export default function Demandes() {
               />
               <div className="flex justify-end gap-3 mt-6">
                 <button 
-                  onClick={() => setRejectingId(null)}
+                  onClick={() => {setRejectingId(null); setTempMotif(""); setDemandeID(null)}}
                   className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg"
                 >
                   Annuler
                 </button>
                 <button 
                   disabled={!tempMotif.trim()}
-                  onClick={() => handleAction(demandeID, rejectingId, 'REJETEE', tempMotif)}
+                  onClick={() => {handleAction(demandeID, rejectingId, 'REJETEE', tempMotif), setTempMotif(""), setDemandeID(null), setRejectingId(null)}}
                   className="px-4 py-2 text-sm font-medium bg-rose-600 text-white hover:bg-rose-700 rounded-lg disabled:opacity-50"
                   type='button'
                 >

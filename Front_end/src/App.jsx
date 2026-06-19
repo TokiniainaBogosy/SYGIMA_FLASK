@@ -30,6 +30,7 @@ import RegisterParDepartement from './components/auth/registerParDepartement'
 import MaterielAdmin from './pages/Admin/MaterielAdmin'
 import StockAdmin from './pages/Admin/StockAdmin'
 import DepartementList from './components/Affichage/GestionDepartement'
+import DetailDemandes from './components/Affichage/DetailDemandes'
 
 
 export default function App() {
@@ -107,7 +108,7 @@ export default function App() {
               <ProtectedRoute>
                 
                   <RegisterParDepartement/>
-                
+  
               </ProtectedRoute>
             }
           />
@@ -188,6 +189,7 @@ export default function App() {
           <Route path="/ListDepartement" element={<ListDepartement/>}/>
           <Route path="/" element={<Login/>}/>
           <Route path="/CategorieMateriel" element={<CategorieMateriel/>}/>
+          <Route path="/DetailDemande" element={<DetailDemandes/>}/>
         </Routes>
       </AuthProvider>
     </div>

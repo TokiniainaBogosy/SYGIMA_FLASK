@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from app.models.Demande import Demande
     from app.models.Stock import Stock
     from app.models.ResponsableDepartement import ResponsableDepartement
+    from app.models.Notification import Notification
 
 
 class Departement(db.Model):  # ← changement
@@ -32,7 +33,11 @@ class Departement(db.Model):  # ← changement
     demandes: Mapped[list["Demande"]] = relationship("Demande", back_populates="departement")
     stocks: Mapped[list["Stock"]] = relationship("Stock", back_populates="departement")
     responsables: Mapped[list["ResponsableDepartement"]] = relationship("ResponsableDepartement", back_populates="departement")
-
+    
+    notifications: Mapped[list["Notification"]] = relationship(
+    "Notification",
+    back_populates="departement"
+)
     # code unique par entreprise (pas globalement)
     __table_args__ = (
         UniqueConstraint("code", "entreprise_id", name="_code_entreprise_uc"),

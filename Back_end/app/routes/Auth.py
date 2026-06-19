@@ -6,11 +6,13 @@ from app.models.UserEntreprise import UserEntreprise
 from app.models.Departement import Departement
 from app.schemas.user import UserLoginSchema, UserResponseSchema, TokenSchema, UserCreateSchema
 from app.database import db
+from flask_cors import cross_origin
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 
 
 @auth_bp.route("/login", methods=["POST"])
+@cross_origin()
 def login():
     """Login avec email + password"""
     credentials = UserLoginSchema().load(request.get_json())

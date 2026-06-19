@@ -3,12 +3,19 @@ from app.core.config import Config
 from app.database import db
 from app.extensions import migrate, jwt
 from flask_socketio import SocketIO
+from flask_cors import CORS
 
 socketio = SocketIO() 
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+    CORS(app, 
+         resources={r"/*": {"origins": "*"}},  # Autoriser toutes les origines en dev
+         supports_credentials=True,
+         allow_headers=["Content-Type", "Authorization"],
+         methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    )
     
     # Extensions
     db.init_app(app)

@@ -2,6 +2,7 @@ from flask import request, abort
 from app.core.security import decode_token
 from app.models.User import User
 from app.models.UserEntreprise import UserEntreprise
+from flask_cors import cross_origin
 
 
 def get_current_user() -> User:

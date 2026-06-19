@@ -32,6 +32,12 @@ export default function Navbar({ onLogout, user }) {
       roles: ['ADMIN', 'RESPONSABLE', 'MAGASINIER', 'EMPLOYE']
     },
     { 
+      icon: Building2, 
+      label: 'Départements', 
+      path: '/departements', 
+      roles: ['ADMIN']
+    },
+    { 
       icon: Package, 
       label: 'Stock', 
       path: '/stock', 
@@ -39,13 +45,13 @@ export default function Navbar({ onLogout, user }) {
     },
     { 
       icon: Package, 
-      label: 'StockAdmin', 
+      label: 'Stock', 
       path: '/StockAdmin', 
       roles: ['ADMIN']
     },
     {
       icon: Boxes, 
-      label: 'MaterielAdmin', 
+      label: 'Materiel', 
       path: '/MaterielAdmin', 
       roles: ['ADMIN']
     },
@@ -66,14 +72,7 @@ export default function Navbar({ onLogout, user }) {
       label: 'Paramètres', 
       path: '/parametres', 
       roles: ['ADMIN']
-    },
-    { 
-      icon: Building2, 
-      label: 'Départements', 
-      path: '/departements', 
-      roles: ['ADMIN']
     }
-    
   ];
 
   // Filtrer les menus selon le rôle de l'utilisateur
@@ -135,7 +134,7 @@ export default function Navbar({ onLogout, user }) {
           {/* Droite : Profil + Déconnexion */}
           <div className="hidden md:flex items-center gap-4">
             {/* Bouton Ajouter utilisateur (admin only) */}
-            {user?.role === 'ADMIN' && (
+            {(user?.role === 'ADMIN') &&(
               <>
               <button
                 onClick={handleRegister}
@@ -153,9 +152,10 @@ export default function Navbar({ onLogout, user }) {
                     d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                 </svg>
               </button>
-              <NotificationButton/>
+              
               </>
             )}
+            <NotificationButton/>
             {/* Infos utilisateur avec badge rôle */}
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-sm font-bold">
