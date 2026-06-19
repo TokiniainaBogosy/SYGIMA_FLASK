@@ -10,7 +10,8 @@ import {
   Menu,
   X,
   ChevronDown,
-  Building2
+  Building2,
+  UsersIcon
 } from 'lucide-react';
 import { NavLink, useNavigate } from "react-router-dom"
 
@@ -71,7 +72,13 @@ export default function Navbar({ onLogout, user }) {
       icon: Settings, 
       label: 'Paramètres', 
       path: '/parametres', 
-      roles: ['ADMIN']
+      roles: ['']
+    },
+    {
+      icon: UsersIcon,
+      label:"Users",
+      path:"/GestionUser",
+      roles:['ADMIN']
     }
   ];
 

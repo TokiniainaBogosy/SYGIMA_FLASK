@@ -22,3 +22,22 @@ def read_user_list(current_user: User, current_user_entreprise: dict,departement
     )
 
     return [dict(row._mapping) for row in results]
+
+def read_user_entreprise_list(current_user: User, current_user_entreprise: dict):
+    results = (
+        db.session.query(
+            User.id,
+            User.nom,
+            User.prenom,
+            User.email,
+            User.role,
+            User.is_active,
+            User.created_at,
+            Departement.nom.label("departement")
+        )
+        .join(Departement, Departement.id == User.departement_id)  
+        .filter(Departement.entreprise_id == current_user_entreprise.entreprise_id)
+        .all()
+    )
+
+    return [dict(row._mapping) for row in results]

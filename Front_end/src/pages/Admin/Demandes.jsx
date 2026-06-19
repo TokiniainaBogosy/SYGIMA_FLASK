@@ -57,7 +57,7 @@ export default function Demandes() {
 
     if (nouveauStatut === 'REJETEE') {
       statutFinal = user?.role === 'Magasinier' ? 'REJETEE2' : 'REJETEE1'
-    } else if (nouveauStatut === 'APPROUVEE') {
+    } else if (nouveauStatut === 'APPROUVEE1') {
       statutFinal = user?.role === 'Magasinier' ? 'APPROUVEE2' : 'APPROUVEE1'
     } else if (nouveauStatut === 'STOCK_INSUFFISANT') {
       statutFinal = 'EN_ATTENTE_STOCK'
@@ -318,10 +318,10 @@ export default function Demandes() {
                       {(user?.role === 'RESPONSABLE' || user?.role === 'Magasinier') &&
                         (
                           <>
-                          {demande.statut_ligne === 'EN_ATTENTE' && (
+                          {demande.statut_ligne === 'SOUMISE' && (
                             <>
                               <button type="button" className="px-3 py-1 bg-green-100 text-green-700 rounded text-xs hover:bg-green-200"
-                              onClick={() =>  handleAction(demande.reference,demande.ligne_id,'APPROUVEE')}>
+                              onClick={() =>  handleAction(demande.reference,demande.ligne_id,'APPROUVEE1')}>
                                 ✅ APPROUVEE
                               </button>
                               
@@ -331,7 +331,24 @@ export default function Demandes() {
                               </button>
                             </>
                           )}
-                            
+                          {demande.statut_ligne === 'APPROUVEE1' && (
+                            <>
+                              <button 
+                                onClick={() => handleAction(demande.reference,demande.ligne_id, 'STOCK_INSUFFISANT')}
+                                className="px-3 py-1 bg-orange-100 text-orange-700 rounded text-xs hover:bg-orange-200"
+                              >
+                                ⏳ En attente stock
+                              </button>
+
+                              <button 
+                                onClick={() => handleAction(demande.reference,demande.ligne_id, 'LIVREE')}
+                                className="px-3 py-1 bg-orange-100 text-orange-700 rounded text-xs  hover:bg-orange-200"
+                              >
+                                📦 Confirmer Sortie 
+                              </button>
+                            </>
+                          )
+                          }
                           </>
                         )}
                         {/* Optionnel : Bouton spécifique pour le magasinier si la demande est APPROUVEE1 */}

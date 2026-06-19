@@ -47,7 +47,7 @@ class DemandeListResponseSchema(Schema):
     id = fields.Int(dump_only=True)
     ligne_id = fields.Int(load_default=None)
     qte_accordee = fields.Int(load_default=None)
-    statut_ligne = fields.Str(load_default=None)
+    statut_ligne = EnumField(StatutDemande, load_default=None)
     reference = fields.Str(dump_only=True)
     demandeur = fields.Str(dump_only=True)
     departement = fields.Str(dump_only=True)

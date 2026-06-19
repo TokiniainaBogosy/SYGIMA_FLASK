@@ -7,6 +7,7 @@ from app.models.User import User
 from app.models.Departement import Departement
 from app.models.ResponsableDepartement import ResponsableDepartement
 from app.models.Demande import StatutDemande
+from app.models.LigneDemande import StatutDemande as StatutLigneDemande
 import uuid
 
 
@@ -50,7 +51,8 @@ def create_demande(data: dict, current_user,current_user_entreprise):
             db_ligne = LigneDemande(
                 demande_id=db_demande.id,
                 materiel_id=materiel.id,
-                qte_demandee=item.get("quantite")
+                qte_demandee=item.get("quantite"),
+                statut_ligne=StatutLigneDemande.SOUMISE.value,
             )
             db.session.add(db_ligne)
 
