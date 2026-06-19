@@ -126,4 +126,5 @@ def modifier_statut_demande(update_data: dict, current_user: User,current_user_e
             "error":str(e),
         }),500
 
-    return {"message": "Mise à jour réussie", "data": db_demande}
+    # return {"message": "Mise à jour réussie", "data": db_demande}
+    return db_demande

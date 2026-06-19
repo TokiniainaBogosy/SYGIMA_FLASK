@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum as PyEnum
+from typing import List ,Optional
 from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, DateTime, Enum as SAEnum, ForeignKey, Integer, String, func
@@ -49,5 +50,14 @@ class User(db.Model):
     demandes_responsable: Mapped[list["Demande"]] = relationship("Demande", foreign_keys="Demande.responsable_id", back_populates="responsable")
     demandes_traitees: Mapped[list["Demande"]] = relationship("Demande", foreign_keys="Demande.traite_par", back_populates="traite_par_user")
     mouvements: Mapped[list["MouvementStock"]] = relationship("MouvementStock", back_populates="user")
-    notifications: Mapped[list["Notification"]] = relationship("Notification", back_populates="user")
+    notifications: Mapped[List["Notification"]] = relationship(
+    "Notification",
+    foreign_keys="Notification.user_id",   # ✅ IMPORTANT
+    back_populates="user"
+)
+    sent_notifications: Mapped[list["Notification"]] = relationship(
+        "Notification",
+        foreign_keys="Notification.sender_id",
+        back_populates="sender"
+    )
     responsabilites: Mapped[list["ResponsableDepartement"]] = relationship("ResponsableDepartement", back_populates="user")

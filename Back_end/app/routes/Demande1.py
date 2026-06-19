@@ -7,6 +7,7 @@ from app.services.answer_demande_service import modifier_statut_demande
 from app.services.read_demande_list_Departement import read_demande_global
 from app.services.read_demande_list_service import read_demande_list, read_demande_list_departement
 from app.utils.auth import get_current_user , get_current_user_entreprise
+from app.utils.notifications import send_notification
 
 
 demande_bp = Blueprint("demande", __name__, url_prefix="/demande")
@@ -16,9 +17,32 @@ demande_bp = Blueprint("demande", __name__, url_prefix="/demande")
 def create_demande_route():
     current_user = get_current_user()
     current_user_entreprise = get_current_user_entreprise()
+
     data = CreateDemandeGlobalSchema().load(request.get_json())
-    result = create_demande(data, current_user, current_user_entreprise)
-    return jsonify(DemandeResponseSchema().dump(result)), 201
+    demande = create_demande(data, current_user, current_user_entreprise)
+
+    departement = current_user.departement
+
+    # ✅ Vérifier qu'il y a un département et un responsable
+    if departement and departement.responsables:
+
+        responsable = departement.responsables[0].user  # ✅ unique responsable
+
+        message = (
+            f"{current_user.prenom} {current_user.nom} "
+            f"a soumis une nouvelle demande (Réf: {demande.reference})"
+        )
+
+        send_notification(
+            user_id=responsable.id,
+            entreprise_id=current_user_entreprise.id,
+            message=message,
+            notification_type="info",
+            departement_id=departement.id,
+            sender_id=current_user.id
+        )
+
+    return jsonify(DemandeResponseSchema().dump(demande)), 201
 
 
 @demande_bp.route("/", methods=["GET"])
@@ -49,9 +73,20 @@ def read_demande_list_departement_global_route():
 def answer_demande_route():
     current_user = get_current_user()
     current_user_entreprise = get_current_user_entreprise()
+
     data = StatusUpdateSchema().load(request.get_json())
-    result = modifier_statut_demande(data, current_user,current_user_entreprise)
-    
-    # Sérialisation propre via Marshmallow
-    # Remplacez DemandeSchema par le nom de votre schéma existant
-    return jsonify(DemandeListResponseSchema().dump(result)), 200
+
+    demande = modifier_statut_demande(data, current_user)
+
+    # ✅ notifier le demandeur
+    send_notification(
+        user_id=demande.demandeur_id,
+        entreprise_id=current_user_entreprise.id,
+        message=f"Votre demande a été {demande.statut.value.lower()} par {current_user.prenom}",
+        notification_type="info",
+        departement_id=demande.departement_id,
+        sender_id=current_user.id
+    )
+    print(demande)  
+
+    return jsonify(DemandeListResponseSchema().dump(demande)), 200
