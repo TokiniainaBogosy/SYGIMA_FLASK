@@ -14,7 +14,7 @@ export default function DepartementForm() {
     setError("");
     setSuccess(false);
   };
-
+  const { post, loading, error } = useApi();
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -22,31 +22,18 @@ export default function DepartementForm() {
     setSuccess(false);
 
     try {
-      // 1. Récupérer le token depuis le stockage local
-      const token = localStorage.getItem('token');
-      
-      const response = await fetch(`http://localhost:8000/departement/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify(form), // On envoie directement nom et code
-      });
+    // Votre hook gère déjà le loading interne, l'URL de base et le token !
+    await post('/departement/', form);
 
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.detail || "Erreur lors de la création");
-      }
-
-      setSuccess(true);
-      setForm({ nom: "", code: "" });
+    // Si le hook n'a pas levé d'erreur (throw e), la création a réussi
+    setSuccess(true);
+    setForm({ nom: "", code: "" }); // Réinitialise le formulaire
     } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+      // L'erreur est automatiquement stockée dans l'état 'error' du hook,
+      // mais vous pouvez intercepter quelque chose ici si nécessaire.
+      console.error("Échec de la création :", err);
     }
-  };
+    };
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">

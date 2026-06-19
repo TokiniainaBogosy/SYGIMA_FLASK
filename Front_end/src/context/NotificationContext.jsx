@@ -77,12 +77,12 @@ export const NotificationProvider = ({ children, userId }) => {
       console.log('📥 Chargement des notifications...');
       
       // ✅ Utiliser /my-notifications au lieu de /${userId}
-      const response = await fetch('http://localhost:8000/api/notifications/my-notifications', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const { 
+        data: notifications, 
+        loading: loadingNotifications, 
+        error: errorNotifications,
+        setData: setNotifications // Utile si vous voulez vider/mettre à jour la liste manuellement plus tard
+      } = useApi('/api/notifications/my-notifications');
 
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
