@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useApi } from '../../hooks/useApi';
-const UserManager = ({ selectedUser , setSelectedUser , setCategories , newNom,newEmail,setNewEmail,setNewNom, newPrenom, setNewPrenom,setNewDepartement,newDepartement,newRole,setNewRole,newActivity,setNewActivity,listRoles,listDepartements}) => {
+const UserManager = ({ selectedUser , setSelectedUser , setCategories , newNom,newEmail,setNewEmail,setNewNom, newPrenom, setNewPrenom,setNewDepartement,newDepartement,newRole,setNewRole,newActivity,setNewActivity,listRoles,listDepartements,setUtilisateurs}) => {
 
   const { patch } = useApi()
 
@@ -8,15 +8,15 @@ const handleUpdate = async (e) => {
   e.preventDefault()
   try {
     await patch(
-      `/materiel/categorie/update/${selectedCategorie.id}`,
-      { nom: newName, description: newDescription }
+      `/user/update/${selectedUser.id}`,
+      { nom: newNom, prenom: newPrenom, email:newEmail,role:newRole,departement_id:newDepartement,is_active:newActivity}
     )
-    setCategories(prev =>
-      prev.map(cat =>
-        cat.id === selectedCategorie.id ? { ...cat, nom: newName } : cat
+    setUtilisateurs(prev =>
+      prev.map(user =>
+        user.id === selectedUser.id ? { ...user,nom: newNom, prenom: newPrenom, email: newEmail, role: newRole, departement_id: newDepartement, is_active: newActivity} : user
       )
     )
-    setSelectedCategorie(null)
+    setSelectedUser(null)
   } catch (err) { /* error géré par le hook */ }
 }
 
@@ -61,7 +61,7 @@ const handleUpdate = async (e) => {
                   type="text"
                   className="w-full border p-2 rounded"
                   value={newNom}
-                  onChange={(e) => setNewName(e.target.value)}
+                  onChange={(e) => setNewNom(e.target.value)}
                   autoFocus
                 />
               </div>

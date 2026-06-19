@@ -45,6 +45,18 @@ const GestionUser = () => {
     // } catch (err) { }
   }
 
+  const { del } = useApi()
+  
+    const handleDelete = async (id, type) => {
+      if (!window.confirm("Supprimer ?")) return
+      try {
+        await del(`/user/${type}/${id}`)
+        window.location.reload() // ou re-fetch
+      } catch (e) {
+        alert("Erreur suppression")
+      }
+    }
+
 
    return (
     <div className="w-full px-6 lg:px-10 py-8 space-y-8">
@@ -160,7 +172,7 @@ const GestionUser = () => {
                           <Pencil className="w-4 h-4" />
                         </button>
                         <button 
-                          // onClick={() => handleDelete(mat.id, 'materiel')}
+                          onClick={() => handleDelete(demande.id, 'delete')}
                           className="p-1.5 text-red-600 hover:bg-red-50 rounded"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -196,6 +208,7 @@ const GestionUser = () => {
           setNewActivity = {setNewActivity}
           listRoles = {roles}
           listDepartements = {departements}
+          setUtilisateurs = {setUtilisateurs}
         />
             )}
     </div>

@@ -19,6 +19,10 @@ class UserLoginSchema(Schema):
     email = fields.Email(required=True)
     password = fields.Str(required=True)
 
+class UserUpdateSchema(UserBaseSchema):
+    departement_id = fields.Str(load_default=None)
+    is_active = fields.Bool(load_default=True)
+    
 
 class UserResponseSchema(UserBaseSchema):
     id = fields.Int(dump_only=True)
