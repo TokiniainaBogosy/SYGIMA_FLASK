@@ -1,39 +1,42 @@
 import { useState } from "react";
+import { useApi } from "../../hooks/useApi"; // Ajustez le chemin selon votre structure de dossiers
 
 export default function DepartementForm() {
   const [form, setForm] = useState({
     nom: "",
     code: "",
   });
-  const [loading, setLoading] = useState(false);
+  
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+
+  // Initialisation du hook avec renommage pour éviter les conflits de variables
+  const { post, loading: apiLoading, error: apiError } = useApi();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setError("");
     setSuccess(false);
   };
-  const { post, loading, error } = useApi();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
     setSuccess(false);
 
     try {
-    // Votre hook gère déjà le loading interne, l'URL de base et le token !
-    await post('/departement/', form);
+      // Appel de la méthode post du hook
+      await post('/departement/', form);
 
-    // Si le hook n'a pas levé d'erreur (throw e), la création a réussi
-    setSuccess(true);
-    setForm({ nom: "", code: "" }); // Réinitialise le formulaire
+      // Si aucune erreur n'est levée, la création a réussi
+      setSuccess(true);
+      setForm({ nom: "", code: "" }); 
     } catch (err) {
-      // L'erreur est automatiquement stockée dans l'état 'error' du hook,
-      // mais vous pouvez intercepter quelque chose ici si nécessaire.
+      // On capture l'erreur retournée par l'API pour l'afficher localement
       console.error("Échec de la création :", err);
+      setError(apiError || err.message || "Une erreur est survenue.");
     }
-    };
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
@@ -115,10 +118,10 @@ export default function DepartementForm() {
               </button>
               <button
                 type="submit"
-                disabled={loading}
+                disabled={apiLoading}
                 className="flex-1 py-2.5 px-4 bg-gray-900 hover:bg-gray-800 disabled:bg-gray-400 text-white text-sm font-medium rounded-xl transition-colors duration-200"
               >
-                {loading ? (
+                {apiLoading ? (
                   <span className="flex items-center justify-center gap-2">
                     <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>

@@ -23,9 +23,9 @@ def list_routes():
     return jsonify(routes)
 
 if __name__ == "__main__":
-    print('🚀 Démarrage du serveur Flask avec Socket.IO...')
-    print('📡 URL: http://localhost:8000')
-    print('🔌 WebSocket: ws://localhost:8000')
+    print('Démarrage du serveur Flask avec Socket.IO...')
+    print('URL: http://localhost:8000')
+    print('WebSocket: ws://localhost:8000')
     
     socketio.run(
         app,

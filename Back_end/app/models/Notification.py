@@ -18,7 +18,7 @@ class TypeNotification(PyEnum):
     INFO = "INFO"
     WARNING = "WARNING"
     ERROR = "ERROR"
-    SUCCESS = "SUCCESS"  # ✅ Ajouté
+    SUCCESS = "SUCCESS"  # Ajouté
 
 
 class Notification(db.Model):
@@ -53,21 +53,21 @@ class Notification(db.Model):
         back_populates="notifications"
     )
 
-    # ✅ Destinataire
+    # Destinataire
     user: Mapped["User"] = relationship(
         "User",
         foreign_keys=[user_id],
         back_populates="notifications"
     )
 
-    # ✅ Expéditeur
+    # Expéditeur
     sender: Mapped[Optional["User"]] = relationship(
         "User",
         foreign_keys=[sender_id],
         back_populates="sent_notifications"
     )
 
-    # ✅ Département
+    # Département
     departement: Mapped[Optional["Departement"]] = relationship(
         "Departement",
         back_populates="notifications"

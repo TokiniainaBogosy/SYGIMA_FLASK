@@ -12,7 +12,7 @@ export const NotificationProvider = ({ children, userId }) => {
 
   useEffect(() => {
     if (!userId) {
-      console.warn('⚠️ userId non défini');
+      console.warn('userId non défini');
       return;
     }
 
@@ -26,16 +26,16 @@ export const NotificationProvider = ({ children, userId }) => {
     });
 
     newSocket.on('connect', () => {
-      console.log('✅ Connecté au serveur Socket.IO');
+      console.log('Connecté au serveur Socket.IO');
       newSocket.emit('join', { userId: parseInt(userId) });
     });
 
     newSocket.on('disconnect', () => {
-      console.log('❌ Déconnecté du serveur Socket.IO');
+      console.log('Déconnecté du serveur Socket.IO');
     });
 
     newSocket.on('new_notification', (notification) => {
-      console.log('📬 Nouvelle notification reçue:', notification);
+      console.log('Nouvelle notification reçue:', notification);
       
       setNotifications(prev => [notification, ...prev]);
       setUnreadCount(prev => prev + 1);
@@ -60,7 +60,7 @@ export const NotificationProvider = ({ children, userId }) => {
     }
 
     return () => {
-      console.log('🔌 Déconnexion Socket.IO');
+      console.log('Déconnexion Socket.IO');
       newSocket.close();
     };
   }, [userId]);
@@ -70,11 +70,11 @@ export const NotificationProvider = ({ children, userId }) => {
       const token = localStorage.getItem('token');
       
       if (!token) {
-        console.error('❌ Token manquant');
+        console.error('Token manquant');
         return;
       }
 
-      console.log('📥 Chargement des notifications...');
+      console.log('Chargement des notifications...');
       
       // ✅ Utiliser /my-notifications au lieu de /${userId}
       const { 
@@ -89,14 +89,14 @@ export const NotificationProvider = ({ children, userId }) => {
       }
 
       const data = await response.json();
-      console.log('✅ Notifications reçues:', data);
+      console.log('Notifications reçues:', data);
 
       const notificationsList = data.notifications || [];
       setNotifications(notificationsList);
       setUnreadCount(notificationsList.filter(n => !n.read).length);
       
     } catch (error) {
-      console.error('❌ Erreur chargement notifications:', error);
+      console.error('Erreur chargement notifications:', error);
     }
   };
 
@@ -124,10 +124,10 @@ export const NotificationProvider = ({ children, userId }) => {
       );
       setUnreadCount(prev => Math.max(0, prev - 1));
       
-      console.log(`✅ Notification ${notificationId} marquée comme lue`);
+      console.log(`Notification ${notificationId} marquée comme lue`);
       
     } catch (error) {
-      console.error('❌ Erreur marquage notification:', error);
+      console.error('Erreur marquage notification:', error);
     }
   };
 
@@ -153,10 +153,10 @@ export const NotificationProvider = ({ children, userId }) => {
       setNotifications(prev => prev.map(n => ({ ...n, read: true })));
       setUnreadCount(0);
       
-      console.log('✅ Toutes les notifications marquées comme lues');
+      console.log('Toutes les notifications marquées comme lues');
       
     } catch (error) {
-      console.error('❌ Erreur:', error);
+      console.error('Erreur:', error);
     }
   };
 

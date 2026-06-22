@@ -9,7 +9,7 @@ def register_socket_events(socketio):
     
     @socketio.on('connect')
     def handle_connect():
-        print(f'✅ Client connecté: {request.sid}')
+        print(f'Client connecté: {request.sid}')
         emit('connection_response', {
             'status': 'connected',
             'sid': request.sid
@@ -17,12 +17,12 @@ def register_socket_events(socketio):
     
     @socketio.on('disconnect')
     def handle_disconnect():
-        print(f'❌ Client déconnecté: {request.sid}')
+        print(f'Client déconnecté: {request.sid}')
         # Retirer l'utilisateur des connectés
         for user_id, sid in list(connected_users.items()):
             if sid == request.sid:
                 del connected_users[user_id]
-                print(f'👤 User {user_id} déconnecté')
+                print(f'User {user_id} déconnecté')
                 break
     
     @socketio.on('join')
@@ -31,7 +31,7 @@ def register_socket_events(socketio):
         room = f"user_{user_id}"
         join_room(room)
         connected_users[user_id] = request.sid
-        print(f'👤 User {user_id} rejoint room {room} (SID: {request.sid})')
+        print(f'User {user_id} rejoint room {room} (SID: {request.sid})')
         emit('joined', {'room': room, 'userId': user_id})
     
     @socketio.on('leave')
@@ -41,5 +41,5 @@ def register_socket_events(socketio):
         leave_room(room)
         if user_id in connected_users:
             del connected_users[user_id]
-        print(f'👤 User {user_id} a quitté room {room}')
+        print(f'User {user_id} a quitté room {room}')
         emit('left', {'room': room, 'userId': user_id})
