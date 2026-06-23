@@ -19,11 +19,11 @@ const GestionUser = () => {
   const [newActivity,setNewActivity] = useState('')
 
   const { data: users } = useApi("/user/")
+  const { data: departements, loading: isLoadingDeps } = useApi('/departement/')
 
   const [utilisateurs, setUtilisateurs] = useState([])
 
   const roles = [...new Set(utilisateurs.map(dem => dem.role))]
-  const departements = [...new Set(utilisateurs.map(util => util.departement))]
 
   useEffect(() => {
     if (users) setUtilisateurs(users)
@@ -77,8 +77,8 @@ const GestionUser = () => {
         value={searchDepartement} onChange={(e) => setSearchDepartement(e.target.value)}
         >
           <option value="">Toutes les Departements</option>
-            {departements.map((dep) => (
-              <option key={dep} value={dep}>{dep}</option>
+            {departements?.map((dep) => (
+              <option key={dep.nom} value={dep.nom}>{dep.nom}</option>
             ))}
         </select>
 
@@ -87,9 +87,8 @@ const GestionUser = () => {
         >
 
           <option value="">Roles</option>
-            {roles.map((rol) => (
-              <option key={rol} value={rol}>{rol}</option>
-            ))} 
+          <option key="EMPLOYE" value="EMPLOYE">EMPLOYE</option>
+          <option key="RESPONSABLE" value="RESPONSABLE">RESPONSABLE</option>            
         </select>
 
         {/* <select 
@@ -158,7 +157,7 @@ const GestionUser = () => {
                 <td className="px-6 py-4 text-sm text-gray-500 border-r border-gray-200"> {demande.prenom} </td>
                 <td className="px-6 py-4 text-sm text-gray-500 border-r border-gray-200">{demande.email}</td>
                 <td className="px-6 py-4 text-sm text-gray-500 border-r border-gray-200">{demande.departement}</td>
-                <td className="px-6 py-4 text-sm text-gray-500 border-r border-gray-200">{demande.is_active}</td>
+                <td className="px-6 py-4 text-sm text-gray-500 border-r border-gray-200">{demande.is_active == '1' ? "OUI" : "NON"}</td>
                 <td className="px-6 py-4 text-sm text-gray-500 border-r border-gray-200">{demande.role}</td>
                 <td className="px-6 py-4 text-sm text-gray-500 border-r border-gray-200">{demande.created_at}</td>
 
@@ -181,10 +180,7 @@ const GestionUser = () => {
                   </td>
                 </tr>
               )})}
-              
-              
             </tbody>
-
           </table>
           </form>
         </div>

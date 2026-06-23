@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useApi } from '../../hooks/useApi';
+import Switch from '../ui/Switch';
 const UserManager = ({ selectedUser , setSelectedUser , setCategories , newNom,newEmail,setNewEmail,setNewNom, newPrenom, setNewPrenom,setNewDepartement,newDepartement,newRole,setNewRole,newActivity,setNewActivity,listRoles,listDepartements,setUtilisateurs}) => {
 
   const { patch } = useApi()
@@ -92,19 +93,26 @@ const handleUpdate = async (e) => {
                   onChange = {(e)=>setNewDepartement(e.target.value)}
                   className="px-4 py-2 border border-gray-300 rounded-lg">
                   {listDepartements?.map((dep) => ( 
-                      <option key={dep} value={dep}>{dep}</option>     
+                      <option key={dep.nom} value={dep.nom}>{dep.nom}</option>     
                   ))}
                 </select>
               </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">Compte active</label>
-                <input 
-                  type="text"
-                  className="w-full border p-2 rounded"
-                  value={newActivity}
-                  onChange={(e) => setNewActivity(e.target.value)}
-                  autoFocus
-                />
+              {/* Remplace l'ancien bloc "Compte active" par celui-ci */}
+              <div className="mb-4 flex flex-col gap-2">
+                <label className="block text-sm font-medium text-gray-700">Compte actif</label>
+                
+                <div className="flex items-center gap-3 mt-1">
+                  {/* On passe la valeur et la fonction de modification */}
+                  <Switch 
+                    checked={newActivity} 
+                    onChange={(e) => setNewActivity(e.target.checked)} 
+                  />
+                  
+                  {/* Petit indicateur textuel à côté (optionnel mais sympa) */}
+                  <span className="text-sm font-medium text-gray-600">
+                    {newActivity ? 'Oui (Actif)' : 'Non (Inactif)'}
+                  </span>
+                </div>
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-medium mb-1">Role</label>
