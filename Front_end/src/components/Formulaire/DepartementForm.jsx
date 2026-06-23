@@ -1,13 +1,17 @@
 import { useState } from "react";
+import { useApi } from "../../hooks/useApi"; // Ajustez le chemin selon votre structure de dossiers
 
 export default function DepartementForm() {
   const [form, setForm] = useState({
     nom: "",
     code: "",
   });
-  const [loading, setLoading] = useState(false);
+  
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+
+  // Initialisation du hook avec renommage pour éviter les conflits de variables
+  const { post, loading: apiLoading, error: apiError } = useApi();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -17,34 +21,20 @@ export default function DepartementForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
     setSuccess(false);
 
     try {
-      // 1. Récupérer le token depuis le stockage local
-      const token = localStorage.getItem('token');
-      
-      const response = await fetch(`http://localhost:8000/departement/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify(form), // On envoie directement nom et code
-      });
+      // Appel de la méthode post du hook
+      await post('/departement/', form);
 
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.detail || "Erreur lors de la création");
-      }
-
+      // Si aucune erreur n'est levée, la création a réussi
       setSuccess(true);
-      setForm({ nom: "", code: "" });
+      setForm({ nom: "", code: "" }); 
     } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+      // On capture l'erreur retournée par l'API pour l'afficher localement
+      console.error("Échec de la création :", err);
+      setError(apiError || err.message || "Une erreur est survenue.");
     }
   };
 
@@ -128,10 +118,10 @@ export default function DepartementForm() {
               </button>
               <button
                 type="submit"
-                disabled={loading}
+                disabled={apiLoading}
                 className="flex-1 py-2.5 px-4 bg-gray-900 hover:bg-gray-800 disabled:bg-gray-400 text-white text-sm font-medium rounded-xl transition-colors duration-200"
               >
-                {loading ? (
+                {apiLoading ? (
                   <span className="flex items-center justify-center gap-2">
                     <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>

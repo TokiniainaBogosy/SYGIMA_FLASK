@@ -22,7 +22,7 @@ export const NotificationProvider = ({ children, userId }) => {
 
   useEffect(() => {
     if (!userId) {
-      console.warn('⚠️ userId non défini');
+      console.warn('userId non défini');
       return;
     }
 
@@ -36,16 +36,16 @@ export const NotificationProvider = ({ children, userId }) => {
     });
 
     newSocket.on('connect', () => {
-      console.log('✅ Connecté au serveur Socket.IO');
+      console.log('Connecté au serveur Socket.IO');
       newSocket.emit('join', { userId: parseInt(userId) });
     });
 
     newSocket.on('disconnect', () => {
-      console.log('❌ Déconnecté du serveur Socket.IO');
+      console.log('Déconnecté du serveur Socket.IO');
     });
 
     newSocket.on('new_notification', (notification) => {
-      console.log('📬 Nouvelle notification reçue:', notification);
+      console.log('Nouvelle notification reçue:', notification);
       
       setNotifications(prev => [notification, ...prev]);
       setUnreadCount(prev => prev + 1);
@@ -70,7 +70,7 @@ export const NotificationProvider = ({ children, userId }) => {
     }
 
     return () => {
-      console.log('🔌 Déconnexion Socket.IO');
+      console.log('Déconnexion Socket.IO');
       newSocket.close();
     };
   }, [userId]);

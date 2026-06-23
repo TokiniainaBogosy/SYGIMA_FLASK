@@ -25,8 +25,8 @@ def send_notification(
     notification = Notification(
         user_id=user_id,
         entreprise_id=entreprise_id,
-        departement_id=departement_id,   # ✅
-        sender_id=sender_id,             # ✅
+        departement_id=departement_id,   # 
+        sender_id=sender_id,             # 
         message=message,
         type=notif_type
     )
@@ -39,6 +39,6 @@ def send_notification(
     room = f"user_{user_id}"
     socketio.emit('new_notification', notification_dict, room=room)
 
-    print(f'📬 Notification envoyée à user {user_id}: {message}')
+    print(f'Notification envoyée à user {user_id}: {message}')
 
     return notification

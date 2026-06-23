@@ -1,0 +1,7 @@
+Collecting eventlet
+  Downloading eventlet-0.41.0-py3-none-any.whl.metadata (5.4 kB)
+Requirement already satisfied: dnspython>=1.15.0 in C:\Users\Tokini\.pyenv\pyenv-win\versions\3.11.9\Lib\site-packages (from eventlet) (2.8.0)
+Requirement already satisfied: greenlet>=1.0 in C:\Users\Tokini\.pyenv\pyenv-win\versions\3.11.9\Lib\site-packages (from eventlet) (3.5.0)
+Downloading eventlet-0.41.0-py3-none-any.whl (364 kB)
+Installing collected packages: eventlet
+Successfully installed eventlet-0.41.0

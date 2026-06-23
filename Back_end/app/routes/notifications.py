@@ -21,7 +21,7 @@ def get_my_notifications():
         if not user:
             return jsonify({'error': 'Utilisateur non trouvé'}), 404
         
-        print(f"📥 User {current_user_id} (role: {user.role})")
+        print(f"User {current_user_id} (role: {user.role})")
         
         # Si RESPONSABLE: voir notifications de son département
         if user.role == 'responsable':
@@ -30,7 +30,7 @@ def get_my_notifications():
             ).all()
             dept_ids = [d.id for d in departements]
             
-            print(f"👔 Responsable de {len(dept_ids)} département(s): {dept_ids}")
+            print(f"Responsable de {len(dept_ids)} département(s): {dept_ids}")
             
             notifications = Notification.query.filter(
                 or_(
@@ -41,7 +41,7 @@ def get_my_notifications():
         
         # Si EMPLOYÉ: voir uniquement SES notifications
         else:
-            print(f"👤 Employé")
+            print(f"Employé")
             notifications = Notification.query.filter_by(
                 user_id=current_user_id,
                 is_read=False
@@ -49,7 +49,7 @@ def get_my_notifications():
         
         notifications_list = [n.to_dict() for n in notifications]
         
-        print(f"✅ {len(notifications_list)} notifications trouvées")
+        print(f"{len(notifications_list)} notifications trouvées")
         
         return jsonify({
             'notifications': notifications_list,
@@ -58,7 +58,7 @@ def get_my_notifications():
         
     except Exception as e:
         import traceback
-        print(f"❌ Erreur: {str(e)}")
+        print(f"Erreur: {str(e)}")
         print(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 
@@ -116,7 +116,7 @@ def create_notification_for_responsable():
         room = f"user_{departement.responsable_id}"
         socketio.emit('new_notification', notification_dict, room=room)
         
-        print(f'✅ Notification envoyée de {user.username} → responsable (user {departement.responsable_id})')
+        print(f'Notification envoyée de {user.username} → responsable (user {departement.responsable_id})')
         
         return jsonify({
             'success': True,
@@ -126,7 +126,7 @@ def create_notification_for_responsable():
     except Exception as e:
         db.session.rollback()
         import traceback
-        print(f'❌ Erreur: {str(e)}')
+        print(f'Erreur: {str(e)}')
         print(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 
@@ -199,7 +199,7 @@ def create_notification_for_department():
         
         db.session.commit()
         
-        print(f'✅ {len(notifications_created)} notifications envoyées au département {departement_id}')
+        print(f'{len(notifications_created)} notifications envoyées au département {departement_id}')
         
         return jsonify({
             'success': True,
@@ -210,7 +210,7 @@ def create_notification_for_department():
     except Exception as e:
         db.session.rollback()
         import traceback
-        print(f'❌ Erreur: {str(e)}')
+        print(f'Erreur: {str(e)}')
         print(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 
@@ -233,7 +233,7 @@ def mark_as_read(notif_id):
         notification.is_read = True
         db.session.commit()
         
-        print(f'✅ Notification {notif_id} marquée comme lue')
+        print(f'Notification {notif_id} marquée comme lue')
         
         return jsonify({
             'success': True,
@@ -242,7 +242,7 @@ def mark_as_read(notif_id):
         
     except Exception as e:
         db.session.rollback()
-        print(f'❌ Erreur: {str(e)}')
+        print(f'Erreur: {str(e)}')
         return jsonify({'error': str(e)}), 500
 
 
@@ -263,7 +263,7 @@ def mark_all_as_read():
         
         db.session.commit()
         
-        print(f'✅ {len(notifications)} notifications marquées comme lues')
+        print(f'{len(notifications)} notifications marquées comme lues')
         
         return jsonify({
             'success': True,
@@ -272,7 +272,7 @@ def mark_all_as_read():
         
     except Exception as e:
         db.session.rollback()
-        print(f'❌ Erreur: {str(e)}')
+        print(f'Erreur: {str(e)}')
         return jsonify({'error': str(e)}), 500
 
 
@@ -312,5 +312,5 @@ def get_unread_count():
         }), 200
         
     except Exception as e:
-        print(f'❌ Erreur: {str(e)}')
+        print(f'Erreur: {str(e)}')
         return jsonify({'error': str(e)}), 500
