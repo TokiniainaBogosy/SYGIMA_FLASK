@@ -11,6 +11,10 @@ import {
   Download
 } from 'lucide-react';
 import DemandeMateriel from '../Formulaire/DemandeMatériel';
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+
+
 
 // ✅ PLUS DE SIDEBAR, on importe NAVBAR
 // import Navbar from '../layout/NavBar2';
@@ -20,31 +24,34 @@ import DataTable from '../ui/DataTable';
 import ActivityChart from '../charts/ActivityChart';
 import StatsSection from '../stats/StatsSection';
 import { useApi } from '../../hooks/useApi';
-
-// ─── MOCK DATA ─────────────────────────────────────────────
-const MOCK_DEMANDES = [
-  { id: 1, reference: 'DEM-2024-001', demandeur: 'Jean Dupont', departement: 'IT', materiels: 'Ordinateur portable Dell XPS', statut: 'APPROUVEE', date: '2024-01-15' },
-  { id: 2, reference: 'DEM-2024-002', demandeur: 'Marie Martin', departement: 'RH', materiels: 'Écran 27" LG', statut: 'SOUMISE', date: '2024-01-16' },
-  { id: 3, reference: 'DEM-2024-003', demandeur: 'Paul Bernard', departement: 'Finance', materiels: 'Clavier mécanique Logitech', statut: 'LIVREE', date: '2024-01-14' },
-  { id: 4, reference: 'DEM-2024-004', demandeur: 'Sophie Petit', departement: 'Marketing', materiels: 'Webcam 4K', statut: 'REJETEE', date: '2024-01-13' },
-  { id: 5, reference: 'DEM-2024-005', demandeur: 'Lucas Moreau', departement: 'IT', materiels: 'Docking station USB-C', statut: 'SOUMISE', date: '2024-01-17' },
-  { id: 6, reference: 'DEM-2024-006', demandeur: 'Emma Rousseau', departement: 'RH', materiels: 'Casque Jabra', statut: 'APPROUVEE', date: '2024-01-12' },
-];
-
-
-
-const MOCK_CHART_DATA = [
-  { label: 'Lun', value: 12 },
-  { label: 'Mar', value: 19 },
-  { label: 'Mer', value: 8 },
-  { label: 'Jeu', value: 25 },
-  { label: 'Ven', value: 15 },
-  { label: 'Sam', value: 5 },
-  { label: 'Dim', value: 3 },
-];
+import { useRef } from "react";
+import { exportRefToPdf } from '../utils/exportPdf';
+import DashboardReportPdf from "../pdf/DashboardReport";
 // ─────────────────────────────────────────────────────────────
 
 export default function DashBoardResponsable() {
+   const reportRef = useRef(null);
+const handleExportPdf = async () => {
+  console.log("reportRef.current =", reportRef.current);
+  if (!reportRef.current) {
+    alert("Zone PDF introuvable (reportRef est null)");
+    return;
+  }
+   try {
+    const filename = `dashboard_${user?.prenom || "user"}_${new Date().toISOString().slice(0,10)}.pdf`;
+    await exportRefToPdf({ element: reportRef.current, filename });
+    console.log("PDF SAVED");
+  } catch (e) {
+    console.error("EXPORT PDF ERROR:", e);
+    alert("Erreur export PDF, regarde la console");
+  }
+};
+
+    // await exportRefToPdf({
+    //   element: reportRef.current,
+    //   filename
+    // });
+  // };
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false)
@@ -100,13 +107,13 @@ export default function DashBoardResponsable() {
     logout();
     navigate('/login');
   };
-
   const quickStats = [
     { label: 'Matériels en stock', value: stats?.total_materiels ?? 0, icon: Package, color: 'blue', trend: 'up', trendValue: '+5%' },
     { label: 'Total des demandes', value: stats?.total_demandes ?? 0, icon: ClipboardList, color: 'orange', trend: null, trendValue: '3 urgents' },
     { label: 'Demandes approuvées', value: stats?.demandes_approuvees ?? 0, icon: CheckCircle2, color: 'green', trend: 'up', trendValue: '+12%' },
     { label: 'Alertes stock', value: stats?.alertes_stock ?? 0, icon: AlertTriangle, color: 'red', trend: 'down', trendValue: '-1' },
   ];
+
 
   const tableColumns = [
     { header: 'Référence', key: 'reference', className: 'text-sm font-medium text-blue-600' },
@@ -131,8 +138,19 @@ export default function DashBoardResponsable() {
 
 
   return (
+    
    
     <div className="min-h-screen bg-gray-50">
+      <div style={{ position: "fixed", left: "-10000px", top: 0, background: "white" }}>
+  <div ref={reportRef}>
+    <DashboardReportPdf
+  user={user}
+  demandes={demandes || []}
+  periode="mois"
+  logoUrl="/logo.png"
+/>
+  </div>
+</div>
       
       {/* ✅ NAVBAR EN HAUT */}
       {/* <Navbar onLogout={handleLogout} user={user} /> */}
@@ -152,10 +170,16 @@ export default function DashBoardResponsable() {
             </p>
           </div>
           <div className="flex gap-3">
-            <button className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+            <button 
+             onClick={() => {
+    console.log("EXPORT CLICK");
+    handleExportPdf();
+  }}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
               <Download className="w-4 h-4" />
               Exporter
             </button>
+           
             <button className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm"  onClick={() => setShowForm(!showForm)}>
               <ArrowUpRight className="w-4 h-4" />
               Nouvelle demande
