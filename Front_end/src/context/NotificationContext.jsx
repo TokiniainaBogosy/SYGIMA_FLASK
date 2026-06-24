@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useApi } from '../hooks/useApi';
 import io from 'socket.io-client';
 
 const NotificationContext = createContext();

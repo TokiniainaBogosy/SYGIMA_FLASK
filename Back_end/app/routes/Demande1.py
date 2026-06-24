@@ -76,7 +76,7 @@ def answer_demande_route():
 
     data = StatusUpdateSchema().load(request.get_json())
 
-    demande = modifier_statut_demande(data, current_user)
+    demande = modifier_statut_demande(data, current_user,current_user_entreprise)
 
     # ✅ notifier le demandeur
     send_notification(
