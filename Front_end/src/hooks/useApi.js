@@ -64,6 +64,19 @@ export function useApi(url = null) {
     setLoading(false)
   }
 }, [])
+const put = useCallback(async (putUrl, body) => {
+    setLoading(true)
+    try {
+      const res = await api.put(putUrl, body)
+      return res.data
+    } catch (e) {
+      setError(e.response?.data?.detail || e.message)
+      throw e
+    } finally {
+      setLoading(false)
+    }
+  }, [])
 
-  return { data, loading, error, setData, patch, post ,del }
+
+  return { data, loading, error, setData, patch, post ,del ,put}
 }
