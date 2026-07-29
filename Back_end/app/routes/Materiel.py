@@ -19,6 +19,8 @@ from app.services.read_stock_employe_service import read_inventaire_list
 from app.utils.auth import get_current_user
 from app.utils.auth import get_current_user_entreprise
 from app.services.update_inventaire_service import update_inventaire
+from app.utils.audit import inscrire_historique
+
 
 materiel_bp = Blueprint("materiel", __name__, url_prefix="/materiel")
 
@@ -27,6 +29,20 @@ materiel_bp = Blueprint("materiel", __name__, url_prefix="/materiel")
 def create_categorie_route():
     data = CategorieBaseSchema().load(request.get_json())
     result = create_categorie(data,get_current_user_entreprise())
+    current_user = get_current_user()
+    current_user_entreprise = get_current_user_entreprise()
+
+    inscrire_historique(
+            action="CREATION_CATEGORIE",
+            objet_cible=result,
+            user_id=current_user.id,
+            entreprise_id=current_user_entreprise.entreprise_id,  
+            details={
+                "nouveau_categorie": result.nom
+            }
+        )
+    
+    
     return jsonify(CategorieBaseSchema().dump(result)), 201
 
 
@@ -36,6 +52,17 @@ def create_materiel_route():
     current_user = get_current_user()
     current_user_entreprise = get_current_user_entreprise()
     result = create_materiel(data,current_user,current_user_entreprise)
+
+    inscrire_historique(
+                action="CREATION_MATERIEL",
+                objet_cible=result,
+                user_id=current_user.id,
+                entreprise_id=current_user_entreprise.entreprise_id,  
+                details={
+                    "nouveau_materiel": result.designation
+                }
+            )
+        
     return jsonify(MaterielResponseSchema().dump(result)), 201
 
 
@@ -124,6 +151,21 @@ def update_categorie_route(categorie_id: int):
 def update_materiel_route(materiel_id: int):
     data = MaterielUpdateSchema().load(request.get_json())
     result = update_materiel(materiel_id, data)
+    current_user = get_current_user()
+    current_user_entreprise = get_current_user_entreprise()
+
+    inscrire_historique(
+                action="MODIFICATION_MATERIEL",
+                objet_cible=result,
+                user_id=current_user.id,
+                entreprise_id=current_user_entreprise.entreprise_id,  
+                details={
+                    "nouveau_materiel": result.designation,
+                    "nouvelle_categorie": result.categorie.nom,
+                    "nouvelle_unite" : result.unite
+                }
+            )
+        
     return jsonify(MaterielResponseSchema().dump(result)), 200
 
 @materiel_bp.route("/inventaire", methods=["GET"])

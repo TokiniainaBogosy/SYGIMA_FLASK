@@ -34,6 +34,16 @@ def create_demande_route():
             f"a soumis une nouvelle demande (Réf: {demande.reference})"
         )
 
+        inscrire_historique(
+                action="SOUMISSION_DEMANDE",
+                objet_cible=demande,
+                user_id=current_user.id,
+                entreprise_id=current_user_entreprise.entreprise_id,  
+                details={
+                    "nouveau_statut": demande.statut.value
+                }
+            )
+
         send_notification(
             user_id=responsable.id,
             entreprise_id=current_user_entreprise.id,
@@ -77,30 +87,29 @@ def answer_demande_route():
 
     data = StatusUpdateSchema().load(request.get_json())
 
-    demande = modifier_statut_demande(data, current_user,current_user_entreprise)
+    ligne_demande,db_demande = modifier_statut_demande(data, current_user,current_user_entreprise)
 
     # Inscription dans l'historique d'actions
     # On passe le nouveau statut dans le champ 'details' pour garder une trace textuelle claire
     inscrire_historique(
         action="TRAITEMENT_DEMANDE",
-        objet_cible=demande,
+        objet_cible=ligne_demande,
         user_id=current_user.id,
         entreprise_id=current_user_entreprise.entreprise_id,  
         details={
-            "nouveau_statut": demande.statut.value,
-            "commentaire": data.get("commentaire", "")  # Si ton schéma accepte un commentaire de refus/validation
+            "nouveau_statut": ligne_demande.statut_ligne.value
         }
     )
 
     # notifier le demandeur
     send_notification(
-        user_id=demande.demandeur_id,
+        user_id=db_demande.demandeur_id,
         entreprise_id=current_user_entreprise.id,
-        message=f"Votre demande a été {demande.statut.value.lower()} par {current_user.prenom}",
+        message=f"Votre demande a été {ligne_demande.statut_ligne.value.lower()} par {current_user.prenom}",
         notification_type="info",
-        departement_id=demande.departement_id,
+        departement_id=db_demande.departement_id,
         sender_id=current_user.id
     )
-    print(demande)  
+    print(ligne_demande)  
 
-    return jsonify(DemandeListResponseSchema().dump(demande)), 200
+    return jsonify(DemandeListResponseSchema().dump(ligne_demande)), 200

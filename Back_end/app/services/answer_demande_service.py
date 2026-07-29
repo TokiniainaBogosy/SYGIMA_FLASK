@@ -135,4 +135,4 @@ def modifier_statut_demande(update_data: dict, current_user: User, current_user_
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
-    return db_demande
+    return ligne_demande,db_demande

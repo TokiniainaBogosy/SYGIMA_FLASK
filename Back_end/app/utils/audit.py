@@ -5,6 +5,7 @@ def inscrire_historique(action: str, objet_cible, user_id: int, entreprise_id: i
     """
     Enregistre une action dans la table historique de manière explicite.
     """
+    print('1111111111111')
     log = HistoriqueAction(
         entreprise_id=entreprise_id,
         user_id=user_id,
@@ -13,4 +14,7 @@ def inscrire_historique(action: str, objet_cible, user_id: int, entreprise_id: i
         id_cible=objet_cible.id,
         details=details
     )
+    print('2222222222222')
     db.session.add(log)
+    db.session.commit()
+    print('5555555555555555')
