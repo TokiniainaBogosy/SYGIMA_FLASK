@@ -24,6 +24,6 @@ class Entreprise(db.Model):  # ← changement
     demandes = relationship("Demande", back_populates="entreprise", lazy="select")
     mouvements_stock = relationship("MouvementStock", back_populates="entreprise", lazy="select")
     notifications = relationship("Notification", back_populates="entreprise", lazy="select")
-
+    inventaire = relationship("InventaireEmploye", back_populates="entreprise", lazy="select")
     def __repr__(self) -> str:
         return f"<Entreprise id={self.id} code={self.code!r} nom={self.nom!r}>"

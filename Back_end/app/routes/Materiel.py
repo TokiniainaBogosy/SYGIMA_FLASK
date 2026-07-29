@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from app.schemas.categorie import CategorieBaseSchema, CategorieResponseSchemaAdmin, CategorieUpdateSchema, CategorieResponseSchema
 from app.schemas.materiel import MaterielBaseSchema, MaterielResponseSchema, MaterielListResponseSchema, MaterielUpdateSchema
 from app.schemas.stock import StockCreateSchema, StockUpdateSchema, StockResponseSchema, StockListResponseSchema
+from app.schemas.inventaire import InventaireResponseSchema
 from app.services.create_categorie_service import create_categorie
 from app.services.read_categorie_service import read_categorie , read_categorie_par_admin
 from app.services.create_materiel_service import create_materiel
@@ -14,8 +15,10 @@ from app.services.delete_stock_service import delete_stock
 from app.services.update_categorie_service import update_categorie
 from app.services.update_materiel_service import update_materiel
 from app.services.update_stock_service import update_stock
+from app.services.read_stock_employe_service import read_inventaire_list
 from app.utils.auth import get_current_user
 from app.utils.auth import get_current_user_entreprise
+from app.services.update_inventaire_service import update_inventaire
 
 materiel_bp = Blueprint("materiel", __name__, url_prefix="/materiel")
 
@@ -122,3 +125,16 @@ def update_materiel_route(materiel_id: int):
     data = MaterielUpdateSchema().load(request.get_json())
     result = update_materiel(materiel_id, data)
     return jsonify(MaterielResponseSchema().dump(result)), 200
+
+@materiel_bp.route("/inventaire", methods=["GET"])
+def read_inventaire_route():
+    current_user = get_current_user()
+    current_user_entreprise = get_current_user_entreprise()
+    result = read_inventaire_list(current_user, current_user_entreprise)
+    return jsonify(InventaireResponseSchema(many=True).dump(result)), 200
+
+@materiel_bp.route("/inventaire/update/<int:inventaire_id>", methods=["PATCH"])
+def update_inventaire_route(inventaire_id: int):
+    data = request.get_json()
+    result = update_inventaire(inventaire_id, data)
+    return jsonify(StockResponseSchema().dump(result)), 200

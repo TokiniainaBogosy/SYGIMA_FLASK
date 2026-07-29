@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-import { useApi } from "../../hooks/useApi"; // ✅ import
+import { useApi } from "../../hooks/useApi"; 
 
 const SECTIONS = ["Catégorie", "Matériel"];
 
@@ -12,12 +12,12 @@ export default function CategorieForm() {
 
   const [success, setSuccess] = useState("");
 
-  // ✅ GET automatiques — remplace useEffect + fetch + les 3 useState
+  // GET automatiques — remplace useEffect + fetch + les 3 useState
   const { data: categories, loading: loadingCat }    = useApi("/materiel/categorie")
   const { data: materiels,  loading: loadingMat }    = useApi("/materiel/materiel")
   const { data: departements }                       = useApi("/departement/")
 
-  // ✅ Pour les POST
+  // Pour les POST
   const { post, loading, error } = useApi()
 
   // Générer référence basée sur le dernier ID

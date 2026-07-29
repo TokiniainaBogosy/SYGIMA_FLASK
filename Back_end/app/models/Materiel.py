@@ -14,6 +14,7 @@ if TYPE_CHECKING:
     from app.models.Stock import Stock
     from app.models.MouvementStock import MouvementStock
     from app.models.LigneDemande import LigneDemande
+    from app.models.InventaireMaterielEmploye import InventaireEmploye
 
 
 class Materiel(db.Model):  # ← changement
@@ -35,3 +36,4 @@ class Materiel(db.Model):  # ← changement
     stocks: Mapped[list["Stock"]] = relationship("Stock", back_populates="materiel")
     mouvements: Mapped[list["MouvementStock"]] = relationship("MouvementStock", back_populates="materiel")
     lignes_demande: Mapped[list["LigneDemande"]] = relationship("LigneDemande", back_populates="materiel")
+    inventaire: Mapped[list["InventaireEmploye"]] = relationship("InventaireEmploye", back_populates="materiel")

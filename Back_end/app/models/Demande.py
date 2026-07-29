@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from app.models.Entreprise import Entreprise
     from app.models.LigneDemande import LigneDemande
     from app.models.MouvementStock import MouvementStock
-
+    from app.models.InventaireMaterielEmploye import InventaireEmploye  
 
 class StatutDemande(PyEnum):
     BROUILLON = "BROUILLON"
@@ -53,3 +53,4 @@ class Demande(db.Model):  # ← changement
     departement: Mapped["Departement"] = relationship("Departement", back_populates="demandes")
     lignes: Mapped[list["LigneDemande"]] = relationship("LigneDemande", back_populates="demande")
     mouvements: Mapped[list["MouvementStock"]] = relationship("MouvementStock", back_populates="demande")
+    inventaire: Mapped[list["InventaireEmploye"]] = relationship("InventaireEmploye", back_populates="demande")

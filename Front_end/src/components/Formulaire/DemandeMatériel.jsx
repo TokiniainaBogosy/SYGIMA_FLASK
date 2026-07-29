@@ -141,7 +141,7 @@ const handleSubmit = async (e) => {
                       className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="">Sélectionner un materiel</option>
-                      {(materiels || []).map((m, index, tableauEntier) => {  // ✅ || [] pour éviter le crash
+                      {(materiels || []).map((m, index, tableauEntier) => {  
                         const elementPrecedent = tableauEntier[index - 1]
                         const isDuplicate = index > 0 && m.designation === elementPrecedent.designation
                         if (!isDuplicate) {

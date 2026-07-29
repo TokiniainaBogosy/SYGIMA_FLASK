@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from app.models.MouvementStock import MouvementStock
     from app.models.Notification import Notification
     from app.models.ResponsableDepartement import ResponsableDepartement
+    from app.models.InventaireMaterielEmploye import InventaireEmploye
 
 
 class RoleUser(PyEnum):
@@ -61,3 +62,4 @@ class User(db.Model):
         back_populates="sender"
     )
     responsabilites: Mapped[list["ResponsableDepartement"]] = relationship("ResponsableDepartement", back_populates="user")
+    inventaire: Mapped[list["InventaireEmploye"]] = relationship("InventaireEmploye", back_populates="user")

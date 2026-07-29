@@ -11,7 +11,8 @@ import {
   X,
   ChevronDown,
   Building2,
-  UsersIcon
+  UsersIcon,
+  HistoryIcon
 } from 'lucide-react';
 import { NavLink, useNavigate } from "react-router-dom"
 
@@ -42,7 +43,13 @@ export default function Navbar({ onLogout, user }) {
       icon: Package, 
       label: 'Stock', 
       path: '/stock', 
-      roles: ['RESPONSABLE', 'MAGASINIER']
+      roles: ['RESPONSABLE','MAGASINIER']
+    },
+    {
+      icon: Package, 
+      label: 'Stock Departement', 
+      path: '/stockDepartement', 
+      roles: ['RESPONSABLE', 'EMPLOYE','ADMIN']
     },
     { 
       icon: Package, 
@@ -79,6 +86,12 @@ export default function Navbar({ onLogout, user }) {
       label:"Users",
       path:"/GestionUser",
       roles:['ADMIN']
+    },
+    {
+      icon:HistoryIcon,
+      label:"Historique",
+      path:"/Historique",
+      roles:['ADMIN','RESPONSABLE']
     }
   ];
 

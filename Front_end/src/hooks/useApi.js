@@ -6,77 +6,91 @@ export function useApi(url = null) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
-  // GET automatique si URL fournie
-  useEffect(() => {
+  const fetchData = useCallback(async () => {
     if (!url) return
-    const fetchData = async () => {
-      setLoading(true)
-      setError(null)
-      try {
-        const res = await api.get(url)
-        setData(res.data)
-      } catch (e) {
-        setError(e.response?.data?.detail || e.message)
-      } finally {
-        setLoading(false)
-      }
+    setLoading(true)
+    setError(null)
+    try {
+      const res = await api.get(url)
+      setData(res.data)
+    } catch (e) {
+      // ← corrigé : cherche description ET detail
+      setError(e.response?.data?.description || e.response?.data?.detail || e.message)
+    } finally {
+      setLoading(false)
     }
-    fetchData()
   }, [url])
 
-  // PATCH manuel
+  useEffect(() => {
+    fetchData()
+  }, [fetchData])
+
+  // ✅ refetch exposé
+  const refetch = useCallback(() => {
+    fetchData()
+  }, [fetchData])
+
+  // PATCH
   const patch = useCallback(async (patchUrl, body) => {
     setLoading(true)
     try {
       const res = await api.patch(patchUrl, body)
       return res.data
     } catch (e) {
-      setError(e.response?.data?.detail || e.message)
-      throw e
+      // ← corrigé : cherche description ET detail
+      const message = e.response?.data?.description || e.response?.data?.detail || e.message
+      setError(message)
+      throw new Error(message)  // ← throw avec le bon message
     } finally {
       setLoading(false)
     }
   }, [])
 
-  // POST manuel
+  // POST
   const post = useCallback(async (postUrl, body) => {
     setLoading(true)
     try {
       const res = await api.post(postUrl, body)
       return res.data
     } catch (e) {
-      setError(e.response?.data?.detail || e.message)
-      throw e
+      const message = e.response?.data?.description || e.response?.data?.detail || e.message
+      setError(message)
+      throw new Error(message)
     } finally {
       setLoading(false)
     }
   }, [])
+
+  // DELETE
   const del = useCallback(async (delUrl) => {
-  setLoading(true)
-  try {
-    const res = await api.delete(delUrl)
-    return res.data
-  } catch (e) {
-    setError(e.response?.data?.detail || e.message)
-    setData([]) 
-    throw e
-  } finally {
-    setLoading(false)
-  }
-}, [])
-const put = useCallback(async (putUrl, body) => {
+    setLoading(true)
+    try {
+      const res = await api.delete(delUrl)
+      return res.data
+    } catch (e) {
+      const message = e.response?.data?.description || e.response?.data?.detail || e.message
+      setError(message)
+      setData([])
+      throw new Error(message)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  // PUT
+  const put = useCallback(async (putUrl, body) => {
     setLoading(true)
     try {
       const res = await api.put(putUrl, body)
       return res.data
     } catch (e) {
-      setError(e.response?.data?.detail || e.message)
-      throw e
+      const message = e.response?.data?.description || e.response?.data?.detail || e.message
+      setError(message)
+      throw new Error(message)
     } finally {
       setLoading(false)
     }
   }, [])
 
-
-  return { data, loading, error, setData, patch, post ,del ,put}
+  return { data, loading, error, refetch, patch, post, del, put }
 }

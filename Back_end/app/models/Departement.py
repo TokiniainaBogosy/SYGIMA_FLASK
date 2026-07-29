@@ -14,6 +14,7 @@ if TYPE_CHECKING:
     from app.models.Stock import Stock
     from app.models.ResponsableDepartement import ResponsableDepartement
     from app.models.Notification import Notification
+    from app.models.InventaireMaterielEmploye import InventaireEmploye  
 
 
 class Departement(db.Model):  # ← changement
@@ -38,6 +39,7 @@ class Departement(db.Model):  # ← changement
     "Notification",
     back_populates="departement"
 )
+    inventaire: Mapped[list["InventaireEmploye"]] = relationship("InventaireEmploye", back_populates="departement")
     # code unique par entreprise (pas globalement)
     __table_args__ = (
         UniqueConstraint("code", "entreprise_id", name="_code_entreprise_uc"),

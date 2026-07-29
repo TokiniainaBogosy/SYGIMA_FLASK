@@ -32,6 +32,8 @@ import StockAdmin from './pages/Admin/StockAdmin'
 import DepartementList from './components/Affichage/GestionDepartement'
 import DetailDemandes from './components/Affichage/DetailDemandes'
 import GestionUser from './pages/Admin/GestionUser'
+import Historique from './pages/Admin/Historique'
+import StockDepartement from './pages/Admin/StockDepartement'
 
 
 export default function App() {
@@ -181,6 +183,26 @@ export default function App() {
               <ProtectedRoute>
                 <Layout>
                   <GestionUser/>
+                </Layout>
+              </ProtectedRoute>
+            }
+          />  
+          <Route
+            path="/Historique"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <Historique/>
+                </Layout>
+              </ProtectedRoute>
+            }
+          />  
+          <Route
+            path="/stockDepartement"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <StockDepartement/>
                 </Layout>
               </ProtectedRoute>
             }

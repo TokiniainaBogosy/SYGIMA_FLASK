@@ -1,26 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useApi } from '../../hooks/useApi';
 const CategorieManager = ({ selectedCategorie , setSelectedCategorie , setCategories , newName, setNewName, newDescription, setNewDescription }) => {
-//   const [categories, setCategories] = useState([]);
-//   const [editingCategorie, setEditingCategorie] = useState(null); // Stocke la catégorie en cours de modif
-  
 
-//   // 1. Charger les catégories
-//   const fetchCategories = async () => {
-//     const res = await fetch('http://127.0.0.1:8000/api/v1/materiel/categorie');
-//     const data = await res.json();
-//     setCategories(data);
-//   };
 
-//   useEffect(() => { fetchCategories(); }, []);
-
-  // 2. Ouvrir le mode édition
-//   const openEdit = (cat) => {
-//     setEditingCategorie(cat);
-//     setNewName(cat.nom); // On pré-remplit l'input avec le nom actuel
-//   };
-
-  // 3. Envoyer la modification (PATCH)
+  // Envoyer la modification (PATCH)
   const { patch } = useApi()
 
 const handleUpdate = async (e) => {
@@ -43,31 +26,6 @@ const handleUpdate = async (e) => {
     <div className="p-6">
       <h2 className="text-xl font-bold mb-4">Gestion des Catégories</h2>
       
-      {/* Tableau des catégories */}
-      {/* <table className="min-w-full bg-white border">
-        <thead>
-          <tr>
-            <th className="border p-2">Nom</th>
-            <th className="border p-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {categories.map(cat => (
-            <tr key={cat.id}>
-              <td className="border p-2">{cat.nom}</td>
-              <td className="border p-2">
-                <button 
-                  onClick={() => openEdit(cat)}
-                  className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
-                >
-                  Modifier
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table> */}
-
       {/* Modal d'édition (s'affiche seulement si editingCategorie n'est pas null) */}
       
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">

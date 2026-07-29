@@ -1,53 +1,36 @@
-import { useEffect, useState } from 'react'
-import MaterielForm from '../../components/Formulaire/MaterielForm';
+import { useState } from 'react'
 import { useApi } from '../../hooks/useApi';
 import StockManager from '../../components/Formulaire/StockManager';
 import { useAuth } from '../../context/AuthContext';
-import { Search, Plus, Pencil, Trash2, Package, Tag } from 'lucide-react'
+import { Minus } from 'lucide-react'
 
-export default function Stock() {
-  const [showForm, setShowForm] = useState(false)
+const StockDepartement = () => {
   const [searchTerm, setSearchTerm] = useState('')
-  const { user } = useAuth()
-
-
-  // useApi retourne déjà les données
-  const { data: stocklist, loading: stocklistLoading, error: stocklistError , refetch} = 
-    useApi('materiel/stockList')
   const [searchCategorie, setSearchCategorie] = useState('')
   const [searchDepartement, setSearchDepartement] = useState('')
   const [selectedStock, setSelectedStock] = useState(null)
-  const [newUnite, setNewUnite] = useState("");
-  const [data,setData] = useState([])
-  const [newDesignation, setNewDesignation] = useState("");
-  const [newName,setNewName] = useState("");
-  const [newDescription,setNewDescription] = useState("");
-  // Ne pas faire setData en dehors d'un useEffect
-  // Utilisez directement stocklist au lieu de créer un state séparé
+  const { user } = useAuth()
+
+  const { data: stocklist, loading: stocklistLoading, error: stocklistError, refetch } =
+    useApi('materiel/inventaire')  // ← refetch extrait du hook
+
   const materiels = stocklist || []
 
-  // Extraire les catégories et départements UNIQUEMENT quand les données sont chargées
   const categories = [...new Set(materiels.map(mat => mat.categorie).filter(Boolean))]
   const departements = [...new Set(materiels.map(mat => mat.departement).filter(Boolean))]
 
-  // Fonction pour le style de quantité
-  const getQuantiteStyle = (quantite, seuil) => {
-    if (quantite <= seuil) {
-      return 'text-red-600 font-bold'
-    }
+  const getQuantiteStyle = (quantite) => {
+    if (quantite <= 0) return 'text-red-600 font-bold'
     return 'text-green-600 font-bold'
   }
 
-  // Filtrage des matériels
   const filteredMateriels = materiels.filter((mat) => {
     const matchSearch = mat.designation?.toLowerCase().includes(searchTerm.toLowerCase()) || false
     const matchCategorie = searchCategorie === '' || mat.categorie === searchCategorie
     const matchDepartement = searchDepartement === '' || mat.departement === searchDepartement
-    
     return matchSearch && matchCategorie && matchDepartement
   })
 
-  // Affichage du chargement
   if (stocklistLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -56,7 +39,6 @@ export default function Stock() {
     )
   }
 
-  // Affichage de l'erreur
   if (stocklistError) {
     return (
       <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
@@ -65,28 +47,21 @@ export default function Stock() {
       </div>
     )
   }
-  
-  console.log(materiels);
+
   return (
-    <div className="space-y-6 w-full px-6 lg:px-10 py-8 space-y-8">
-      {/* En-tête de la page */}
-      <div className="flex justify-between items-center mb-8">
+    <div className="w-full px-6 lg:px-10 py-8 space-y-6">
+
+      {/* En-tête */}
+      <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Stock</h1>
-          <p className="text-gray-500 mt-1">Gestion des Stocks</p>
+          <h1 className="text-3xl font-bold text-gray-900">Inventaire du département</h1>
+          <p className="text-gray-500 mt-1">Matériels distribués aux employés</p>
         </div>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition flex items-center gap-2"
-        >
-          <span className="text-xl">+</span>
-          Ajouter un matériel
-        </button>
       </div>
 
-      {/* Barres de recherche et filtres */}
-      <div className="mb-6 flex flex-wrap gap-4 items-center">
-        <select 
+      {/* Filtres */}
+      <div className="flex flex-wrap gap-4 items-center">
+        <select
           value={searchCategorie}
           onChange={(e) => setSearchCategorie(e.target.value)}
           className="px-4 py-2 border border-gray-300 rounded-lg"
@@ -96,9 +71,9 @@ export default function Stock() {
             <option key={cat} value={cat}>{cat}</option>
           ))}
         </select>
-        {
-          user?.role === 'ADMIN' && (
-            <select 
+
+        {user?.role === 'admin' && (
+          <select
             value={searchDepartement}
             onChange={(e) => setSearchDepartement(e.target.value)}
             className="px-4 py-2 border border-gray-300 rounded-lg"
@@ -108,10 +83,8 @@ export default function Stock() {
               <option key={dep} value={dep}>{dep}</option>
             ))}
           </select>
-          )
-        }
-        
-        
+        )}
+
         <input
           type="text"
           placeholder="Rechercher un matériel..."
@@ -121,22 +94,30 @@ export default function Stock() {
         />
       </div>
 
-      {/* Formulaire d'ajout */}
-      {showForm && <MaterielForm />}
+      {/* Modal StockManager */}
+      {selectedStock && (
+        <StockManager
+          selectedStock={selectedStock}
+          setSelectedStock={setSelectedStock}
+          mode="reduire"
+          onSuccess={() => {
+            refetch()              // ← rafraîchit la liste
+            setSelectedStock(null)
+          }}
+        />
+      )}
 
-      {/* Tableau du stock */}
+      {/* Tableau */}
       <div className="bg-white rounded-xl shadow-sm">
         <div className="px-6 py-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900">
-            Inventaire des matériels <span className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full">{filteredMateriels.length}</span>
+            Inventaire des matériels{' '}
+            <span className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full">
+              {filteredMateriels.length}
+            </span>
           </h2>
         </div>
-        {selectedStock && (  <StockManager
-          selectedStock={selectedStock}
-          setSelectedStock={setSelectedStock}
-          mode="ajouter"
-          onSuccess={() => refetch()}  // ← rafraîchit la liste
-        />)}
+
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
@@ -144,38 +125,43 @@ export default function Stock() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Référence</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Désignation</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Catégorie</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Employé</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Quantité</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Seuil</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Unité</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Département</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mis à jour</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
               </tr>
             </thead>
-
             <tbody className="divide-y divide-gray-200">
-              {filteredMateriels.map((mat, id) => (
-                <tr key={id} className="hover:bg-gray-50">
+              {filteredMateriels.map((mat) => (  // ← key sur mat.id, pas l'index
+                <tr key={mat.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm font-medium text-blue-600">{mat.reference}</td>
                   <td className="px-6 py-4 text-sm text-gray-900">{mat.designation}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{mat.categorie}</td>
-                  <td className={`px-6 py-4 text-sm ${getQuantiteStyle(mat.quantite_actuelle, mat.seuil_alerte)}`}>
-                    {mat.quantite_actuelle}
-                    {mat.quantite_actuelle <= mat.seuil_alerte && ' ⚠️'}
+                  <td className="px-6 py-4 text-sm text-gray-900">{mat.employe_prenom} {mat.employe_nom}</td>
+                  <td className={`px-6 py-4 text-sm ${getQuantiteStyle(mat.quantite)}`}>
+                    {mat.quantite}
+                    {mat.quantite <= 0 && ' ⚠️'}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{mat.seuil_alerte}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500">{mat.unite}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{mat.departement}</td>
+                  <td className="px-6 py-4 text-sm text-gray-400">
+                    {mat.updated_at ? new Date(mat.updated_at).toLocaleDateString('fr-FR') : '—'}
+                  </td>
                   <td className="px-6 py-4 text-sm">
-                    <div className="flex gap-2">
-                      <button onClick={() => setSelectedStock(mat)}>
-                        <Plus className="w-4 h-4 text-green-600" />
-                      </button>
-                    </div>
+                    <button
+                      className="p-1.5 bg-red-50 hover:bg-red-100 rounded"
+                      onClick={() => setSelectedStock(mat)}
+                    >
+                      <Minus className="w-4 h-4 text-red-600" />
+                    </button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-          
-          {/* Message si aucun résultat */}
+
           {filteredMateriels.length === 0 && (
             <div className="text-center py-8 text-gray-500">
               Aucun matériel trouvé
@@ -186,3 +172,5 @@ export default function Stock() {
     </div>
   )
 }
+
+export default StockDepartement

@@ -67,6 +67,7 @@ def create_app():
             LigneDemande,
             MouvementStock,
             Notification,
+            InventaireMaterielEmploye
         )
     app.register_blueprint(notifications_bp, url_prefix='/api/notifications')
     from app.socket_events import register_socket_events

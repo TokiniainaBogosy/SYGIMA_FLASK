@@ -8,6 +8,7 @@ from app.services.read_demande_list_Departement import read_demande_global
 from app.services.read_demande_list_service import read_demande_list, read_demande_list_departement
 from app.utils.auth import get_current_user , get_current_user_entreprise
 from app.utils.notifications import send_notification
+from app.utils.audit import inscrire_historique
 
 
 demande_bp = Blueprint("demande", __name__, url_prefix="/demande")
@@ -23,10 +24,10 @@ def create_demande_route():
 
     departement = current_user.departement
 
-    # ✅ Vérifier qu'il y a un département et un responsable
+    # Vérifier qu'il y a un département et un responsable
     if departement and departement.responsables:
 
-        responsable = departement.responsables[0].user  # ✅ unique responsable
+        responsable = departement.responsables[0].user  # unique responsable
 
         message = (
             f"{current_user.prenom} {current_user.nom} "
@@ -78,7 +79,20 @@ def answer_demande_route():
 
     demande = modifier_statut_demande(data, current_user,current_user_entreprise)
 
-    # ✅ notifier le demandeur
+    # Inscription dans l'historique d'actions
+    # On passe le nouveau statut dans le champ 'details' pour garder une trace textuelle claire
+    inscrire_historique(
+        action="TRAITEMENT_DEMANDE",
+        objet_cible=demande,
+        user_id=current_user.id,
+        entreprise_id=current_user_entreprise.entreprise_id,  
+        details={
+            "nouveau_statut": demande.statut.value,
+            "commentaire": data.get("commentaire", "")  # Si ton schéma accepte un commentaire de refus/validation
+        }
+    )
+
+    # notifier le demandeur
     send_notification(
         user_id=demande.demandeur_id,
         entreprise_id=current_user_entreprise.id,
