@@ -1,66 +1,61 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
+import { useApi } from '../hooks/useApi';
 
 // Constantes pour les filtres de modules
 const MODULES = [
-  { id: 'all', label: 'Tout l\'historique' },
-  { id: 'stock', label: 'Stock' },
-  { id: 'categorie', label: 'Catégories' },
-  { id: 'materiel', label: 'Matériel' },
-  { id: 'demande', label: 'Demandes' },
-  { id: 'utilisateur', label: 'Utilisateurs' }
+  { id: 'all', label: "Tout l'historique" },
+  { id: 'stocks', label: 'Stock' },
+  { id: 'categories_materiel', label: 'Catégories' },
+  { id: 'materiels', label: 'Matériel' },
+  { id: 'demandes', label: 'Demandes' },
+  { id: 'lignes_demande', label: 'Lignes de demande' }
 ];
 
 export default function HistoriqueAffichage() {
-  const [logs, setLogs] = useState([]);
-  const [filteredLogs, setFilteredLogs] = useState([]);
   const [activeTab, setActiveTab] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
 
-  // Simulation du fetch de l'API (À remplacer par votre appel Axios/Fetch)
-  useEffect(() => {
-    setIsLoading(true);
-    // Exemple de données fictives concordant avec vos modules
-    const mockLogs = [
-      { id: 1, date: '2026-06-29 11:15', utilisateur: 'Tokini', action: 'Création', module: 'materiel', description: 'Ajout du matériel "Écran ASUS 24 pouces"' },
-      { id: 2, date: '2026-06-29 10:30', utilisateur: 'Admin_Sygima', action: 'Modification', module: 'stock', description: 'Ajustement de stock pour "Câbles HDMI" (-10 unités)' },
-      { id: 3, date: '2026-06-28 16:45', utilisateur: 'Rindra', action: 'Approbation', module: 'demande', description: 'Demande de matériel #1044 validée' },
-      { id: 4, date: '2026-06-28 14:20', utilisateur: 'Tokini', action: 'Création', module: 'categorie', description: 'Nouvelle catégorie créée : "Périphériques Réseau"' },
-      { id: 5, date: '2026-06-27 09:00', utilisateur: 'Système', action: 'Désactivation', module: 'utilisateur', description: 'Utilisateur "test_user" désactivé pour inactivité' }
-    ];
-    
-    setLogs(mockLogs);
-    setFilteredLogs(mockLogs);
-    setIsLoading(false);
-  }, []);
+  // Récupération des données et des états directement depuis le hook personnalisé
+  const { data: mockLogs, loading: isLoading, error } = useApi('/historique/');
 
-  // Gestion des filtres et de la recherche
-  useEffect(() => {
-    let result = logs;
+  // Calcul mémorisé des logs filtrés (évite l'utilisation d'un useEffect + state supplémentaire)
+  const filteredLogs = useMemo(() => {
+    if (!mockLogs || !Array.isArray(mockLogs)) return [];
 
-    if (activeTab !== 'all') {
-      result = result.filter(log => log.module === activeTab);
-    }
+    return mockLogs.filter((log) => {
+      // 1. Filtre par onglet/module
+      const matchModule = activeTab === 'all' || log.table_cible === activeTab;
 
-    if (searchTerm.trim() !== '') {
-      result = result.filter(log => 
-        log.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        log.utilisateur.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        log.action.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
+      // 2. Filtre par terme de recherche
+      const search = searchTerm.trim().toLowerCase();
+      if (!search) return matchModule;
 
-    setFilteredLogs(result);
-  }, [activeTab, searchTerm, logs]);
+      const descriptionText = log.details || log.description || '';
+      const matchSearch =
+        (log.utilisateur && log.utilisateur.toLowerCase().includes(search)) ||
+        (log.action && log.action.toLowerCase().includes(search));
+
+      return matchModule && matchSearch;
+    });
+  }, [mockLogs, activeTab, searchTerm]);
 
   // Fonction utilitaire pour le badge de couleur par action
-  const getActionBadgeColor = (action) => {
+  const getActionBadgeColor = (action = '') => {
     switch (action.toLowerCase()) {
-      case 'création': return 'bg-green-100 text-green-800 border-green-200';
-      case 'modification': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'suppression': case 'désactivation': return 'bg-red-100 text-red-800 border-red-200';
-      case 'approbation': return 'bg-purple-100 text-purple-800 border-purple-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'création' :
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'soumission':
+        return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'modification':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'suppression':
+        return 'bg-red-100 text-red-800 border-red-200';
+      case 'désactivation':
+        return 'bg-red-100 text-red-800 border-red-200';
+      case 'traitement':
+        return 'bg-green-100 text-green-800 border-green-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
@@ -111,6 +106,8 @@ export default function HistoriqueAffichage() {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         {isLoading ? (
           <div className="p-8 text-center text-gray-500">Chargement de l'historique...</div>
+        ) : error ? (
+          <div className="p-8 text-center text-red-500">Une erreur est survenue lors du chargement de l'historique.</div>
         ) : filteredLogs.length === 0 ? (
           <div className="p-8 text-center text-gray-500">Aucun historique trouvé pour les critères sélectionnés.</div>
         ) : (
@@ -129,14 +126,14 @@ export default function HistoriqueAffichage() {
                 {filteredLogs.map((log) => (
                   <tr key={log.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap font-mono text-xs">
-                      {log.date}
+                      {log.created_at}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
-                      {log.utilisateur}
+                      {log.utilisateur || 'Système'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="capitalize px-2 py-1 text-xs bg-gray-100 rounded text-gray-600 font-medium">
-                        {log.module === 'categorie' ? 'Catégorie' : log.module}
+                        {log.table_cible}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -145,7 +142,11 @@ export default function HistoriqueAffichage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 max-w-md break-words">
-                      {log.description}
+                      {Object.entries(log.details || {}).map(([key, value]) => (
+                        <div key={key} className="mb-1">
+                          <span className="font-semibold">{key}:</span> {String(value)}
+                        </div>
+                      ))}
                     </td>
                   </tr>
                 ))}

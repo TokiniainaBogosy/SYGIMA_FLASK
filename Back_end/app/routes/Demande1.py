@@ -35,7 +35,7 @@ def create_demande_route():
         )
 
         inscrire_historique(
-                action="SOUMISSION_DEMANDE",
+                action="SOUMISSION",
                 objet_cible=demande,
                 user_id=current_user.id,
                 entreprise_id=current_user_entreprise.entreprise_id,  
@@ -92,7 +92,7 @@ def answer_demande_route():
     # Inscription dans l'historique d'actions
     # On passe le nouveau statut dans le champ 'details' pour garder une trace textuelle claire
     inscrire_historique(
-        action="TRAITEMENT_DEMANDE",
+        action="TRAITEMENT",
         objet_cible=ligne_demande,
         user_id=current_user.id,
         entreprise_id=current_user_entreprise.entreprise_id,  

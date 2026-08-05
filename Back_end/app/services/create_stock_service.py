@@ -41,7 +41,7 @@ def create_stock(data: dict, current_user: User,current_user_entreprise):
         db.session.add(db_stock)
         db.session.commit()
         db.session.refresh(db_stock)
-        return db_stock
+        return db_stock,materiel  # Retourner l'objet créé pour l'historique
     except Exception as e:
         db.session.rollback()
         print(f"Erreur : {e}")

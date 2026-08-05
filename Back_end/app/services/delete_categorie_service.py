@@ -20,6 +20,7 @@ def delete_categorie(categorie_id: int):
     # 4. Valider la transaction
     try:
         db.session.commit()
+        return db_categorie  # Retourner l'objet supprimé pour l'historique
     except Exception as e:
         db.session.rollback()
         print(f"Erreur : {e}")

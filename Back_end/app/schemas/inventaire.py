@@ -22,6 +22,7 @@ class InventaireResponseSchema(Schema):
     seuil_alerte = fields.Int(dump_only=True)
     departement = fields.Str(dump_only=True)
     categorie = fields.Str(dump_only=True)
+    sous_categorie = fields.Str(dump_only=True)
     reference = fields.Str(dump_only=True)
     designation = fields.Str(dump_only=True)
     unite = fields.Str(dump_only=True)

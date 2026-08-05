@@ -7,7 +7,7 @@ def update_stock(stock_id: int, data: dict):
 
     # 1. Chercher le stock
     db_obj = Stock.query.filter(Stock.id == stock_id).first()
-
+    db_materiel = db_obj.materiel  # Accéder à l'objet Materiel associé
     if not db_obj:
         abort(404, description="Stock non trouvé")
 
@@ -33,7 +33,7 @@ def update_stock(stock_id: int, data: dict):
     try:
         db.session.commit()
         db.session.refresh(db_obj)
-        return db_obj
+        return db_obj,db_materiel  # Retourner l'objet mis à jour pour l'historique
     except Exception as e:
         db.session.rollback()
         print(f"Erreur : {e}")

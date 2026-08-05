@@ -41,6 +41,7 @@ def create_app():
     from app.routes.Dashboard import dashboard_bp
     from app.routes.Responsable import responsable_bp
     from app.routes.notifications import notifications_bp
+    from app.routes.Historique import historique_bp
 
     app.register_blueprint(current_user_bp)
     app.register_blueprint(stats_bp)
@@ -52,6 +53,7 @@ def create_app():
     app.register_blueprint(materiel_bp)
     app.register_blueprint(user_bp)
     app.register_blueprint(responsable_bp)
+    app.register_blueprint(historique_bp)
 
     with app.app_context():
         from app.models import (
@@ -67,7 +69,8 @@ def create_app():
             LigneDemande,
             MouvementStock,
             Notification,
-            InventaireMaterielEmploye
+            InventaireMaterielEmploye,
+            HistoriqueAction
         )
     app.register_blueprint(notifications_bp, url_prefix='/api/notifications')
     from app.socket_events import register_socket_events

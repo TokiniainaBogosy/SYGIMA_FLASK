@@ -4,7 +4,7 @@ import StockManager from '../../components/Formulaire/StockManager';
 import { useAuth } from '../../context/AuthContext';
 import { Minus } from 'lucide-react'
 
-const StockDepartement = () => {
+const StockDepartementAdmin = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [searchCategorie, setSearchCategorie] = useState('')
   const [searchDepartement, setSearchDepartement] = useState('')
@@ -12,12 +12,12 @@ const StockDepartement = () => {
   const { user } = useAuth()
 
   const { data: stocklist, loading: stocklistLoading, error: stocklistError, refetch } =
-    useApi('materiel/inventaire')  // ← refetch extrait du hook
+    useApi('materiel/inventaire/admin')  // ← refetch extrait du hook
 
-  const materiels = stocklist?.filter(stock => stock.sous_categorie == "equipement") || []
+  const materiels = stocklist || []
 
   const categories = [...new Set(materiels.map(mat => mat.categorie).filter(Boolean))]
-  const departements = [...new Set(materiels.map(mat => mat.departement).filter(Boolean))]
+  const {data : departements, loading: departementLoading} = useApi('/departement/')
 
   const getQuantiteStyle = (quantite) => {
     if (quantite <= 0) return 'text-red-600 font-bold'
@@ -61,6 +61,18 @@ const StockDepartement = () => {
 
       {/* Filtres */}
       <div className="flex flex-wrap gap-4 items-center">
+
+        <select
+          value={searchDepartement}
+          onChange={(e) => setSearchDepartement(e.target.value)}
+          className="px-4 py-2 border border-gray-300 rounded-lg"
+        >
+          <option value="">Tous les départements</option>
+          {departements?.map((dep) => (
+            <option key={dep.id} value={dep.nom}>{dep.nom}</option>
+          ))}
+        </select>
+        
         <select
           value={searchCategorie}
           onChange={(e) => setSearchCategorie(e.target.value)}
@@ -71,19 +83,6 @@ const StockDepartement = () => {
             <option key={cat} value={cat}>{cat}</option>
           ))}
         </select>
-
-        {user?.role === 'admin' && (
-          <select
-            value={searchDepartement}
-            onChange={(e) => setSearchDepartement(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg"
-          >
-            <option value="">Tous les départements</option>
-            {departements.map((dep) => (
-              <option key={dep} value={dep}>{dep}</option>
-            ))}
-          </select>
-        )}
 
         <input
           type="text"
@@ -173,4 +172,4 @@ const StockDepartement = () => {
   )
 }
 
-export default StockDepartement
+export default StockDepartementAdmin

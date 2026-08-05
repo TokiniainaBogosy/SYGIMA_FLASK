@@ -630,10 +630,10 @@ export default function HomePage() {
 
         <div ref={heroRef} className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className={`transition-all duration-1000 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium mb-8">
+            {/* <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium mb-8">
               <Zap className="w-4 h-4" />
               Nouvelle version 2.0 disponible
-            </div>
+            </div> */}
             
             <h1 className="text-4xl sm:text-6xl font-bold text-gray-900 tracking-tight mb-6">
               Gérez votre inventaire <br />
@@ -808,7 +808,7 @@ export default function HomePage() {
                     <span className="text-indigo-600 font-semibold text-sm uppercase tracking-wider">Workflow fluide</span>
                     <h3 className="text-3xl font-bold text-gray-900 mt-3 mb-4">De la demande à la livraison en 3 clics</h3>
                     <p className="text-gray-600 leading-relaxed mb-6">
-                      L'employé soumet, le responsable approuve, le magasinier livre. Chaque étape est tracée, notifiée et sécurisée. Fini les emails perdus et les relances interminables.
+                      L'employé soumet, le responsable approuve. Chaque étape est tracée, notifiée et sécurisée. Fini les emails perdus et les relances interminables.
                     </p>
                     <div className="flex gap-4">
                       {['Soumission', 'Approbation', 'Livraison'].map((step, i) => (

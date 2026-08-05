@@ -76,16 +76,7 @@ export default function StockAdmin() {
           ))}
         </select> */}
         
-        <select 
-          value={searchDepartement}
-          onChange={(e) => setSearchDepartement(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg"
-        >
-          <option value="">Tous les départements</option>
-          {departementList?.map((dep) => (
-            <option key={dep.nom} value={dep.nom}>{dep.nom}</option>
-          ))}
-        </select>
+        
         
         {/* <input
           type="text"
@@ -94,6 +85,16 @@ export default function StockAdmin() {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 flex-1"
         /> */}
+          <select
+            value={searchDepartement}
+            onChange={(e) => setSearchDepartement(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg"
+          >
+            <option value="">Tous les départements</option>
+            {departementList?.map((dep) => (
+              <option key={dep.id} value={dep.nom}>{dep.nom}</option>
+            ))}
+          </select>
       </div>
 
       {/* Formulaire d'ajout */}

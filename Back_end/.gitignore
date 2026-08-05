@@ -4,9 +4,9 @@ venv/
 env/
 
 # Variables d'environnement (contient vos mots de passe !)
-# .env
-# .env.local
-# .env.production
+.env
+.env.local
+.env.production
 
 # Python
 __pycache__/

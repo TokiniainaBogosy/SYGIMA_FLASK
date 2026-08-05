@@ -15,7 +15,7 @@ from app.services.delete_stock_service import delete_stock
 from app.services.update_categorie_service import update_categorie
 from app.services.update_materiel_service import update_materiel
 from app.services.update_stock_service import update_stock
-from app.services.read_stock_employe_service import read_inventaire_list
+from app.services.read_stock_employe_service import read_inventaire_list, read_inventaire_list_par_admin
 from app.utils.auth import get_current_user
 from app.utils.auth import get_current_user_entreprise
 from app.services.update_inventaire_service import update_inventaire
@@ -33,7 +33,7 @@ def create_categorie_route():
     current_user_entreprise = get_current_user_entreprise()
 
     inscrire_historique(
-            action="CREATION_CATEGORIE",
+            action="CREATION",
             objet_cible=result,
             user_id=current_user.id,
             entreprise_id=current_user_entreprise.entreprise_id,  
@@ -54,7 +54,7 @@ def create_materiel_route():
     result = create_materiel(data,current_user,current_user_entreprise)
 
     inscrire_historique(
-                action="CREATION_MATERIEL",
+                action="CREATION",
                 objet_cible=result,
                 user_id=current_user.id,
                 entreprise_id=current_user_entreprise.entreprise_id,  
@@ -91,15 +91,41 @@ def create_stock_route():
     current_user = get_current_user()
     current_user_entreprise = get_current_user_entreprise()
     data = StockCreateSchema().load(request.get_json())
-    result = create_stock(data, current_user, current_user_entreprise)
+    result, materiel = create_stock(data, current_user, current_user_entreprise)
+
+    inscrire_historique(
+                action="INSERTION",
+                objet_cible=result,
+                user_id=current_user.id,
+                entreprise_id=current_user_entreprise.entreprise_id,  
+                details={
+                    "materiel": materiel.designation,
+                    "quantite": result.quantite_actuelle
+                }
+            )
     return jsonify(StockResponseSchema().dump(result)), 201
 
 
 @materiel_bp.route("/stock/update/<int:stock_id>", methods=["PATCH"])
 def update_stock_route(stock_id: int):
     data = StockUpdateSchema().load(request.get_json())
-    result = update_stock(stock_id, data)
-    return jsonify(StockResponseSchema().dump(result)), 200
+    db_obj, db_materiel = update_stock(stock_id, data)
+
+    current_user = get_current_user()
+    current_user_entreprise = get_current_user_entreprise()
+
+    inscrire_historique(
+                action="MODIFICATION",
+                objet_cible=db_obj,
+                user_id=current_user.id,
+                entreprise_id=current_user_entreprise.entreprise_id,  
+                details={
+                    "materiel": db_materiel.designation,
+                    "nouvelle_quantite": db_obj.quantite_actuelle,
+                    "quantite_ajoutee": data.get("quantite_ajoutee")
+                }
+            )
+    return jsonify(StockResponseSchema().dump(db_obj)), 200
 
 
 @materiel_bp.route("/stockList", methods=["GET"])
@@ -125,18 +151,45 @@ def read_materiel_list_route():
 
 @materiel_bp.route("/materiel/<int:materiel_id>", methods=["DELETE"])
 def delete_materiel_route(materiel_id: int):
-    delete_materiel(materiel_id)
+    result = delete_materiel(materiel_id)
+
+    current_user = get_current_user()
+    current_user_entreprise = get_current_user_entreprise()
+
+    inscrire_historique(
+                action="SUPPRESSION",
+                objet_cible=result,
+                user_id=current_user.id,
+                entreprise_id=current_user_entreprise.entreprise_id,  
+                details={
+                    "materiel_supprimé": result.designation
+                }
+            )     
     return "", 204
 
 
 @materiel_bp.route("/categorie/<int:categorie_id>", methods=["DELETE"])
 def delete_categorie_route(categorie_id: int):
-    delete_categorie(categorie_id)
+    result = delete_categorie(categorie_id)
+
+    current_user = get_current_user()
+    current_user_entreprise = get_current_user_entreprise()
+
+    inscrire_historique(
+                action="SUPPRESSION",
+                objet_cible=result,
+                user_id=current_user.id,
+                entreprise_id=current_user_entreprise.entreprise_id,  
+                details={
+                    "categorie_supprimée": result.nom
+                }
+            ) 
     return "", 204
 
 @materiel_bp.route("/stock/delete/<int:stock_id>", methods=["DELETE"])
 def delete_stock_route(stock_id: int):
     result = delete_stock(stock_id)
+   
     return "", 204
 
 
@@ -144,6 +197,19 @@ def delete_stock_route(stock_id: int):
 def update_categorie_route(categorie_id: int):
     data = CategorieUpdateSchema().load(request.get_json())
     result = update_categorie(categorie_id, data)
+    current_user = get_current_user()
+    current_user_entreprise = get_current_user_entreprise()
+
+    inscrire_historique(
+                action="MODIFICATION",
+                objet_cible=result,
+                user_id=current_user.id,
+                entreprise_id=current_user_entreprise.entreprise_id,  
+                details={
+                    "nouvelle_categorie": result.nom,
+                    "nouvelle_descrition": result.description
+                }
+            )
     return jsonify(CategorieResponseSchema().dump(result)), 200
 
 
@@ -155,7 +221,7 @@ def update_materiel_route(materiel_id: int):
     current_user_entreprise = get_current_user_entreprise()
 
     inscrire_historique(
-                action="MODIFICATION_MATERIEL",
+                action="MODIFICATION",
                 objet_cible=result,
                 user_id=current_user.id,
                 entreprise_id=current_user_entreprise.entreprise_id,  
@@ -175,8 +241,30 @@ def read_inventaire_route():
     result = read_inventaire_list(current_user, current_user_entreprise)
     return jsonify(InventaireResponseSchema(many=True).dump(result)), 200
 
+@materiel_bp.route("/inventaire/admin", methods=["GET"])
+def read_inventaire_admin_route():
+    current_user_entreprise = get_current_user_entreprise()
+    result = read_inventaire_list_par_admin(current_user_entreprise)
+    return jsonify(InventaireResponseSchema(many=True).dump(result)), 200
+
 @materiel_bp.route("/inventaire/update/<int:inventaire_id>", methods=["PATCH"])
 def update_inventaire_route(inventaire_id: int):
     data = request.get_json()
-    result = update_inventaire(inventaire_id, data)
-    return jsonify(StockResponseSchema().dump(result)), 200
+    db_obj, db_materiel = update_inventaire(inventaire_id, data)
+
+    current_user = get_current_user()
+    current_user_entreprise = get_current_user_entreprise()
+
+    inscrire_historique(
+                action="MODIFICATION",
+                objet_cible=db_obj,
+                user_id=current_user.id,
+                entreprise_id=current_user_entreprise.entreprise_id,  
+                details={
+                    "materiel": db_materiel.designation,
+                    "nouvelle_quantite": db_obj.quantite,
+                    "quantite_reduite": data.get("quantite_reduite")
+                }
+            )
+
+    return jsonify(StockResponseSchema().dump(db_obj)), 200

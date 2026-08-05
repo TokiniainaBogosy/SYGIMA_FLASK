@@ -7,8 +7,8 @@ const SECTIONS = ["Catégorie", "Matériel"];
 export default function CategorieForm() {
   const [active, setActive] = useState(0);
 
-  const [categorie, setCategorie] = useState({ nom: "", description: "" });
-  const [materiel, setMateriel] = useState({ reference: "", designation: "", categorie: "", unite: "" });
+  const [categorie, setCategorie] = useState({ nom: "",description: "" });
+  const [materiel, setMateriel] = useState({ reference: "", designation: "", categorie: "",sous_categorie: "", unite: "" });
 
   const [success, setSuccess] = useState("");
 
@@ -56,9 +56,10 @@ export default function CategorieForm() {
         reference:   materiel.reference,
         designation: materiel.designation,
         categorie:   materiel.categorie,
-        unite:       materiel.unite,
+        sous_categorie: materiel.sous_categorie,
+        unite:materiel.unite,
       })
-      setMateriel({ reference: generateReferenceFromLastId(), designation: "", categorie: "", unite: "" })
+      setMateriel({ reference: generateReferenceFromLastId(), designation: "", categorie: "", sous_categorie: "", unite: "" })
       setSuccess("Matériel créé avec succès !")
     } catch (err) { /* error géré par le hook */ }
   }
@@ -131,7 +132,7 @@ export default function CategorieForm() {
                   className={inputClass + " resize-none"}
                 />
               </div>
-              <Buttons loading={loading} onReset={() => setCategorie({ nom: "", description: "" })} />
+              <Buttons loading={loading} onReset={() => setCategorie({ nom: "",description: "" })} />
             </form>
           )}
 
@@ -188,10 +189,23 @@ export default function CategorieForm() {
                   ))}
                 </select>
               </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Sous catégorie</label>
+                <select
+                  value={materiel.sous_categorie}
+                  onChange={e => setMateriel({ ...materiel, sous_categorie: e.target.value })}
+                  className={inputClass}
+                >
+                  <option value="">Sélectionner une sous-catégorie</option>
+                  <option value="Equipement">Equipement</option>
+                  <option value="Consommable">Consommable</option>
+                </select>
+              </div>
               <Buttons loading={loading} onReset={() => setMateriel({ 
                 reference: generateReferenceFromLastId(), 
                 designation: "", 
                 categorie: "", 
+                sous_categorie: "",
                 unite: "" 
               })} />
             </form>

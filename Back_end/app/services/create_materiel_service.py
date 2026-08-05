@@ -19,6 +19,7 @@ def create_materiel(data: dict,current_user,current_user_entreprise):
         reference=data.get("reference"),
         designation=data.get("designation"),
         categorie_id=categorie.id,
+        sous_categorie=data.get("sous_categorie"),
         unite=data.get("unite"),
         departement_id=current_user.departement_id,
         entreprise_id=current_user_entreprise.entreprise_id

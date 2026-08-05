@@ -49,12 +49,18 @@ export default function Navbar({ onLogout, user }) {
       icon: Package, 
       label: 'Stock Departement', 
       path: '/stockDepartement', 
-      roles: ['RESPONSABLE', 'EMPLOYE','ADMIN']
+      roles: ['RESPONSABLE', 'EMPLOYE']
     },
     { 
       icon: Package, 
       label: 'Stock', 
       path: '/StockAdmin', 
+      roles: ['ADMIN']
+    },
+    { 
+      icon: Package, 
+      label: 'Inventaire', 
+      path: '/StockDepartementAdmin', 
       roles: ['ADMIN']
     },
     {
@@ -91,7 +97,7 @@ export default function Navbar({ onLogout, user }) {
       icon:HistoryIcon,
       label:"Historique",
       path:"/Historique",
-      roles:['ADMIN','RESPONSABLE']
+      roles:['ADMIN','RESPONSABLE','EMPLOYE']
     }
   ];
 

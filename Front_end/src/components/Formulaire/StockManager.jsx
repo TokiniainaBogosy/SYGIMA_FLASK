@@ -26,7 +26,8 @@ const StockManager = ({
       if (mode === "ajouter") {
         // ─── Responsable : augmente le stock
         await patch(`/materiel/stock/update/${selectedStock.id}`, {
-          quantite_actuelle: selectedStock.quantite_actuelle + qty
+          quantite_actuelle: selectedStock.quantite_actuelle + qty,
+          quantite_ajoutee: qty
         })
       } else {
         // ─── Inventaire : réduit la quantité
@@ -35,7 +36,8 @@ const StockManager = ({
           return
         }
         await patch(`/materiel/inventaire/update/${selectedStock.id}`, {
-          quantite: selectedStock.quantite - qty
+          quantite: selectedStock.quantite - qty,
+          quantite_reduite: qty
         })
       }
 

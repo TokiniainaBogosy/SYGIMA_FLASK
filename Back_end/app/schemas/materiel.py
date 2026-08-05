@@ -4,6 +4,7 @@ from marshmallow import Schema, fields
 class MaterielBaseSchema(Schema):
     reference = fields.Str(required=True)
     categorie = fields.Str(required=True)
+    sous_categorie = fields.Str(required=True)
     designation = fields.Str(required=True)
     unite = fields.Str(required=True)
 
@@ -20,6 +21,7 @@ class MaterielListResponseSchema(Schema):
     id = fields.Int(dump_only=True)
     categorie = fields.Str(dump_only=True)
     categorie_description = fields.Str(dump_only=True)
+    sous_categorie = fields.Str(dump_only=True)
     reference = fields.Str(dump_only=True)
     designation = fields.Str(dump_only=True)
     unite = fields.Str(dump_only=True)

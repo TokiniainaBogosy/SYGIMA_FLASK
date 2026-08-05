@@ -18,6 +18,7 @@ def delete_materiel(materiel_id: int):
     # 4. Valider la transaction
     try:
         db.session.commit()
+        return db_materiel  # Retourner l'objet supprimé pour l'historique
     except Exception as e:
         db.session.rollback()
         print(f"Erreur : {e}")
