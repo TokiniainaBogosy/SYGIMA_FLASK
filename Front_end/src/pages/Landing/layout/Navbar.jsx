@@ -26,6 +26,7 @@ export default function Navbar() {
             
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2.5">
+              
               <Boxes className="w-7 h-7 text-blue-600" />
               <span className="font-bold text-xl text-gray-900">Sygima</span>
             </Link>

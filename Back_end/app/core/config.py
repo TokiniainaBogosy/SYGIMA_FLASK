@@ -4,6 +4,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
+    # Configuration générale
+    APP_MODE = os.getenv("APP_MODE", "Local")  # Valeur par défaut : "Local"
+    
     # Base de données
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
     SQLALCHEMY_TRACK_MODIFICATIONS = False

@@ -4,9 +4,17 @@ from app.models.Entreprise import Entreprise
 from app.models.User import User, RoleUser
 from app.models.UserEntreprise import UserEntreprise
 from app.core.security import HashHelper
+from app.core.config import Config
 
 
 def setup_entreprise_et_admin(payload: dict):
+
+    # Cette opération n'est disponible qu'en mode SaaS
+    if Config.APP_MODE != "SAAS":
+        abort(
+            403,
+            description="La création d'une entreprise est désactivée en mode local."
+        )
 
     # 1. Vérification unicité code entreprise
     # if Entreprise.query.filter(Entreprise.code == payload["entreprise"]["code"]).first():

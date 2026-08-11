@@ -35,6 +35,9 @@ import GestionUser from './pages/Admin/GestionUser'
 import Historique from './pages/Admin/Historique'
 import StockDepartement from './pages/Admin/StockDepartement'
 import StockDepartementAdmin from './pages/Admin/StockDepartementAdmin'
+import appConfig from "./config/appConfig";
+import LoginLocal from './pages/LoginLocal'
+
 
 
 export default function App() {
@@ -56,14 +59,21 @@ export default function App() {
 
         <Routes>
           {/* PUBLIC */}
-          <Route element={<LandingLayout />}>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/features" element={<Features />} />
-          <Route path="/pricing" element={<Pricing />} />
-        </Route>
-          
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          {appConfig.mode === "SAAS" && (
+            <Route element={<LandingLayout />}>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/features" element={<Features />} />
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+            </Route>
+          )}
+          {
+            appConfig.mode === "LOCAL" && (
+              <Route path="/login" element={<LoginLocal/>}/>
+            )
+          }
+
 
           {/* PROTECTED */}
           <Route 
