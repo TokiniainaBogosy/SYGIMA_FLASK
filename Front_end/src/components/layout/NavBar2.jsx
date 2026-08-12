@@ -15,6 +15,7 @@ import {
   HistoryIcon
 } from 'lucide-react';
 import { NavLink, useNavigate } from "react-router-dom"
+import logo from '../../../public/logo-sygima.png'
 
 export default function Navbar({ onLogout, user }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -132,7 +133,7 @@ export default function Navbar({ onLogout, user }) {
           <div className="flex items-center gap-8">
             {/* Logo */}
             <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => navigate('/dashboard')}>
-              <Boxes className="w-7 h-7 text-blue-400" />
+              <img src={logo} alt="Logo" className="w-7 h-7" />
               <span className="font-bold text-lg tracking-tight">SYGIMA</span>
             </div>
 

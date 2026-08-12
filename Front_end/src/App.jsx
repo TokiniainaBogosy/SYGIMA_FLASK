@@ -73,8 +73,6 @@ export default function App() {
               <Route path="/login" element={<LoginLocal/>}/>
             )
           }
-
-
           {/* PROTECTED */}
           <Route 
             path="/dashboard" 
