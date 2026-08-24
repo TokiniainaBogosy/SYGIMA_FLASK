@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from app.models.ResponsableDepartement import ResponsableDepartement
     from app.models.Notification import Notification
     from app.models.InventaireMaterielEmploye import InventaireEmploye  
-
+    from app.models.CategoriesMateriel import CategoriesMateriel
 
 class Departement(db.Model):  # ← changement
     __tablename__ = "departements"
@@ -34,7 +34,7 @@ class Departement(db.Model):  # ← changement
     demandes: Mapped[list["Demande"]] = relationship("Demande", back_populates="departement")
     stocks: Mapped[list["Stock"]] = relationship("Stock", back_populates="departement")
     responsables: Mapped[list["ResponsableDepartement"]] = relationship("ResponsableDepartement", back_populates="departement")
-    
+    categories_materiel: Mapped[list["CategoriesMateriel"]] = relationship("CategoriesMateriel",back_populates="departement")
     notifications: Mapped[list["Notification"]] = relationship(
     "Notification",
     back_populates="departement"

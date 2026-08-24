@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from app.models.Stock import Stock
 from app.schemas.categorie import CategorieBaseSchema, CategorieResponseSchemaAdmin, CategorieUpdateSchema, CategorieResponseSchema
 from app.schemas.materiel import MaterielBaseSchema, MaterielResponseSchema, MaterielListResponseSchema, MaterielUpdateSchema
 from app.schemas.stock import StockCreateSchema, StockUpdateSchema, StockResponseSchema, StockListResponseSchema
@@ -20,7 +21,12 @@ from app.utils.auth import get_current_user
 from app.utils.auth import get_current_user_entreprise
 from app.services.update_inventaire_service import update_inventaire
 from app.utils.audit import inscrire_historique
-
+from flask import send_file
+from app.services.pdf.stock_pdf_service import generate_stock_pdf
+from app.models.InventaireMaterielEmploye import InventaireEmploye
+from app.services.pdf.inventaire_pdf_service import generate_inventaire_pdf
+from app.models.CategoriesMateriel import CategoriesMateriel
+from app.services.pdf.materiel_pdf_service import generate_materiel_pdf
 
 materiel_bp = Blueprint("materiel", __name__, url_prefix="/materiel")
 
@@ -78,6 +84,30 @@ def read_categorie_route():
     current_user_entreprise = get_current_user_entreprise()
     result = read_categorie(current_user_entreprise)
     return jsonify(CategorieResponseSchema(many=True).dump(result)), 200
+
+@materiel_bp.route("/materiel/pdf", methods=["GET"])
+def export_materiel_pdf():
+
+    current_user_entreprise = get_current_user_entreprise()
+    current_user = get_current_user()
+    categories = CategoriesMateriel.query.filter(
+        CategoriesMateriel.entreprise_id == current_user_entreprise.entreprise_id,
+        CategoriesMateriel.departement_id == current_user.departement_id
+    ).all()
+
+    entreprise = current_user_entreprise.entreprise
+
+    pdf = generate_materiel_pdf(
+        categories=categories,
+        entreprise_nom=entreprise.nom
+    )
+
+    return send_file(
+        pdf,
+        mimetype="application/pdf",
+        as_attachment=True,
+        download_name="catalogue_materiels.pdf"
+    )
 
 @materiel_bp.route("/categorie/admin", methods=["GET"])
 def read_categorie_par_admin_route():
@@ -241,6 +271,36 @@ def read_inventaire_route():
     result = read_inventaire_list(current_user, current_user_entreprise)
     return jsonify(InventaireResponseSchema(many=True).dump(result)), 200
 
+@materiel_bp.route("/inventaire/pdf", methods=["GET"])
+def export_inventaire_pdf():
+
+    current_user = get_current_user()
+    current_user_entreprise = get_current_user_entreprise()
+
+    inventaires = InventaireEmploye.query.filter(
+        InventaireEmploye.entreprise_id
+        == current_user_entreprise.entreprise_id,
+
+        InventaireEmploye.departement_id
+        == current_user.departement_id
+    ).all()
+
+    entreprise = current_user_entreprise.entreprise
+    departement = current_user.departement
+
+    pdf = generate_inventaire_pdf(
+        inventaires=inventaires,
+        entreprise_nom=entreprise.nom,
+        departement_nom=departement.nom
+    )
+
+    return send_file(
+        pdf,
+        mimetype="application/pdf",
+        as_attachment=True,
+        download_name="rapport_inventaire.pdf"
+    )
+
 @materiel_bp.route("/inventaire/admin", methods=["GET"])
 def read_inventaire_admin_route():
     current_user_entreprise = get_current_user_entreprise()
@@ -268,3 +328,30 @@ def update_inventaire_route(inventaire_id: int):
             )
 
     return jsonify(StockResponseSchema().dump(db_obj)), 200
+
+@materiel_bp.route("/stock/pdf", methods=["GET"])
+def export_stock_pdf():
+
+    current_user = get_current_user()
+    current_user_entreprise = get_current_user_entreprise()
+
+    stocks = Stock.query.filter(
+        Stock.entreprise_id == current_user_entreprise.entreprise_id,
+        Stock.departement_id == current_user.departement_id
+    ).all()
+
+    entreprise = current_user_entreprise.entreprise
+    departement = current_user.departement
+
+    pdf = generate_stock_pdf(
+        stocks=stocks,
+        entreprise_nom=entreprise.nom,
+        departement_nom=departement.nom
+    )
+
+    return send_file(
+        pdf,
+        mimetype="application/pdf",
+        as_attachment=True,
+        download_name="rapport_stock.pdf"
+    )

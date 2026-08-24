@@ -3,6 +3,9 @@ import { useApi } from '../../hooks/useApi';
 import StockManager from '../../components/Formulaire/StockManager';
 import { useAuth } from '../../context/AuthContext';
 import { Minus } from 'lucide-react'
+import { Search, Plus, Pencil, Trash2, Package, Tag,
+  Download } from 'lucide-react'
+import api from "../../services/api";
 
 const StockDepartement = () => {
   const [searchTerm, setSearchTerm] = useState('')
@@ -18,6 +21,46 @@ const StockDepartement = () => {
 
   const categories = [...new Set(materiels.map(mat => mat.categorie).filter(Boolean))]
   const departements = [...new Set(materiels.map(mat => mat.departement).filter(Boolean))]
+
+  const handleExportInventairePdf = async () => {
+    try {
+        const response = await api.get(
+            "/materiel/inventaire/pdf",
+            {
+                responseType: "blob",
+            }
+        );
+
+        const url = window.URL.createObjectURL(
+            new Blob([response.data], {
+                type: "application/pdf",
+            })
+        );
+
+        const link = document.createElement("a");
+
+        link.href = url;
+        link.download = "rapport_inventaire.pdf";
+
+        document.body.appendChild(link);
+
+        link.click();
+
+        link.remove();
+
+        window.URL.revokeObjectURL(url);
+
+    } catch (error) {
+        console.error(
+            "Erreur lors de l'export de l'inventaire :",
+            error
+        );
+
+        alert(
+            "Impossible de générer le rapport de l'inventaire."
+        );
+    }
+  };
 
   const getQuantiteStyle = (quantite) => {
     if (quantite <= 0) return 'text-red-600 font-bold'
@@ -57,7 +100,18 @@ const StockDepartement = () => {
           <h1 className="text-3xl font-bold text-gray-900">Inventaire du département</h1>
           <p className="text-gray-500 mt-1">Matériels distribués aux employés</p>
         </div>
+        <div className="flex gap-3">
+          <button 
+            onClick={() => {
+              handleExportInventairePdf();
+            }}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+              <Download className="w-4 h-4" /> 
+              Exporter
+          </button>
+        </div>
       </div>
+      
 
       {/* Filtres */}
       <div className="flex flex-wrap gap-4 items-center">

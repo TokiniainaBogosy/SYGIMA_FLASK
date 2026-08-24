@@ -3,6 +3,16 @@ import { useAuth } from '../../context/AuthContext'
 import { useApi } from '../../hooks/useApi'
 import DemandeMateriel from '../../components/Formulaire/DemandeMatériel'
 import DetailDemandes from '../../components/Affichage/DetailDemandes'
+import api from "../../services/api";
+import { 
+  Package, 
+  ClipboardList, 
+  CheckCircle2, 
+  AlertTriangle,
+  ArrowUpRight,
+  Loader2,
+  Download
+} from 'lucide-react';
 
 export default function Demandes() {
   const [showForm, setShowForm] = useState(false)
@@ -16,6 +26,34 @@ export default function Demandes() {
   const [demandeID, setDemandeID] = useState(null)
   const [tempMotif, setTempMotif] = useState('')
   const [form, setForm] = useState({ reference: "", status: "", motif: "" })
+
+  const handleExportPdf = async () => {
+      try {
+          const response = await api.get("/demande/pdf", {
+              responseType: "blob",
+          });
+  
+          const blob = new Blob([response.data], {
+              type: "application/pdf",
+          });
+  
+          const url = window.URL.createObjectURL(blob);
+  
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = "rapport_demandes.pdf";
+  
+          document.body.appendChild(link);
+          link.click();
+  
+          link.remove();
+          window.URL.revokeObjectURL(url);
+  
+      } catch (error) {
+          console.error("Erreur lors de l'export PDF :", error);
+          alert("Impossible de générer le PDF.");
+      }
+  };
 
   // ✅ GET via useApi
   const url = user
@@ -119,17 +157,26 @@ export default function Demandes() {
             Gestion des demandes de matériel
           </p>
         </div>
-
-        {/* Bouton nouvelle demande (visible pour employé et responsable) */}
-        {(user?.role === 'RESPONSABLE' || user?.role === 'EMPLOYE') &&(
-          <button
-          onClick={() => setShowForm(!showForm)}
-          className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition flex items-center gap-2"
-        >
-          <span className="text-xl">+</span>
-          Nouvelle demande
-        </button>
-        )}
+        <div className="flex gap-3">
+          <button 
+            onClick={() => {
+               handleExportPdf();
+             }}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+            <Download className="w-4 h-4" /> 
+            Exporter
+          </button>
+          {/* Bouton nouvelle demande (visible pour employé et responsable) */}
+          {(user?.role === 'RESPONSABLE' || user?.role === 'EMPLOYE') &&(
+            <button
+            onClick={() => setShowForm(!showForm)}
+            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition flex items-center gap-2"
+          >
+            <span className="text-xl">+</span>
+            Nouvelle demande
+          </button>
+          )}
+        </div>
       </div>
 
       {/* Formulaire de demande */}
@@ -287,7 +334,7 @@ export default function Demandes() {
                       <button 
                         onClick={()=>{setShowDetails(!showDetails), setDetailData({reference: demande.reference, demandeur: demande.demandeur, materiel: demande.materiels, justification: demande.justification, stock: demande.qte_disponible,qte_demande: demande.qte_demandee, motif_rejet: demande.motif_rejet,qte_disponible : demande.qte_disponible, statut: demande.statut_ligne,departement: demande.departement,ligne_id: demande.ligne_id,rejectingId: demande.ligne_id, demandeID: demande.reference})}}
                         className="px-3 py-1 bg-blue-100 text-blue-700 rounded text-xs hover:bg-blue-200">
-                          👁️ Voir
+                          Voir
                       </button>
                       {/* ACTION EMPLOYE : Annuler sa propre demande */}
                       {user?.role === 'EMPLOYE' && demande.statut === 'SOUMISE' && (
@@ -322,12 +369,12 @@ export default function Demandes() {
                             <>
                               <button type="button" className="px-3 py-1 bg-green-100 text-green-700 rounded text-xs hover:bg-green-200"
                               onClick={() =>  handleAction(demande.reference,demande.ligne_id,'APPROUVEE1')}>
-                                ✅ APPROUVEE
+                                APPROUVEE
                               </button>
                               
                               <button className="px-3 py-1 bg-red-100 text-red-700 rounded text-xs hover:bg-red-200"
                               onClick={() => {setRejectingId(demande.ligne_id);setDemandeID(demande.reference)}}>
-                                ❌ Rejeter
+                                Rejeter
                               </button>
                             </>
                           )}
@@ -337,14 +384,14 @@ export default function Demandes() {
                                 onClick={() => handleAction(demande.reference,demande.ligne_id, 'STOCK_INSUFFISANT')}
                                 className="px-3 py-1 bg-orange-100 text-orange-700 rounded text-xs hover:bg-orange-200"
                               >
-                                ⏳ En attente stock
+                                En attente stock
                               </button>
 
                               <button 
                                 onClick={() => handleAction(demande.reference,demande.ligne_id, 'LIVREE')}
                                 className="px-3 py-1 bg-orange-100 text-orange-700 rounded text-xs  hover:bg-orange-200"
                               >
-                                📦 Confirmer Sortie 
+                                Confirmer Sortie 
                               </button>
                             </>
                           )
@@ -357,7 +404,7 @@ export default function Demandes() {
                             onClick={() => handleAction(demande.reference,demande.ligne_id, 'STOCK_INSUFFISANT')}
                             className="px-3 py-1 bg-orange-100 text-orange-700 rounded text-xs hover:bg-orange-200"
                           >
-                            ⏳ En attente stock
+                            En attente stock
                           </button>
                         )}
                         {user?.role === 'Magasinier' && demande.statut === 'APPROUVEE2' && (
@@ -365,7 +412,7 @@ export default function Demandes() {
                             onClick={() => handleAction(demande.reference,demande.ligne_id, 'LIVREE')}
                             className="px-3 py-1 bg-orange-100 text-orange-700 rounded text-xs  hover:bg-orange-200"
                           >
-                            📦 Confirmer Sortie 
+                            Confirmer Sortie 
                           </button>
                         )}
                     </div>

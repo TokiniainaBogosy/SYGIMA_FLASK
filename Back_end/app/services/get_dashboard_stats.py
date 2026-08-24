@@ -54,7 +54,8 @@ def get_dashboard_stats(current_user: User,current_user_entreprise ):
 
     demandes_recentes = db.session.query(Demande).filter(
         Demande.date_soumission >= il_y_a_7_jours,
-        Demande.entreprise_id == current_user_entreprise.entreprise_id
+        Demande.entreprise_id == current_user_entreprise.entreprise_id,
+        Demande.departement_id == current_user.departement_id  
     ).all()
 
     jours = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"]

@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify , send_file
 from typing import Optional
 from app.schemas.ligneDemande import CreateDemandeGlobalSchema
 from app.schemas.demande import DemandeResponseSchema, DemandeListResponseSchema, StatusUpdateSchema
@@ -9,6 +9,7 @@ from app.services.read_demande_list_service import read_demande_list, read_deman
 from app.utils.auth import get_current_user , get_current_user_entreprise
 from app.utils.notifications import send_notification
 from app.utils.audit import inscrire_historique
+from app.services.pdf.demande_pdf_service import generate_demandes_pdf
 
 
 demande_bp = Blueprint("demande", __name__, url_prefix="/demande")
@@ -55,6 +56,34 @@ def create_demande_route():
 
     return jsonify(DemandeResponseSchema().dump(demande)), 201
 
+@demande_bp.route("/pdf", methods=["GET"])
+def export_demandes_pdf():
+    current_user = get_current_user()
+    current_user_entreprise = get_current_user_entreprise()
+
+    # Récupérer les demandes avec la même logique
+    # que la liste normale
+    demandes = read_demande_list(
+        current_user,
+        current_user_entreprise,
+        None
+    )
+
+    # Générer le PDF
+    pdf = generate_demandes_pdf(
+        demandes=demandes,
+        titre="Rapport des demandes",
+        entreprise_nom=current_user_entreprise.entreprise.nom,
+        periode="Toutes les demandes"
+    )
+
+    # Envoyer le PDF au navigateur
+    return send_file(
+        pdf,
+        mimetype="application/pdf",
+        as_attachment=True,
+        download_name="rapport_demandes.pdf"
+    )
 
 @demande_bp.route("/", methods=["GET"])
 def read_demande_list_route():

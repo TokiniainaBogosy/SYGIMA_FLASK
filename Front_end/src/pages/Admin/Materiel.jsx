@@ -1,9 +1,10 @@
 import { use, useEffect, useState } from 'react'
 import { useApi } from '../../hooks/useApi'
-import { Search, Plus, Pencil, Trash2, Package, Tag } from 'lucide-react'
+import { Search, Plus, Pencil, Trash2, Package, Tag, Download } from 'lucide-react'
 import CategorieManager from '../../components/Formulaire/CategorieManager'
 import MaterielManager from '../../components/Formulaire/MaterielManager'
 import CategorieForm from '../../components/Formulaire/CategorieForm'
+import api from "../../services/api";
 
 export default function Materiel() {
   const [showForm, setShowForm] = useState(false)
@@ -41,7 +42,44 @@ export default function Materiel() {
       alert("Erreur suppression")
     }
   }
+  const handleExportMaterielPdf = async () => {
+    try {
+        const response = await api.get(
+            "/materiel/materiel/pdf",
+            {
+                responseType: "blob",
+            }
+        );
 
+        const url = window.URL.createObjectURL(
+            new Blob([response.data], {
+                type: "application/pdf",
+            })
+        );
+
+        const link = document.createElement("a");
+
+        link.href = url;
+        link.download = "catalogue_materiels.pdf";
+
+        document.body.appendChild(link);
+        link.click();
+
+        link.remove();
+
+        window.URL.revokeObjectURL(url);
+
+    } catch (error) {
+        console.error(
+            "Erreur lors de l'export des matériels :",
+            error
+        );
+
+        alert(
+            "Impossible de générer le catalogue des matériels."
+        );
+    }
+  };
   // Filtres
   const filteredCategories = categoriesData?.filter(c => 
     c.nom.toLowerCase().includes(searchCat.toLowerCase())
@@ -61,13 +99,20 @@ export default function Materiel() {
           <h1 className="text-2xl font-bold text-gray-900">Categories et Materiels existants</h1>
           <p className="text-gray-500">Gestion des matériels et catégories</p>
         </div>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg flex items-center gap-2 hover:bg-blue-700"
-        >
-          <Plus className="w-4 h-4" />
-          Nouveau
-        </button>
+        <div className="flex gap-3">
+          <button onClick={handleExportMaterielPdf} 
+          className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+            <Download className="w-4 h-4" />
+            Exporter
+          </button>
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg flex items-center gap-2 hover:bg-blue-700"
+          >
+            <Plus className="w-4 h-4" />
+            Nouveau
+          </button>
+        </div>
       </div>
 
       {showForm && <CategorieForm />}

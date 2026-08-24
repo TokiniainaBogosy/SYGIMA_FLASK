@@ -3,7 +3,9 @@ import MaterielForm from '../../components/Formulaire/MaterielForm';
 import { useApi } from '../../hooks/useApi';
 import StockManager from '../../components/Formulaire/StockManager';
 import { useAuth } from '../../context/AuthContext';
-import { Search, Plus, Pencil, Trash2, Package, Tag } from 'lucide-react'
+import { Search, Plus, Pencil, Trash2, Package, Tag,
+  Download } from 'lucide-react'
+import api from "../../services/api";
 
 export default function Stock() {
   const [showForm, setShowForm] = useState(false)
@@ -29,6 +31,40 @@ export default function Stock() {
   // Extraire les catégories et départements UNIQUEMENT quand les données sont chargées
   const categories = [...new Set(materiels.map(mat => mat.categorie).filter(Boolean))]
   const departements = [...new Set(materiels.map(mat => mat.departement).filter(Boolean))]
+
+  const handleExportStockPdf = async () => {
+    try {
+        const response = await api.get("materiel/stock/pdf", {
+            responseType: "blob",
+        });
+
+        const url = window.URL.createObjectURL(
+            new Blob([response.data], {
+                type: "application/pdf",
+            })
+        );
+
+        const link = document.createElement("a");
+
+        link.href = url;
+        link.download = "rapport_stock.pdf";
+
+        document.body.appendChild(link);
+        link.click();
+
+        link.remove();
+
+        window.URL.revokeObjectURL(url);
+
+    } catch (error) {
+        console.error(
+            "Erreur lors de l'export du stock :",
+            error
+        );
+
+        alert("Impossible de générer le rapport du stock.");
+    }
+  };
 
   // Fonction pour le style de quantité
   const getQuantiteStyle = (quantite, seuil) => {
@@ -75,13 +111,23 @@ export default function Stock() {
           <h1 className="text-3xl font-bold text-gray-900">Stock</h1>
           <p className="text-gray-500 mt-1">Gestion des Stocks</p>
         </div>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition flex items-center gap-2"
-        >
+        <div className="flex gap-3">
+          <button 
+            onClick={() => {
+              handleExportStockPdf();
+            }}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+              <Download className="w-4 h-4" /> 
+              Exporter
+          </button>
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition flex items-center gap-2"
+          >
           <span className="text-xl">+</span>
           Ajouter un matériel
         </button>
+        </div>
       </div>
 
       {/* Barres de recherche et filtres */}

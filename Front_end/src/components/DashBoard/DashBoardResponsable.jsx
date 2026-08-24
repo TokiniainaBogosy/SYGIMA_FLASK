@@ -11,13 +11,6 @@ import {
   Download
 } from 'lucide-react';
 import DemandeMateriel from '../Formulaire/DemandeMatériel';
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
-
-
-
-// ✅ PLUS DE SIDEBAR, on importe NAVBAR
-// import Navbar from '../layout/NavBar2';
 import StatCard from '../ui/StatCard';
 import StatusBadge from '../ui/StatusBadge';
 import DataTable from '../ui/DataTable';
@@ -25,33 +18,39 @@ import ActivityChart from '../charts/ActivityChart';
 import StatsSection from '../stats/StatsSection';
 import { useApi } from '../../hooks/useApi';
 import { useRef } from "react";
-import { exportRefToPdf } from '../utils/exportPdf';
-import DashboardReportPdf from "../pdf/DashboardReport";
+import api from "../../services/api";
 // ─────────────────────────────────────────────────────────────
 
 export default function DashBoardResponsable() {
-   const reportRef = useRef(null);
-const handleExportPdf = async () => {
-  console.log("reportRef.current =", reportRef.current);
-  if (!reportRef.current) {
-    alert("Zone PDF introuvable (reportRef est null)");
-    return;
-  }
-   try {
-    const filename = `dashboard_${user?.prenom || "user"}_${new Date().toISOString().slice(0,10)}.pdf`;
-    await exportRefToPdf({ element: reportRef.current, filename });
-    console.log("PDF SAVED");
-  } catch (e) {
-    console.error("EXPORT PDF ERROR:", e);
-    alert("Erreur export PDF, regarde la console");
-  }
-};
+  
+  const handleExportPdf = async () => {
+  try {
+    const response = await api.get("/dashboard/pdf", {
+      responseType: "blob",
+    });
 
-    // await exportRefToPdf({
-    //   element: reportRef.current,
-    //   filename
-    // });
-  // };
+    const blob = new Blob([response.data], {
+      type: "application/pdf",
+    });
+
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "rapport_dashboard.pdf";
+
+    document.body.appendChild(link);
+    link.click();
+
+    link.remove();
+    window.URL.revokeObjectURL(url);
+
+  } catch (error) {
+    console.error("Erreur lors de l'export du dashboard :", error);
+    alert("Impossible de générer le rapport PDF.");
+  }
+  }
+  
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false)
@@ -60,12 +59,11 @@ const handleExportPdf = async () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-  // const [stats, setStats] = useState(null)
+
   const { data: stats, loading: statsLoading, error: statsError } = 
     useApi("/dashboard/stats")
   const { data: demandes, loading: demandesLoading, error: demandesError } = 
     useApi(`/demande/${user.departement_id}`)
-    // const STATS_DEMANDES = demandes.
 
   useEffect(() => {
     const fetchData = async () => {
@@ -73,21 +71,6 @@ const handleExportPdf = async () => {
       setError(null);
       try {
         await new Promise(r => setTimeout(r, 800));
-        // const token = localStorage.getItem("token")
-        // const response = await fetch("http://localhost:8000/api/stats/dashboard", {
-        //   headers: {
-        //     "Content-Type": "application/json",
-        //     Authorization: `Bearer ${token}`,
-        //   }
-        // })
-        
-        // // Si le serveur renvoie une erreur (401, 500...)
-        // if (!response.ok) {
-        //   throw new Error(`Erreur ${response.status}`)
-        // }
-        
-        // const stats = await response.json()
-        // setStats(stats)
         setData(demandes);
       } catch (err) {
         setError(err.message);
@@ -140,22 +123,11 @@ const handleExportPdf = async () => {
   return (
     
    
-    <div className="min-h-screen bg-gray-50">
-      <div style={{ position: "fixed", left: "-10000px", top: 0, background: "white" }}>
-  <div ref={reportRef}>
-    <DashboardReportPdf
-  user={user}
-  demandes={demandes || []}
-  periode="mois"
-  logoUrl="/logo.png"
-/>
-  </div>
-</div>
-      
-      {/* ✅ NAVBAR EN HAUT */}
+    <div className="min-h-screen bg-gray-50"> 
+      {/* NAVBAR EN HAUT */}
       {/* <Navbar onLogout={handleLogout} user={user} /> */}
 
-      {/* ✅ CONTENU : plus besoin de flex-row, juste du padding-top */}
+      {/* CONTENU : plus besoin de flex-row, juste du padding-top */}
       {/* <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8"> */}
       <main className="w-full px-6 lg:px-10 py-8 space-y-8">
         
@@ -172,9 +144,8 @@ const handleExportPdf = async () => {
           <div className="flex gap-3">
             <button 
              onClick={() => {
-    console.log("EXPORT CLICK");
-    handleExportPdf();
-  }}
+                handleExportPdf();
+              }}
             className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
               <Download className="w-4 h-4" />
               Exporter
@@ -244,9 +215,16 @@ const handleExportPdf = async () => {
               <p className="text-sm text-gray-500 mt-0.5">Demandes par jour</p>
             </div>
             <div className="p-6">
-              {stats?.activite_hebdo && (
-  <ActivityChart data={stats.activite_hebdo} height={220} />
-)}
+              {stats?.activite_hebdo?.length > 0 ? (
+                <ActivityChart
+                  data={stats.activite_hebdo}
+                  height={220}
+                />
+              ) : (
+                <div className="h-[220px] flex items-center justify-center text-sm text-gray-400">
+                  Aucune activité à afficher
+                </div>
+              )}
             </div>
           </div>
         </div>
