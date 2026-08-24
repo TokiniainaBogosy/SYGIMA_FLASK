@@ -37,6 +37,8 @@ import StockDepartement from './pages/Admin/StockDepartement'
 import StockDepartementAdmin from './pages/Admin/StockDepartementAdmin'
 import appConfig from "./config/appConfig";
 import LoginLocal from './pages/LoginLocal'
+import Conditions from './pages/Landing/conditions'
+import PolitiqueConfidentialite from './pages/Landing/politique'
 
 
 
@@ -66,11 +68,14 @@ export default function App() {
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/conditions" element={<Conditions />} />
+              {/* <Route path="/register" element={<Register />} /> */}
             </Route>
           )}
           {
             appConfig.mode === "LOCAL" && (
               <Route path="/login" element={<LoginLocal/>}/>
+              
             )
           }
           {/* PROTECTED */}
@@ -136,11 +141,21 @@ export default function App() {
             }
           />
           <Route
-            path="/demandes"
+            path="/conditions"
             element={
               <ProtectedRoute>
                 <Layout>
-                  <Demandes />
+                  <Conditions />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/confidentialite"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <PolitiqueConfidentialite />
                 </Layout>
               </ProtectedRoute>
             }
