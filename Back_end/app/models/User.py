@@ -23,9 +23,9 @@ if TYPE_CHECKING:
 class RoleUser(PyEnum):
     EMPLOYE = "EMPLOYE"
     RESPONSABLE = "RESPONSABLE"
-    MAGASINIER = "MAGASINIER"
+    # MAGASINIER = "MAGASINIER"
     ADMIN = "ADMIN"
-    SUPER_ADMIN = "SUPER_ADMIN"
+    
 
 
 class User(db.Model):
