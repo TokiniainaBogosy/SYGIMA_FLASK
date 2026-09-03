@@ -12,7 +12,7 @@ const StockDepartementAdmin = () => {
   const { user } = useAuth()
 
   const { data: stocklist, loading: stocklistLoading, error: stocklistError, refetch } =
-    useApi('materiel/inventaire/admin')  // ← refetch extrait du hook
+    useApi('materiel/inventaire/admin')
 
   const materiels = stocklist || []
 
@@ -100,7 +100,7 @@ const StockDepartementAdmin = () => {
           setSelectedStock={setSelectedStock}
           mode="reduire"
           onSuccess={() => {
-            refetch()              // ← rafraîchit la liste
+            refetch()
             setSelectedStock(null)
           }}
         />
@@ -133,7 +133,7 @@ const StockDepartementAdmin = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {filteredMateriels.map((mat) => (  // ← key sur mat.id, pas l'index
+              {filteredMateriels.map((mat) => (
                 <tr key={mat.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm font-medium text-blue-600">{mat.reference}</td>
                   <td className="px-6 py-4 text-sm text-gray-900">{mat.designation}</td>
@@ -141,7 +141,7 @@ const StockDepartementAdmin = () => {
                   <td className="px-6 py-4 text-sm text-gray-900">{mat.employe_prenom} {mat.employe_nom}</td>
                   <td className={`px-6 py-4 text-sm ${getQuantiteStyle(mat.quantite)}`}>
                     {mat.quantite}
-                    {mat.quantite <= 0 && ' ⚠️'}
+                    {mat.quantite <= 0 && ' (quantité épuisée)'}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">{mat.unite}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{mat.departement}</td>

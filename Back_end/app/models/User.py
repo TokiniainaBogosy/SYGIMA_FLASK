@@ -37,7 +37,7 @@ class User(db.Model):
     email: Mapped[str] = mapped_column(String(100), unique=True, index=True)
     password_hash: Mapped[str] = mapped_column(String(255))
     role: Mapped[RoleUser] = mapped_column(
-        SAEnum(RoleUser, values_callable=lambda obj: [e.value for e in obj]),  # ← fix
+        SAEnum(RoleUser, values_callable=lambda obj: [e.value for e in obj]),
         default=RoleUser.EMPLOYE
     )
     departement_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("departements.id"))
@@ -53,7 +53,7 @@ class User(db.Model):
     mouvements: Mapped[list["MouvementStock"]] = relationship("MouvementStock", back_populates="user")
     notifications: Mapped[List["Notification"]] = relationship(
     "Notification",
-    foreign_keys="Notification.user_id",   # ✅ IMPORTANT
+    foreign_keys="Notification.user_id",
     back_populates="user"
 )
     sent_notifications: Mapped[list["Notification"]] = relationship(

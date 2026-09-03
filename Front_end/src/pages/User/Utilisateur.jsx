@@ -264,7 +264,7 @@ export default function Utilisateur() {
         <div className="bg-white rounded-lg shadow-sm p-4">
           <p className="text-sm text-gray-500">Administrateurs</p>
           <p className="text-2xl font-bold text-purple-600 mt-1">
-            {utilisateurs.filter(u => u.role === 'admin').length}
+            {utilisateurs.filter(u => u.role?.toUpperCase?.() === 'ADMIN').length}
           </p>
         </div>
       </div>

@@ -1,5 +1,6 @@
 from io import BytesIO
 from datetime import datetime
+from xml.sax.saxutils import escape
 
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_LEFT
@@ -118,14 +119,14 @@ def generate_dashboard_pdf(
 
     elements.append(
         Paragraph(
-            f"<b>Entreprise :</b> {entreprise_nom}",
+            f"<b>Entreprise :</b> {escape(str(entreprise_nom or ''))}",
             info_style
         )
     )
 
     elements.append(
         Paragraph(
-            f"<b>Département :</b> {departement_nom}",
+            f"<b>Département :</b> {escape(str(departement_nom or ''))}",
             info_style
         )
     )
@@ -146,31 +147,19 @@ def generate_dashboard_pdf(
     # STATISTIQUES
     # ---------------------------------------------------------
 
-    total_materiels = stats.get("total_materiels", 0)
-    total_demandes = stats.get("total_demandes", 0)
-    demandes_en_cours = stats.get(
-        "total_demandes_en_cours",
-        0
-    )
-    demandes_approuvees = stats.get(
-        "demandes_approuvees",
-        0
-    )
-    demandes_rejetees = stats.get(
-        "total_demandes_rejetées",
-        0
-    )
-    alertes_stock = stats.get(
-        "alertes_stock",
-        0
-    )
+    total_materiels = stats.get("total_materiels_en_stock", 0)
+    demandes_en_attente = stats.get("total_demandes_en_attente_global", 0)
+    demandes_approuvees = stats.get("total_demandes_approuvees_global", 0)
+    demandes_en_attente_stock = stats.get("total_demandes_en_cours", 0)
+    sorties_materiel = stats.get("total_materiels_stock_sortie_cette_semaine", 0)
+    alertes_stock = stats.get("alertes_stock", 0)
 
     cards = [
         ("Matériels en stock", total_materiels),
-        ("Total des demandes", total_demandes),
-        ("Demandes en cours", demandes_en_cours),
+        ("Demandes en attente", demandes_en_attente),
         ("Demandes approuvées", demandes_approuvees),
-        ("Demandes rejetées", demandes_rejetees),
+        ("En attente de stock", demandes_en_attente_stock),
+        ("Sorties matériel", sorties_materiel),
         ("Alertes stock", alertes_stock),
     ]
 

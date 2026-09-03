@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import DemandeMateriel from '../Formulaire/DemandeMatériel';
 
-// ✅ PLUS DE SIDEBAR, on importe NAVBAR
+// Navigation principale
 // import Navbar from '../layout/NavBar2';
 import StatCard from '../ui/StatCard';
 import StatusBadge from '../ui/StatusBadge';
@@ -21,7 +21,7 @@ import ActivityChart from '../charts/ActivityChart';
 import StatsSection from '../stats/StatsSection';
 import { useApi } from '../../hooks/useApi';
 
-// ─── MOCK DATA ─────────────────────────────────────────────
+// Données de démonstration
 const MOCK_DEMANDES = [
   { id: 1, reference: 'DEM-2024-001', demandeur: 'Jean Dupont', departement: 'IT', materiels: 'Ordinateur portable Dell XPS', statut: 'APPROUVEE', date: '2024-01-15' },
   { id: 2, reference: 'DEM-2024-002', demandeur: 'Marie Martin', departement: 'RH', materiels: 'Écran 27" LG', statut: 'SOUMISE', date: '2024-01-16' },
@@ -42,7 +42,7 @@ const MOCK_CHART_DATA = [
   { label: 'Sam', value: 5 },
   { label: 'Dim', value: 3 },
 ];
-// ─────────────────────────────────────────────────────────────
+// Données affichées
 
 export default function DashBoardAdmin() {
   const { user, logout } = useAuth();
@@ -92,7 +92,7 @@ export default function DashBoardAdmin() {
   }, []);
 
   const handleLogout = () => {
-    setShowLogoutConfirm(true);  // ← au lieu de logout() direct
+    setShowLogoutConfirm(true);  // Afficher la confirmation
   };
 
   const confirmLogout = () => {
@@ -109,17 +109,17 @@ export default function DashBoardAdmin() {
   ];
 
   const tableColumns = [
-    { header: 'Référence', key: 'reference', className: 'text-sm font-medium text-blue-600' },
-    { header: 'Demandeur', key: 'demandeur' },
-    { header: 'Département', key: 'departement', className: 'text-sm text-gray-500' },
-    { header: 'Matériel', key: 'materiels', className: 'text-sm text-gray-500 max-w-xs truncate' },
-    { 
-      header: 'Statut', 
-      key: 'statut',
-      render: (row) => <StatusBadge status={row.statut} />
-    },
-    { header: 'Date', key: 'date', className: 'text-sm text-gray-500 font-mono' },
-  ];
+      { header: 'Référence', key: 'reference', className: 'text-sm font-medium text-[#58B2B0]' },
+      { header: 'Demandeur', key: 'demandeur' },
+      { header: 'Département', key: 'departement', className: 'text-sm text-gray-500' },
+      { header: 'Matériel', key: 'materiels', className: 'text-sm text-gray-500 max-w-xs truncate' },
+      { 
+        header: 'Statut', 
+        key: 'statut',
+        render: (row) => <StatusBadge status={row.statut} />
+      },
+      { header: 'Date', key: 'date_soumission', className: 'text-sm text-gray-500 font-mono' },
+    ];
 
   if (!user) {
     return (
@@ -134,10 +134,10 @@ export default function DashBoardAdmin() {
    
     <div className="min-h-screen bg-gray-50">
       
-      {/* ✅ NAVBAR EN HAUT */}
+      {/* Navigation en haut */}
       {/* <Navbar onLogout={handleLogout} user={user} /> */}
 
-      {/* ✅ CONTENU : plus besoin de flex-row, juste du padding-top */}
+      {/* Contenu principal */}
       {/* <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8"> */}
       <main className="w-full px-6 lg:px-10 py-8 space-y-8">
         
@@ -152,11 +152,11 @@ export default function DashBoardAdmin() {
             </p>
           </div>
           <div className="flex gap-3">
-            <button className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+            <button className="inline-flex h-10 min-w-30 items-center justify-center gap-2 px-4 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
               <Download className="w-4 h-4" />
               Exporter
             </button>
-            <button className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm"  onClick={() => setShowForm(!showForm)}>
+            <button className="inline-flex h-10 min-w-45 items-center justify-center gap-2 px-4 bg-[#0D3056] text-white rounded-lg text-sm font-medium hover:bg-[#1e4e7e] transition-colors shadow-sm"  onClick={() => setShowForm(!showForm)}>
               <ArrowUpRight className="w-4 h-4" />
               Nouvelle demande
             </button>

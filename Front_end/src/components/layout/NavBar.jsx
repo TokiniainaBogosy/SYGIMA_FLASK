@@ -17,9 +17,9 @@ function Navbar() {
     navigate('/register')
   }
 
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // Navigation
   // ICÔNES SVG INLINE (remplacent les emojis)
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // Navigation mobile
   const icons = {
     dashBoard: (
       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -59,9 +59,9 @@ function Navbar() {
     ),
   }
 
-  // ━━━━━━━━━━━━━━━━━━━━━━
+  // Menu
   // ONGLETS DE NAVIGATION
-  // ━━━━━━━━━━━━━━━━━━━━━━
+  // Menu utilisateur
   const onglets = [
     {
       id: "dashBoard", label: "Dashboard", path: '/dashboard',
@@ -89,9 +89,9 @@ function Navbar() {
     }
   ]
 
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━
+  // Filtrage par rôle
   // BADGE COULEUR SELON RÔLE
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━
+  // Couleur du rôle
   const roleBadgeColor = {
     admin: "bg-red-500/20 text-red-300 border-red-500/30",
     responsable: "bg-blue-500/20 text-blue-300 border-blue-500/30",
@@ -172,7 +172,7 @@ function Navbar() {
           <div className="flex items-center gap-2 min-w-[180px] justify-end">
 
             {/* Bouton Ajouter utilisateur (admin only) */}
-            {user?.role === 'Admin' && (
+            {user?.role?.toUpperCase?.() === 'ADMIN' && (
               <button
                 onClick={handleRegister}
                 className="group w-9 h-9 rounded-xl bg-indigo-500/20 border border-indigo-500/30

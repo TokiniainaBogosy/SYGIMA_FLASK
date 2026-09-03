@@ -62,6 +62,13 @@ def login():
 def register():
     """Créer un nouvel utilisateur — réservé à l'interface admin"""
     user_data = UserCreateSchema().load(request.get_json())
+    role = user_data.get("role", "employe").upper()
+
+    if role == "MAGASINIER":
+        abort(403, description="La création d'un compte Magasinier n'est pas autorisée ici.")
+
+    if role not in {role_user.name for role_user in RoleUser if role_user != RoleUser.MAGASINIER}:
+        abort(400, description="Rôle utilisateur invalide.")
 
     # 1. Vérifier unicité email
     if User.query.filter(User.email == user_data.get("email")).first():
@@ -80,7 +87,7 @@ def register():
         nom=user_data.get("nom"),
         prenom=user_data.get("prenom"),
         password_hash=HashHelper.get_password_hash(user_data.get("password")),
-        role=RoleUser[user_data.get("role", "employe").upper()],
+        role=RoleUser[role],
         departement_id=departement.id,
         is_active=True,
     )

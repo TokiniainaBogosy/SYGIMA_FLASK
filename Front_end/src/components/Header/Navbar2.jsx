@@ -17,9 +17,9 @@ const Navbar2 = () => {
       navigate('/register')
     }
     
-      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      // Navigation
       // ICÔNES SVG INLINE (remplacent les emojis)
-      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      // Navigation mobile
     const icons = {
       dashBoard: (
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -59,9 +59,9 @@ const Navbar2 = () => {
       ),
     }
     
-      // ━━━━━━━━━━━━━━━━━━━━━━
+      // Menu
       // ONGLETS DE NAVIGATION
-      // ━━━━━━━━━━━━━━━━━━━━━━
+      // Menu utilisateur
     const onglets = [
       {
         id: "dashBoard", label: "Dashboard", path: '/dashboard',
@@ -94,9 +94,9 @@ const Navbar2 = () => {
 
     ]
     
-      // ━━━━━━━━━━━━━━━━━━━━━━━━━
+      // Filtrage par rôle
       // BADGE COULEUR SELON RÔLE
-      // ━━━━━━━━━━━━━━━━━━━━━━━━━
+      // Couleur du rôle
     const roleBadgeColor = {
       admin: "bg-red-500/20 text-red-300 border-red-500/30",
       responsable: "bg-blue-500/20 text-blue-300 border-blue-500/30",

@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from sqlalchemy import ForeignKey, Integer , Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.database import db  # ← changement
+from app.database import db
 from enum import Enum as PyEnum
 if TYPE_CHECKING:
     from app.models.Demande import Demande
@@ -24,7 +24,7 @@ class StatutDemande(PyEnum):
     LIVREE = "LIVREE"
 
 
-class LigneDemande(db.Model):  # ← changement
+class LigneDemande(db.Model):
     __tablename__ = "lignes_demande"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)

@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 from sqlalchemy import DateTime, Enum, ForeignKey, Integer, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.database import db  # ← changement
+from app.database import db
 
 if TYPE_CHECKING:
     from app.models.Materiel import Materiel
@@ -22,7 +22,7 @@ class TypeMouvement(PyEnum):
     SORTIE = "SORTIE"
 
 
-class MouvementStock(db.Model):  # ← changement
+class MouvementStock(db.Model):
     __tablename__ = "mouvements_stock"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)

@@ -24,9 +24,9 @@ def create_user(data: dict, current_user):
         nom=data.get("nom"),
         prenom=data.get("prenom"),
         email=data.get("email"),
-        password_hash=HashHelper.get_password_hash(data.get("password")),  # ← corrigé (password_hash, pas password)
+        password_hash=HashHelper.get_password_hash(data.get("password")),
         role=data.get("role", "employe"),
-        departement_id=departement.id  # ← corrigé (departement_id, pas departement)
+        departement_id=departement.id
     )
     db.session.add(db_user)
     db.session.flush()  # génère db_user.id sans commit
@@ -34,7 +34,7 @@ def create_user(data: dict, current_user):
     # 4. Liaison User ↔ Entreprise via UserEntreprise
     lien = UserEntreprise(
         user_id=db_user.id,
-        entreprise_id=current_user.entreprise_id,  # ← corrigé (passé en paramètre)
+        entreprise_id=current_user.entreprise_id,
         role_entreprise=db_user.role,
         is_active=True
     )

@@ -28,7 +28,7 @@ def show_stats():
         Stock.entreprise_id == current_user_entreprise.entreprise_id
     ).count()
 
-    # ─── ACTIVITÉ HEBDO ───────────────────────────────
+    # Activité hebdomadaire
     il_y_a_7_jours = datetime.now() - timedelta(days=7)
 
     demandes_recentes = db.session.query(Demande).filter(

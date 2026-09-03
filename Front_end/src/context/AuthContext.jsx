@@ -44,9 +44,9 @@ export function AuthProvider({ children }) {
       
       return user;
     } catch (err) {
-      console.error('Erreur complète:', err); // ← Important
-      console.error('Status:', err.response?.status); // ← Et ça
-      console.error('Message:', err.response?.data); // ← Et ça
+      console.error('Erreur complète:', err);
+      console.error('Status:', err.response?.status);
+      console.error('Message:', err.response?.data);
       const errorMsg = err.response?.data?.detail || 'Erreur de connexion';
       setError(errorMsg);
       throw err;
@@ -71,9 +71,9 @@ export function AuthProvider({ children }) {
     
     return new_user;
   } catch (err) {
-    console.error('Erreur complète:', err); // ← Important
-    console.error('Status:', err.response?.status); // ← Et ça
-    console.error('Message:', err.response?.data); // ← Et ça
+    console.error('Erreur complète:', err);
+    console.error('Status:', err.response?.status);
+    console.error('Message:', err.response?.data);
     const errorMsg = err.response?.data?.detail || 'Erreur de connexion';
     setError(errorMsg);
     throw err;

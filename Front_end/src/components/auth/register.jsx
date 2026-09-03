@@ -5,7 +5,7 @@ import {
   Building2, Hash, MapPin, Image as ImageIcon, 
   ArrowRight, Loader2, Boxes, User, Mail, Lock, Eye, EyeOff, ChevronLeft 
 } from 'lucide-react'
-import { useApi } from '../../hooks/useApi'  // ✅ import
+import { useApi } from '../../hooks/useApi'
 
 const REGEX_EMAIL = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
 
@@ -16,7 +16,7 @@ export default function RegisterEntreprise({ inModal = false }) {
   
   const navigate = useNavigate()
 
-  // ✅ Remplace useState(isLoading) + fetch manuel
+  // Chargement et soumission via useApi
   const { post, loading, error } = useApi()
 
   const {
@@ -51,7 +51,7 @@ export default function RegisterEntreprise({ inModal = false }) {
     }
 
     try {
-      // ✅ Remplace le fetch POST manuel
+      // Soumission du formulaire
       await post('/entreprises/setup-entreprise', fullPayload)
       navigate('/dashboard')
     } catch (e) {

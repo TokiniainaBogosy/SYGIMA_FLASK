@@ -145,7 +145,7 @@ export default function CategorieForm() {
                   <input
                     type="text"
                     value={materiel.reference}
-                    disabled  // ← Désactivé, l'utilisateur ne peut pas modifier
+                    disabled
                     className={`${inputClass} bg-gray-100 cursor-not-allowed`}
                   />
                   <p className="text-xs text-gray-400 mt-1">Générée automatiquement</p>

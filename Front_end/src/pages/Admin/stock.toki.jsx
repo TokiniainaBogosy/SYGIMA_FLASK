@@ -7,7 +7,7 @@ export default function Stock() {
   const [searchTerm, setSearchTerm] = useState('')
   const [searchCategorie, setsearchCategorie] = useState('')
 
-  // ✅ Remplace tout le useEffect + fetch + useState([])
+  // Chargement des données via useApi
   const { data, loading, error } = useApi('/api/v1/materiel/stockList')
 
   const materiels = data || []  // évite le crash si data est null au départ
@@ -135,7 +135,7 @@ export default function Stock() {
                   <td className={`px-6 py-4 text-sm ${getQuantiteStyle(mat.quantite, mat.seuil)}`}>
                     {mat.quantite_actuelle}
                     {/* Affiche une icône d'alerte si stock bas */}
-                    {mat.quantite <= mat.seuil && ' ⚠️'}
+                    {mat.quantite <= mat.seuil && ' (stock faible)'}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">
                     {mat.seuil_alerte}

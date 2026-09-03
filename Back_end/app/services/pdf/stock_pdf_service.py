@@ -206,7 +206,6 @@ def generate_stock_pdf(stocks, entreprise_nom, departement_nom):
         48 * mm,   # désignation
         32 * mm,   # catégorie
         32 * mm,   # sous-catégorie
-        38 * mm,   # département
         25 * mm,   # quantité
         28 * mm,   # seuil
         25 * mm,   # état

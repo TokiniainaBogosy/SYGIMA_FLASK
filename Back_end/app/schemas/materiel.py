@@ -35,4 +35,4 @@ class MaterielUpdateSchema(Schema):
     reference = fields.Str(load_default=None)
     designation = fields.Str(load_default=None)
     unite = fields.Str(load_default=None)
-    categorie = fields.Str(load_default=None)  # ← Optional[int] | Optional[str] simplifié en Int
+    categorie = fields.Str(load_default=None)

@@ -52,10 +52,10 @@ const DepartementList = () => {
           </div>
           <button
               onClick={() => setShowForm(!showForm)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg flex items-center gap-2 hover:bg-blue-700"
-           >
+              className="px-4 py-2 bg-[#0D3056] hover:bg-[#1e4e7e] text-white rounded-lg transition flex items-center gap-2"
+            >
               <Plus className="w-4 h-4" />
-                Nouveau
+              Nouveau
           </button>
         </div>
 

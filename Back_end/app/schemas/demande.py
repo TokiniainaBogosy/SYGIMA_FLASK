@@ -12,7 +12,7 @@ class StatutDemande(str, Enum):
     REJETEE2 = "REJETEE2"
     EN_ATTENTE_STOCK = "EN_ATTENTE_STOCK"
     LIVREE = "LIVREE"
-    BROUILLON = "BROUILLON"  # ← typo corrigée (BROULLION → BROUILLON)
+    BROUILLON = "BROUILLON"
 
 
 class DemandeBaseSchema(Schema):
@@ -33,6 +33,7 @@ class DemandeTraitementSchema(DemandeBaseSchema):
 
 class DemandeResponseSchema(DemandeBaseSchema):
     id = fields.Int(dump_only=True)
+    numero_demande = fields.Method("get_numero_demande", dump_only=True)
     statut = EnumField(StatutDemande, dump_only=True)
     demandeur_id = fields.Int(dump_only=True)
     departement_id = fields.Int(dump_only=True)
@@ -41,6 +42,9 @@ class DemandeResponseSchema(DemandeBaseSchema):
     motif_rejet = fields.Str(load_default=None)
     traite_par = fields.Int(load_default=None)
     date_traitement = fields.DateTime(load_default=None)
+
+    def get_numero_demande(self, obj):
+        return getattr(obj, "reference", None)
 
 
 class DemandeListResponseSchema(Schema):

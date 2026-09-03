@@ -27,6 +27,8 @@ from app.models.InventaireMaterielEmploye import InventaireEmploye
 from app.services.pdf.inventaire_pdf_service import generate_inventaire_pdf
 from app.models.CategoriesMateriel import CategoriesMateriel
 from app.services.pdf.materiel_pdf_service import generate_materiel_pdf
+from app.services.import_categorie_service import import_categories
+from app.services.import_materiel_service import import_materiels
 
 materiel_bp = Blueprint("materiel", __name__, url_prefix="/materiel")
 
@@ -219,7 +221,21 @@ def delete_categorie_route(categorie_id: int):
 @materiel_bp.route("/stock/delete/<int:stock_id>", methods=["DELETE"])
 def delete_stock_route(stock_id: int):
     result = delete_stock(stock_id)
-   
+
+    current_user = get_current_user()
+    current_user_entreprise = get_current_user_entreprise()
+
+    inscrire_historique(
+        action="SUPPRESSION",
+        objet_cible=result,
+        user_id=current_user.id,
+        entreprise_id=current_user_entreprise.entreprise_id,
+        details={
+            "materiel": result.materiel.designation if result.materiel else None,
+            "quantite_supprimee": result.quantite_actuelle,
+        }
+    )
+
     return "", 204
 
 
@@ -319,7 +335,7 @@ def update_inventaire_route(inventaire_id: int):
                 action="MODIFICATION",
                 objet_cible=db_obj,
                 user_id=current_user.id,
-                entreprise_id=current_user_entreprise.entreprise_id,  
+                entreprise_id=current_user_entreprise.entreprise_id,
                 details={
                     "materiel": db_materiel.designation,
                     "nouvelle_quantite": db_obj.quantite,
@@ -327,7 +343,7 @@ def update_inventaire_route(inventaire_id: int):
                 }
             )
 
-    return jsonify(StockResponseSchema().dump(db_obj)), 200
+    return jsonify(InventaireResponseSchema().dump(db_obj)), 200
 
 @materiel_bp.route("/stock/pdf", methods=["GET"])
 def export_stock_pdf():
@@ -355,3 +371,65 @@ def export_stock_pdf():
         as_attachment=True,
         download_name="rapport_stock.pdf"
     )
+
+@materiel_bp.route("/categorie/import", methods=["POST"])
+def import_categories_route():
+    fichier = request.files.get("file")
+    if not fichier:
+        return jsonify({"error": "Aucun fichier fourni"}), 400
+ 
+    current_user = get_current_user()
+    current_user_entreprise = get_current_user_entreprise()
+ 
+    try:
+        created, errors, categories_creees = import_categories(fichier, current_user, current_user_entreprise)
+    except Exception as e:
+        return jsonify({"error": f"Échec de l'import : {str(e)}"}), 400
+ 
+    if created > 0:
+        # objet_cible attend un vrai enregistrement SQLAlchemy (__tablename__, .id) :
+        # on passe le dernier élément créé, comme le font les autres routes avec `result`.
+        inscrire_historique(
+            action="IMPORT",
+            objet_cible=categories_creees[-1],
+            user_id=current_user.id,
+            entreprise_id=current_user_entreprise.entreprise_id,
+            details={
+                "type": "categories",
+                "nombre_importe": created,
+                "noms": [c.nom for c in categories_creees],
+            }
+        )
+ 
+    return jsonify({"created": created, "errors": errors}), 200
+ 
+ 
+@materiel_bp.route("/materiel/import", methods=["POST"])
+def import_materiels_route():
+    fichier = request.files.get("file")
+    if not fichier:
+        return jsonify({"error": "Aucun fichier fourni"}), 400
+ 
+    current_user = get_current_user()
+    current_user_entreprise = get_current_user_entreprise()
+ 
+    try:
+        created, errors, materiels_crees = import_materiels(fichier, current_user, current_user_entreprise)
+    except Exception as e:
+        return jsonify({"error": f"Échec de l'import : {str(e)}"}), 400
+ 
+    if created > 0:
+        inscrire_historique(
+            action="IMPORT",
+            objet_cible=materiels_crees[-1],
+            user_id=current_user.id,
+            entreprise_id=current_user_entreprise.entreprise_id,
+            details={
+                "type": "materiels",
+                "nombre_importe": created,
+                "designations": [m.designation for m in materiels_crees],
+            }
+        )
+ 
+    return jsonify({"created": created, "errors": errors}), 200
+ 

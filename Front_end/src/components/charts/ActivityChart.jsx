@@ -37,7 +37,7 @@ export default function ActivityChart({ data, height = 200 }) {
                 width={barWidth}
                 height={barHeight}
                 rx={6}
-                className="fill-blue-500 hover:fill-blue-600 transition-colors"
+                className="fill-[#58B2B0] hover:fill-[#1e4e7e] transition-colors"
               />
               {/* Label */}
               <text

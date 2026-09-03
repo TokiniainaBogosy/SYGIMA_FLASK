@@ -89,7 +89,7 @@ export const NotificationProvider = ({ children, userId }) => {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
     setUnreadCount(0);
       
-    console.log('✅ Toutes les notifications marquées comme lues');
+    console.log('Toutes les notifications marquées comme lues');
   };
 
   return (

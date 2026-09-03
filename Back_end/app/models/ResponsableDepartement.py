@@ -5,14 +5,14 @@ from typing import TYPE_CHECKING
 from sqlalchemy import ForeignKey, Integer, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.database import db  # ← changement
+from app.database import db
 
 if TYPE_CHECKING:
     from app.models.User import User
     from app.models.Departement import Departement
 
 
-class ResponsableDepartement(db.Model):  # ← changement
+class ResponsableDepartement(db.Model):
     __tablename__ = "responsable_departements"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)

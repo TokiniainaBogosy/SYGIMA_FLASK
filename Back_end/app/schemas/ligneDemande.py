@@ -9,7 +9,7 @@ class StatutDemande(str, Enum):
     REJETEE2 = "REJETEE2"
     EN_ATTENTE_STOCK = "EN_ATTENTE_STOCK"
     LIVREE = "LIVREE"
-    BROUILLON = "BROUILLON"  # ← typo corrigée (BROULLION → BROUILLON)
+    BROUILLON = "BROUILLON"
 
 
 
@@ -32,4 +32,4 @@ class LigneDemandeResponseSchema(LigneDemandeBaseSchema):
 class CreateDemandeGlobalSchema(Schema):
     justification = fields.Str(required=True)
     date_souhaitee = fields.Str(required=True)
-    lignes = fields.List(fields.Nested(LigneDemandeCreateSchema), required=True)  # ← équivalent de List[LigneDemandeCreate]
+    lignes = fields.List(fields.Nested(LigneDemandeCreateSchema), required=True)

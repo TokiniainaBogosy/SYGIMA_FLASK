@@ -71,7 +71,7 @@ export default function Stock() {
     if (quantite <= seuil) {
       return 'text-red-600 font-bold'
     }
-    return 'text-green-600 font-bold'
+    return 'text-[#0D3056] font-bold'
   }
 
   // Filtrage des matériels
@@ -116,13 +116,13 @@ export default function Stock() {
             onClick={() => {
               handleExportStockPdf();
             }}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+              className="inline-flex h-10 min-w-30 items-center justify-center gap-2 px-4 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
               <Download className="w-4 h-4" /> 
               Exporter
           </button>
           <button
             onClick={() => setShowForm(!showForm)}
-            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition flex items-center gap-2"
+            className="inline-flex h-10 min-w-45 items-center justify-center gap-2 px-4 bg-[#0D3056] hover:bg-[#1e4e7e] text-white rounded-lg transition"
           >
           <span className="text-xl">+</span>
           Ajouter un matériel
@@ -143,7 +143,7 @@ export default function Stock() {
           ))}
         </select>
         {
-          user?.role === 'ADMIN' && (
+          user?.role?.toUpperCase?.() === 'ADMIN' && (
             <select 
             value={searchDepartement}
             onChange={(e) => setSearchDepartement(e.target.value)}
@@ -181,7 +181,7 @@ export default function Stock() {
           selectedStock={selectedStock}
           setSelectedStock={setSelectedStock}
           mode="ajouter"
-          onSuccess={() => refetch()}  // ← rafraîchit la liste
+          onSuccess={() => refetch()}
         />)}
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -200,12 +200,12 @@ export default function Stock() {
             <tbody className="divide-y divide-gray-200">
               {filteredMateriels.map((mat, id) => (
                 <tr key={id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm font-medium text-blue-600">{mat.reference}</td>
+                  <td className="px-6 py-4 text-sm font-medium text-[#58B2B0]">{mat.reference}</td>
                   <td className="px-6 py-4 text-sm text-gray-900">{mat.designation}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{mat.categorie}</td>
                   <td className={`px-6 py-4 text-sm ${getQuantiteStyle(mat.quantite_actuelle, mat.seuil_alerte)}`}>
                     {mat.quantite_actuelle}
-                    {mat.quantite_actuelle <= mat.seuil_alerte && ' ⚠️'}
+                    {mat.quantite_actuelle <= mat.seuil_alerte && ' (stock faible)'}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">{mat.seuil_alerte}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{mat.departement}</td>

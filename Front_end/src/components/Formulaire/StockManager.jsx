@@ -5,8 +5,8 @@ import { Plus, Minus } from 'lucide-react';
 const StockManager = ({
   selectedStock,
   setSelectedStock,
-  mode = "ajouter",        // ← "ajouter" pour le responsable, "reduire" pour l'inventaire
-  onSuccess              // ← callback pour rafraîchir la liste parente
+  mode = "ajouter",        // "ajouter" pour le responsable, "reduire" pour l'inventaire
+  onSuccess              // Callback de rafraîchissement
 }) => {
   const [quantite, setQuantite] = useState("")
   const [error, setError] = useState("")
@@ -24,13 +24,13 @@ const StockManager = ({
 
     try {
       if (mode === "ajouter") {
-        // ─── Responsable : augmente le stock
+        // Le responsable augmente le stock
         await patch(`/materiel/stock/update/${selectedStock.id}`, {
           quantite_actuelle: selectedStock.quantite_actuelle + qty,
           quantite_ajoutee: qty
         })
       } else {
-        // ─── Inventaire : réduit la quantité
+        // L'inventaire réduit la quantité
         if (qty > selectedStock.quantite) {
           setError(`Quantité insuffisante. Maximum : ${selectedStock.quantite}`)
           return
@@ -41,7 +41,7 @@ const StockManager = ({
         })
       }
 
-      onSuccess?.()         // ← rafraîchit la liste parente
+      onSuccess?.()         // Rafraîchir la liste parente
       setSelectedStock(null)
     } catch (err) {
       setError("Une erreur est survenue.")

@@ -29,7 +29,7 @@ function useScrollReveal(threshold = 0.1) {
 
 // ═══ COMPOSANT: Section animée au scroll (CORRIGÉ) ═══
 function AnimatedSection({ children, className = '', delay = 0 }) {
-  const [ref, visible] = useScrollReveal() // ✅ Tableau, pas objet
+  const [ref, visible] = useScrollReveal()
   
   return (
     <div 

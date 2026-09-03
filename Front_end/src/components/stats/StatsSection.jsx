@@ -1,61 +1,75 @@
-import { useMemo, useState } from 'react';
-import { 
-  Package, 
-  ClipboardList, 
-  CheckCircle2, 
-  AlertTriangle, 
-  BarChart3
+import { useState } from 'react';
+import {
+  Package,
+  ClipboardList,
+  CheckCircle2,
+  AlertTriangle,
+  TrendingDown,
+  BarChart3,
+  Loader2
 } from 'lucide-react';
 import StatCard from '../ui/StatCard';
+import { useApi } from '../../hooks/useApi';
 
-export default function StatsSection({ data = [], type = "demandes" }) {
-  // CORRECTION 1 : La valeur par défaut doit correspondre aux valeurs du select ('semaine')
-  const [periode, setPeriode] = useState("semaine");
+export default function StatsSection() {
+  const [periode, setPeriode] = useState('semaine');
 
-  const stats = useMemo(() => {
-    if (type === "demandes") {
-      // 1. Filtrage par date (basé sur le type datetime)
-      const dataFiltreeParDate = data.filter(d => {
-        // Choix de la date selon le statut de la ligne (soumission vs traitement)
-        const dateBrute = d.statut === 'SOUMISE' ? d.date_soumission : d.date_traitement;
-        if (!dateBrute) return false;
-        
-        const dateCible = new Date(dateBrute); 
-        const limiteDate = new Date();
+  // Le hook doit relancer la requête à chaque changement de `periode`
+  // (vérifier que useApi a bien `url` en dépendance de son useEffect interne)
+  const { data: stats, loading, error } = useApi(`/dashboard/stats?periode=${periode}`);
 
-        if (periode === 'semaine') {
-          limiteDate.setDate(limiteDate.getDate() - 7);
-        } else if (periode === 'mois') {
-          limiteDate.setMonth(limiteDate.getMonth() - 1);
-        } else if (periode === 'annee') {
-          limiteDate.setFullYear(limiteDate.getFullYear() - 1);
-        }
-
-        return dateCible >= limiteDate;
-      });
-
-      // 2. Élimination des doublons d'ID sur la période sélectionnée
-      const vus = new Set();
-      const dataUnique = dataFiltreeParDate.filter(d => !vus.has(d.id) && vus.add(d.id));
-
-      // 3. Calculs des compteurs
-      const total = dataUnique.length;
-      const enCours = dataUnique.filter(d => d.statut === 'SOUMISE').length;
-      const approuvees = dataUnique.filter(d => d.statut === 'APPROUVEE1').length;
-      const rejetees = dataUnique.filter(d => d.statut === 'REJETEE1').length;
-      const taux = total > 0 ? Math.round((approuvees / total) * 100) : 0;
-
-      return [
-        { label: 'Total demandes', value: total, icon: ClipboardList, color: 'blue', trend: 'up', trendValue: '+12%' },
-        { label: 'En attente', value: enCours, icon: Package, color: 'orange', trend: null, trendValue: '3 urgents' },
-        { label: 'Approuvées', value: approuvees, icon: CheckCircle2, color: 'green', trend: 'up', trendValue: '+8%' },
-        { label: 'Rejetées', value: rejetees, icon: AlertTriangle, color: 'red', trend: 'down', trendValue: '-2%' },
-        { label: 'Taux approbation', value: `${taux}%`, icon: BarChart3, color: 'purple', trend: null, trendValue: 'Objectif 85%' },
-      ];
-    }
-    return [];
-    // CORRECTION 2 : Ajout de 'periode' dans les dépendances pour relancer useMemo au changement de filtre
-  }, [data, type, periode]);
+  const cards = stats ? [
+    {
+      label: 'Lignes à traiter',
+      value: stats.total_lignes_demandes_a_traiter,
+      icon: ClipboardList,
+      color: 'navy',
+      trend: null,
+      trendValue: 'tous statuts actifs',
+    },
+    {
+      label: 'En attente de stock',
+      value: stats.total_demandes_en_cours,
+      icon: Package,
+      color: 'orange',
+      trend: null,
+      trendValue: 'bloquées',
+    },
+    {
+      label: 'Lignes approuvées',
+      value: stats.total_demandes_approuvees_cette_semaine,
+      icon: CheckCircle2,
+      color: 'teal',
+      trend: null,
+      trendValue: 'cette période',
+    },
+    {
+      label: 'Lignes rejetées',
+      value: stats.total_demandes_rejetees_cette_semaine,
+      icon: AlertTriangle,
+      color: 'red',
+      trend: null,
+      trendValue: 'cette période',
+    },
+    {
+      label: 'Sorties matériel',
+      value: stats.total_materiels_stock_sortie_cette_semaine,
+      icon: TrendingDown,
+      color: 'navy',
+      trend: null,
+      trendValue: 'mouvements',
+    },
+    {
+      label: "Taux d'approbation",
+      value: stats.taux_approbation !== null && stats.taux_approbation !== undefined
+        ? `${stats.taux_approbation}%`
+        : '—',
+      icon: BarChart3,
+      color: 'teal',
+      trend: null,
+      trendValue: 'lignes décidées',
+    },
+  ] : [];
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -64,10 +78,11 @@ export default function StatsSection({ data = [], type = "demandes" }) {
           <h2 className="text-lg font-semibold text-gray-900">Statistiques détaillées</h2>
           <p className="text-sm text-gray-500 mt-0.5">Vue d'ensemble de l'activité</p>
         </div>
-        <select 
+        <select
           value={periode}
           onChange={(e) => setPeriode(e.target.value)}
-          className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+        >
           <option value="semaine">Cette semaine</option>
           <option value="mois">Ce mois</option>
           <option value="annee">Cette année</option>
@@ -75,11 +90,24 @@ export default function StatsSection({ data = [], type = "demandes" }) {
       </div>
 
       <div className="p-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          {stats.map((stat, index) => (
-            <StatCard key={index} {...stat} />
-          ))}
-        </div>
+        {loading && (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="w-6 h-6 animate-spin text-blue-600 mr-2" />
+            <span className="text-gray-500 text-sm">Chargement des statistiques...</span>
+          </div>
+        )}
+
+        {error && !loading && (
+          <p className="text-red-600 text-sm">{error}</p>
+        )}
+
+        {!loading && !error && stats && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+            {cards.map((stat, index) => (
+              <StatCard key={index} {...stat} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

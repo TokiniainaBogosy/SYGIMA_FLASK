@@ -43,7 +43,7 @@ export default function Navbar() {
                 Tarifs
               </Link>
               
-              {/* Bouton connexion → ouvre modale */}
+              {/* Bouton connexion : ouvre la modale */}
               <button
                 onClick={openLogin}
                 className="text-sm font-medium text-gray-600 hover:text-blue-600"
@@ -51,7 +51,7 @@ export default function Navbar() {
                 Se connecter
               </button>
               
-              {/* Bouton inscription → ouvre modale */}
+              {/* Bouton inscription : ouvre la modale */}
               <button
                 onClick={openRegister}
                 className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700"

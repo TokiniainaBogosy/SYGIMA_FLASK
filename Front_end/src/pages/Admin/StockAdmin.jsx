@@ -19,7 +19,7 @@ export default function StockAdmin() {
     const [newDescription,setNewDescription] = useState("");
 
     const materiels = stocklist || []
-    // ✅ Correction 5 : Filtrage des matériels
+    // Filtrage des matériels
     const filteredMateriels = materiels.filter((mat) => {
         // const matchSearch = mat.designation?.toLowerCase().includes(searchTerm.toLowerCase()) || false
         // const matchCategorie = searchCategorie === '' || mat.categorie === searchCategorie
@@ -56,9 +56,9 @@ export default function StockAdmin() {
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition flex items-center gap-2"
+          className="inline-flex h-10 min-w-30 items-center justify-center gap-2 rounded-lg bg-[#0D3056] px-4 text-sm font-medium text-white transition-colors hover:bg-[#1e4e7e]"
         >
-          <span className="text-xl">+</span>
+          <Plus className="h-4 w-4" />
           Nouveau matériel
         </button>
       </div>
@@ -132,7 +132,7 @@ export default function StockAdmin() {
                   <td className="px-6 py-4 text-sm text-gray-500">{mat.categorie}</td>
                   <td className={`px-6 py-4 text-sm ${getQuantiteStyle(mat.quantite_actuelle, mat.seuil_alerte)}`}>
                     {mat.quantite_actuelle}
-                    {mat.quantite_actuelle <= mat.seuil_alerte && ' ⚠️'}
+                    {mat.quantite_actuelle <= mat.seuil_alerte && ' (stock faible)'}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">{mat.seuil_alerte}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{mat.departement}</td>

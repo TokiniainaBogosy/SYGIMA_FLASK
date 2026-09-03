@@ -9,7 +9,7 @@ def update_materiel(materiel_id: int, data: dict):
     # 1. Chercher l'existant
     db_obj = Materiel.query.filter(Materiel.id == materiel_id).first()
 
-    if not db_obj:  # ← vérifié AVANT d'utiliser db_obj
+    if not db_obj:
         abort(404, description="Matériel non trouvé")
 
     # 2. Résoudre la catégorie par nom si fournie

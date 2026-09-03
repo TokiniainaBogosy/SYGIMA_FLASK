@@ -43,7 +43,7 @@ def ajout_responsable(data: dict):
     #     abort(404, description="Département introuvable")
 
     existing = ResponsableDepartement.query.filter(
-        ResponsableDepartement.departement_id == departement.id  # ← bug corrigé (était .id == departement_id)
+        ResponsableDepartement.departement_id == departement.id
     ).first()
 
     # if existing:

@@ -11,13 +11,13 @@ class EntrepriseCreateSchema(Schema):
 class AdminCreateSchema(Schema):
     nom = fields.Str(required=True)
     prenom = fields.Str(required=True)
-    email = fields.Email(required=True)  # ← équivalent de EmailStr
+    email = fields.Email(required=True)
     password = fields.Str(required=True)
     role = fields.Str(load_default="Admin")
 
 
 class SetupRequestSchema(Schema):
-    entreprise = fields.Nested(EntrepriseCreateSchema, required=True)  # ← équivalent de sous-modèle Pydantic
+    entreprise = fields.Nested(EntrepriseCreateSchema, required=True)
     admin = fields.Nested(AdminCreateSchema, required=True)
 
 

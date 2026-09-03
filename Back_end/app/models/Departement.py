@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from sqlalchemy import DateTime, ForeignKey, Integer, String, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.database import db  # ← changement
+from app.database import db
 
 if TYPE_CHECKING:
     from app.models.Entreprise import Entreprise
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from app.models.InventaireMaterielEmploye import InventaireEmploye  
     from app.models.CategoriesMateriel import CategoriesMateriel
 
-class Departement(db.Model):  # ← changement
+class Departement(db.Model):
     __tablename__ = "departements"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)

@@ -5,6 +5,7 @@ import { useApi } from '../hooks/useApi';
 const MODULES = [
   { id: 'all', label: "Tout l'historique" },
   { id: 'stocks', label: 'Stock' },
+  { id: 'mouvements_stock', label: 'Sorties/Entrées' },
   { id: 'categories_materiel', label: 'Catégories' },
   { id: 'materiels', label: 'Matériel' },
   { id: 'demandes', label: 'Demandes' },
@@ -15,14 +16,12 @@ export default function HistoriqueAffichage() {
   const [activeTab, setActiveTab] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Récupération des données et des états directement depuis le hook personnalisé
-  const { data: mockLogs, loading: isLoading, error } = useApi('/historique/');
+  const { data: logs, loading: isLoading, error } = useApi('/historique/');
 
-  // Calcul mémorisé des logs filtrés (évite l'utilisation d'un useEffect + state supplémentaire)
   const filteredLogs = useMemo(() => {
-    if (!mockLogs || !Array.isArray(mockLogs)) return [];
+    if (!logs || !Array.isArray(logs)) return [];
 
-    return mockLogs.filter((log) => {
+    return logs.filter((log) => {
       // 1. Filtre par onglet/module
       const matchModule = activeTab === 'all' || log.table_cible === activeTab;
 
@@ -30,30 +29,42 @@ export default function HistoriqueAffichage() {
       const search = searchTerm.trim().toLowerCase();
       if (!search) return matchModule;
 
-      const descriptionText = log.details || log.description || '';
+      // Le contenu de `details` est un objet ({cle: valeur, ...}) : on l'aplatit
+      // en texte pour pouvoir le chercher, au lieu de le calculer sans s'en servir.
+      const descriptionText = Object.values(log.details || {}).join(' ').toLowerCase();
+
       const matchSearch =
         (log.utilisateur && log.utilisateur.toLowerCase().includes(search)) ||
-        (log.action && log.action.toLowerCase().includes(search));
+        (log.action && log.action.toLowerCase().includes(search)) ||
+        descriptionText.includes(search);
 
       return matchModule && matchSearch;
     });
-  }, [mockLogs, activeTab, searchTerm]);
+  }, [logs, activeTab, searchTerm]);
 
-  // Fonction utilitaire pour le badge de couleur par action
+  // BUG CORRIGÉ : les valeurs réelles d'action (venant de inscrire_historique)
+  // sont sans accent ("CREATION", "MODIFICATION", ...) ; les cases avec accents
+  // ("création", "désactivation") ne matchaient donc jamais.
   const getActionBadgeColor = (action = '') => {
     switch (action.toLowerCase()) {
-      case 'création' :
+      case 'creation':
         return 'bg-green-100 text-green-800 border-green-200';
+      case 'insertion':
+        return 'bg-blue-100 text-blue-800 border-blue-200';
       case 'soumission':
         return 'bg-blue-100 text-blue-800 border-blue-200';
       case 'modification':
         return 'bg-yellow-100 text-yellow-800 border-yellow-200';
       case 'suppression':
         return 'bg-red-100 text-red-800 border-red-200';
-      case 'désactivation':
+      case 'desactivation':
         return 'bg-red-100 text-red-800 border-red-200';
       case 'traitement':
         return 'bg-green-100 text-green-800 border-green-200';
+      case 'import':
+        return 'bg-[#E7F4F3] text-[#0D3056] border-[#58B2B0]/40';
+      case 'sortie':
+        return 'bg-[#FCF1E1] text-[#0D3056] border-[#E5A03A]/40';
       default:
         return 'bg-gray-100 text-gray-800 border-gray-200';
     }
@@ -70,7 +81,7 @@ export default function HistoriqueAffichage() {
       {/* Barre d'outils : Recherche & Onglets */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          
+
           {/* Navigation par onglets (Modules) */}
           <div className="flex flex-wrap gap-2">
             {MODULES.map((mod) => (
@@ -79,7 +90,7 @@ export default function HistoriqueAffichage() {
                 onClick={() => setActiveTab(mod.id)}
                 className={`px-4 py-2 text-sm font-medium rounded-md transition-colors border ${
                   activeTab === mod.id
-                    ? 'bg-indigo-600 text-white border-indigo-600'
+                    ? 'bg-[#58B2B0] text-white border-[#58B2B0]'
                     : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
                 }`}
               >
@@ -95,7 +106,7 @@ export default function HistoriqueAffichage() {
               placeholder="Rechercher une action, un utilisateur..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-[#58B2B0] focus:border-[#58B2B0] text-sm"
             />
           </div>
 

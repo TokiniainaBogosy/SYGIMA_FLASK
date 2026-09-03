@@ -1,7 +1,7 @@
 from flask import abort
 from app.database import db
 from app.models.Demande import Demande
-from app.models.User import User
+from app.models.User import User, RoleUser
 from app.models.Materiel import Materiel
 from app.models.Departement import Departement
 from app.models.LigneDemande import LigneDemande
@@ -73,6 +73,11 @@ def read_demande_list(current_user: User, current_user_entreprise: dict, limit: 
         .filter(Demande.entreprise_id == current_user_entreprise.entreprise_id)
         .order_by(Demande.date_soumission.desc())
     )
+
+    if current_user.role == RoleUser.EMPLOYE:
+        query = query.filter(Demande.demandeur_id == current_user.id)
+    elif current_user.role == RoleUser.RESPONSABLE:
+        query = query.filter(Demande.departement_id == current_user.departement_id)
 
     if limit is not None:
         query = query.limit(limit)

@@ -14,19 +14,21 @@ import {
   UsersIcon,
   HistoryIcon
 } from 'lucide-react';
-import { NavLink, useNavigate } from "react-router-dom"
+import { NavLink, useLocation, useNavigate } from "react-router-dom"
 import logo from '../../../public/logo-sygima.png'
 
 export default function Navbar({ onLogout, user }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [openGroup, setOpenGroup] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
   const handleRegister = () => {
     navigate('/registerParDepartement')
   }
 
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // Navigation
   // ONGLETS DE NAVIGATION AVEC RÔLES
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // Navigation mobile
   const menuItems = [
     { 
       icon: LayoutDashboard, 
@@ -40,6 +42,12 @@ export default function Navbar({ onLogout, user }) {
       path: '/departements', 
       roles: ['ADMIN']
     },
+    {
+      icon: UsersIcon,
+      label:"Users",
+      path:"/GestionUser",
+      roles:['ADMIN']
+    },
     { 
       icon: Package, 
       label: 'Stock', 
@@ -48,7 +56,7 @@ export default function Navbar({ onLogout, user }) {
     },
     {
       icon: Package, 
-      label: 'Stock Departement', 
+      label: 'Inventaire', 
       path: '/stockDepartement', 
       roles: ['RESPONSABLE', 'EMPLOYE']
     },
@@ -89,12 +97,6 @@ export default function Navbar({ onLogout, user }) {
       roles: ['']
     },
     {
-      icon: UsersIcon,
-      label:"Users",
-      path:"/GestionUser",
-      roles:['ADMIN']
-    },
-    {
       icon:HistoryIcon,
       label:"Historique",
       path:"/Historique",
@@ -106,15 +108,47 @@ export default function Navbar({ onLogout, user }) {
   const filteredMenuItems = menuItems.filter(item => 
     item.roles.includes(user?.role)
   );
+  const isAdmin = user?.role?.toUpperCase?.() === 'ADMIN';
 
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━
+  const dashboardItem = filteredMenuItems.find(item => item.path === '/dashboard');
+  const navigationGroups = [
+    {
+      id: 'organisation',
+      label: 'Organisation',
+      icon: Building2,
+      paths: ['/departements', '/GestionUser'],
+    },
+    {
+      id: 'materiel',
+      label: 'Matériel et stock',
+      icon: Package,
+      paths: ['/stock', '/StockAdmin', '/stockDepartement', '/StockDepartementAdmin', '/materiels', '/MaterielAdmin'],
+    },
+    {
+      id: 'demandes',
+      label: 'Demandes',
+      icon: ClipboardList,
+      paths: ['/demandes'],
+    },
+    {
+      id: 'historique',
+      label: 'Historique',
+      icon: HistoryIcon,
+      paths: ['/Historique'],
+    },
+  ].map(group => ({
+    ...group,
+    items: filteredMenuItems.filter(item => group.paths.includes(item.path)),
+  })).filter(group => group.items.length > 0);
+
+  // Filtrage par rôle
   // BADGE COULEUR SELON RÔLE
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━
+  // Couleur du rôle
   const roleBadgeColor = {
     admin: "bg-red-500/20 text-red-300 border-red-500/30",
     responsable: "bg-blue-500/20 text-blue-300 border-blue-500/30",
     magasinier: "bg-amber-500/20 text-amber-300 border-amber-500/30",
-    employe: "bg-green-500/20 text-green-300 border-green-500/30",
+    employe: " text-[#58B2B0] border-[#58B2B0]/30",
   }
 
   const roleLabel = {
@@ -126,32 +160,68 @@ export default function Navbar({ onLogout, user }) {
 
   return (
     <nav className="bg-gray-900 text-white sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+      <div className="mx-auto max-w-7xl overflow-visible px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 min-w-0 items-center justify-between gap-3">
           
           {/* Logo + Liens desktop */}
-          <div className="flex items-center gap-8">
+          <div className="flex min-w-0 flex-1 items-center gap-3 lg:gap-5">
             {/* Logo */}
-            <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => navigate('/dashboard')}>
+            <div className="flex shrink-0 cursor-pointer items-center gap-2.5" onClick={() => navigate('/dashboard')}>
               <img src={logo} alt="Logo" className="w-7 h-7" />
               <span className="font-bold text-lg tracking-tight">SYGIMA</span>
             </div>
 
             {/* Navigation desktop (selon rôle) */}
-            <div className="hidden md:flex items-center gap-1">
-              {filteredMenuItems.map((item, i) => (
+            <div className="hidden min-w-0 flex-1 items-center justify-center gap-3 md:flex">
+              {isAdmin ? <>
+                {dashboardItem && (
                 <NavLink
-                  key={i}
-                  to={item.path}
-                  className={({ isActive }) =>
-                    `flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors
-                     ${isActive
-                      ? 'bg-blue-600 text-white' 
-                      : 'text-gray-400 hover:bg-gray-800 hover:text-white'
-                    }`
-                  }
+                  to={dashboardItem.path}
+                  className={({ isActive }) => `flex h-9 shrink-0 items-center gap-1.5 rounded-lg px-2 text-sm font-medium transition-colors ${isActive ? 'bg-[#58B2B0] text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'}`}
                 >
-                  <item.icon className="w-4 h-4" />
+                  <dashboardItem.icon className="h-4 w-4" />
+                  {dashboardItem.label}
+                </NavLink>
+                )}
+              {navigationGroups.map(group => {
+                const GroupIcon = group.icon;
+                const isActive = group.items.some(item => item.path === location.pathname);
+                return (
+                  <div key={group.id} className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setOpenGroup(openGroup === group.id ? null : group.id)}
+                      className={`flex h-9 shrink-0 items-center gap-1.5 rounded-lg px-2 text-sm font-medium transition-colors ${isActive ? 'bg-[#58B2B0] text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'}`}
+                    >
+                      <GroupIcon className="h-4 w-4" />
+                      {group.label}
+                      <ChevronDown className={`h-3.5 w-3.5 transition-transform ${openGroup === group.id ? 'rotate-180' : ''}`} />
+                    </button>
+                    {openGroup === group.id && (
+                      <div className="absolute left-0 top-full z-50 mt-2 min-w-48 rounded-lg border border-gray-700 bg-gray-900 p-1 shadow-xl">
+                        {group.items.map(item => (
+                          <NavLink
+                            key={item.path}
+                            to={item.path}
+                            onClick={() => setOpenGroup(null)}
+                            className={({ isActive: itemActive }) => `flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors ${itemActive ? 'bg-[#58B2B0] text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}`}
+                          >
+                            <item.icon className="h-4 w-4" />
+                            {item.label}
+                          </NavLink>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+              </> : filteredMenuItems.map(item => (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  className={({ isActive }) => `flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${isActive ? 'bg-[#58B2B0] text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'}`}
+                >
+                  <item.icon className="h-4 w-4" />
                   {item.label}
                 </NavLink>
               ))}
@@ -159,9 +229,9 @@ export default function Navbar({ onLogout, user }) {
           </div>
 
           {/* Droite : Profil + Déconnexion */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden shrink-0 items-center gap-2 lg:gap-3 md:flex">
             {/* Bouton Ajouter utilisateur (admin only) */}
-            {(user?.role === 'ADMIN') &&(
+            {(user?.role?.toUpperCase?.() === 'ADMIN') &&(
               <>
               <button
                 onClick={handleRegister}
@@ -184,12 +254,12 @@ export default function Navbar({ onLogout, user }) {
             )}
             <NotificationButton/>
             {/* Infos utilisateur avec badge rôle */}
-            <div className="flex items-center gap-3">
+            <div className="flex min-w-0 items-center gap-2 xl:gap-3">
               <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-sm font-bold">
                 {user?.prenom?.[0] || user?.nom?.[0] || 'U'}
               </div>
-              <div className="text-sm">
-                <p className="font-medium text-white">{user?.prenom} {user?.nom}</p>
+              <div className="hidden min-w-0 text-sm xl:block xl:max-w-36">
+                <p className="truncate font-medium text-white">{user?.prenom} {user?.nom}</p>
                 <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-md border inline-block mt-0.5 ${roleBadgeColor[user?.role?.toLowerCase()] || "bg-white/10 text-white/50 border-white/20"}`}>
                   {roleLabel[user?.role?.toLowerCase()] || user?.role || 'Employé'}
                 </span>
@@ -221,20 +291,33 @@ export default function Navbar({ onLogout, user }) {
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-gray-800 bg-gray-900">
           <div className="px-4 py-3 space-y-1">
-            {filteredMenuItems.map((item, i) => (
-              <NavLink
-                key={i}
-                to={item.path}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors
-                   ${isActive
-                    ? 'bg-blue-600 text-white' 
-                    : 'text-gray-400 hover:bg-gray-800 hover:text-white'
-                  }`
-                }
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <item.icon className="w-5 h-5" />
+            {isAdmin ? <>
+            {dashboardItem && (
+              <NavLink to={dashboardItem.path} onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-400 hover:bg-gray-800 hover:text-white">
+                <dashboardItem.icon className="h-5 w-5" />
+                {dashboardItem.label}
+              </NavLink>
+            )}
+            {navigationGroups.map(group => {
+              const GroupIcon = group.icon;
+              return (
+                <div key={group.id} className="border-b border-gray-800 py-1 last:border-b-0">
+                  <p className="flex items-center gap-3 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                    <GroupIcon className="h-4 w-4" />
+                    {group.label}
+                  </p>
+                  {group.items.map(item => (
+                    <NavLink key={item.path} to={item.path} onClick={() => setMobileMenuOpen(false)} className={({ isActive }) => `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium ${isActive ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'}`}>
+                      <item.icon className="h-5 w-5" />
+                      {item.label}
+                    </NavLink>
+                  ))}
+                </div>
+              );
+            })}
+            </> : filteredMenuItems.map(item => (
+              <NavLink key={item.path} to={item.path} onClick={() => setMobileMenuOpen(false)} className={({ isActive }) => `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium ${isActive ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'}`}>
+                <item.icon className="h-5 w-5" />
                 {item.label}
               </NavLink>
             ))}

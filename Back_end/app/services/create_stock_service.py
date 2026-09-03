@@ -5,15 +5,17 @@ from app.models.Materiel import Materiel
 from app.models.User import User
 
 
-def create_stock(data: dict, current_user: User,current_user_entreprise):
-
+def create_stock(data: dict, current_user: User, current_user_entreprise):
     materiel = Materiel.query.filter(Materiel.designation == data.get("materiel")).first()
-    # if not materiel:
-    #     abort(404, description="Matériel introuvable")
+    if not materiel:
+        abort(404, description="Matériel introuvable")
 
     quantite_ajoutee = data.get("quantite")
+    if quantite_ajoutee is None:
+        abort(400, description="Le champ 'quantite' est requis.")
+    if quantite_ajoutee < 0:
+        abort(400, description="La quantité ne peut pas être négative.")
 
-    # Vérifier si un stock existe déjà pour ce matériel + département
     stock_existing = Stock.query.filter(
         Stock.materiel_id == materiel.id,
         Stock.departement_id == current_user.departement_id
@@ -24,7 +26,7 @@ def create_stock(data: dict, current_user: User,current_user_entreprise):
         try:
             db.session.commit()
             db.session.refresh(stock_existing)
-            return stock_existing
+            return stock_existing, materiel
         except Exception as e:
             db.session.rollback()
             print(f"ERREUR REELLE : {str(e)}")
@@ -41,7 +43,7 @@ def create_stock(data: dict, current_user: User,current_user_entreprise):
         db.session.add(db_stock)
         db.session.commit()
         db.session.refresh(db_stock)
-        return db_stock,materiel  # Retourner l'objet créé pour l'historique
+        return db_stock, materiel
     except Exception as e:
         db.session.rollback()
         print(f"Erreur : {e}")

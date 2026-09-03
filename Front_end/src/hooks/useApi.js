@@ -14,7 +14,11 @@ export function useApi(url = null) {
       const res = await api.get(url)
       setData(res.data)
     } catch (e) {
-      // ← corrigé : cherche description ET detail
+      if (e.response?.status === 404) {
+        setData([])
+        setError(null)
+        return
+      }
       setError(e.response?.data?.description || e.response?.data?.detail || e.message)
     } finally {
       setLoading(false)
@@ -25,7 +29,7 @@ export function useApi(url = null) {
     fetchData()
   }, [fetchData])
 
-  // ✅ refetch exposé
+  // Expose la fonction de rechargement
   const refetch = useCallback(() => {
     fetchData()
   }, [fetchData])
@@ -37,10 +41,10 @@ export function useApi(url = null) {
       const res = await api.patch(patchUrl, body)
       return res.data
     } catch (e) {
-      // ← corrigé : cherche description ET detail
+      // Lire les formats d'erreur du backend
       const message = e.response?.data?.description || e.response?.data?.detail || e.message
       setError(message)
-      throw new Error(message)  // ← throw avec le bon message
+      throw new Error(message)
     } finally {
       setLoading(false)
     }

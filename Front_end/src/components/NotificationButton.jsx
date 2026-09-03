@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Bell, X, Check, CheckCheck } from 'lucide-react';
+import { Bell, X, Check, CheckCheck, CircleCheck, AlertTriangle, CircleX, Info } from 'lucide-react';
 import { useNotifications } from '../context/NotificationContext';
 
 const NotificationButton = () => {
@@ -20,12 +20,13 @@ const NotificationButton = () => {
 
   const getNotificationIcon = (type) => {
     const icons = {
-      success: '✅',
-      warning: '⚠️',
-      error: '❌',
-      info: 'ℹ️'
+      success: CircleCheck,
+      warning: AlertTriangle,
+      error: CircleX,
+      info: Info
     };
-    return icons[type] || icons.info;
+    const Icon = icons[type] || icons.info;
+    return <Icon className="w-5 h-5" />;
   };
 
   const formatTime = (timestamp) => {
@@ -96,7 +97,7 @@ const NotificationButton = () => {
                               ${!notif.read ? 'bg-indigo-500/5' : ''}`}
                 >
                   <div className="flex items-start gap-3">
-                    <span className="text-2xl">{getNotificationIcon(notif.type)}</span>
+                    <span>{getNotificationIcon(notif.type)}</span>
                     
                     <div className="flex-1">
                       <p className={`text-sm ${!notif.read ? 'text-white font-medium' : 'text-gray-300'}`}>

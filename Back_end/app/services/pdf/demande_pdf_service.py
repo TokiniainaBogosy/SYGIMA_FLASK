@@ -41,12 +41,39 @@ def format_value(value):
     return str(value)
 
 
+STATUS_LABELS = {
+    "BROUILLON": "Brouillon",
+    "SOUMISE": "Soumise",
+    "EN_TRAITEMENT": "En traitement",
+    "APPROUVEE1": "Approuvée",
+    "APPROUVEE2": "Approuvée",
+    "REJETEE1": "Rejetée",
+    "REJETEE2": "Rejetée",
+    "EN_ATTENTE_STOCK": "En attente de stock",
+    "LIVREE": "Livrée",
+}
+
+
+def normalize_status(status):
+    """Extrait le code d'un statut Python ou texte."""
+    status_value = format_value(status)
+    if "." in status_value:
+        status_value = status_value.rsplit(".", 1)[-1]
+    return status_value.upper()
+
+
+def format_status(status):
+    """Convertit un statut technique en libellé métier lisible."""
+    status_code = normalize_status(status)
+    return STATUS_LABELS.get(status_code, status_code)
+
+
 def get_status_color(status):
     """
     Retourne une couleur selon le statut de la demande.
     """
 
-    status = format_value(status).upper()
+    status = normalize_status(status)
 
     if status in ["APPROUVEE1", "APPROUVEE2", "LIVREE"]:
         return colors.HexColor("#16a34a")
@@ -180,9 +207,7 @@ def create_summary_table(demandes, styles):
 
     for demande in demandes:
 
-        statut = format_value(
-            demande.get("statut")
-        ).upper()
+        statut = normalize_status(demande.get("statut"))
 
         if statut == "SOUMISE":
             soumises += 1
@@ -350,9 +375,9 @@ def create_demande_table(demandes, styles):
             demande.get("qte_accordee")
         )
 
-        statut = format_value(
-            demande.get("statut")
-        )
+        statut_code = normalize_status(demande.get("statut"))
+        statut = format_status(statut_code)
+        statut_color = get_status_color(statut_code).hexval()
 
         date = format_date(
             demande.get("date_soumission")
@@ -367,7 +392,10 @@ def create_demande_table(demandes, styles):
                 Paragraph(materiels, styles["small"]),
                 Paragraph(qte_demandee, styles["small"]),
                 Paragraph(qte_accordee, styles["small"]),
-                Paragraph(statut, styles["small"]),
+                Paragraph(
+                    f'<font color="{statut_color}"><b>{statut}</b></font>',
+                    styles["small"],
+                ),
                 Paragraph(date, styles["small"]),
             ]
         )
@@ -520,7 +548,7 @@ def create_detail_section(demandes, styles):
             demande.get("motif_rejet")
         )
 
-        statut = format_value(
+        statut = format_status(
             demande.get("statut")
         )
 

@@ -15,9 +15,9 @@ export default function DataTable({
 
   if (loading) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-xl border border-[#F2F3F4] overflow-hidden">
         <div className="flex justify-center py-16">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0D3056]" />
         </div>
       </div>
     );
@@ -25,52 +25,52 @@ export default function DataTable({
 
   if (error) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-xl border border-[#F2F3F4] overflow-hidden">
         <div className="px-6 py-16 text-center">
           <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-3">
             <Package className="w-6 h-6 text-red-500" />
           </div>
           <p className="text-red-600 font-medium">Erreur de chargement</p>
-          <p className="text-sm text-gray-500 mt-1">{error}</p>
+          <p className="text-sm text-[#8B939A] mt-1">{error}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+    <div className="bg-white rounded-xl border border-[#F2F3F4] overflow-hidden">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+      <div className="px-6 py-4 border-b border-[#F2F3F4] flex justify-between items-center">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
-          {subtitle && <p className="text-sm text-gray-500 mt-0.5">{subtitle}</p>}
+          <h2 className="text-lg font-semibold text-[#0D3056] font-['Montserrat',_sans-serif]">{title}</h2>
+          {subtitle && <p className="text-sm text-[#8B939A] mt-0.5">{subtitle}</p>}
         </div>
       </div>
 
       {data.length === 0 ? (
         <div className="px-6 py-16 text-center">
-          <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3">
-            <Package className="w-6 h-6 text-gray-400" />
+          <div className="w-12 h-12 bg-[#F2F3F4] rounded-full flex items-center justify-center mx-auto mb-3">
+            <Package className="w-6 h-6 text-[#8B939A]" />
           </div>
-          <p className="text-gray-500 font-medium">{emptyMessage}</p>
+          <p className="text-[#8B939A] font-medium">{emptyMessage}</p>
         </div>
       ) : (
         <>
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
-                <tr className="border-b border-gray-100 bg-gray-50/50">
+                <tr className="border-b border-[#F2F3F4] bg-[#F2F3F4]/50">
                   {columns.map((col, i) => (
                     <th 
                       key={i} 
-                      className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                      className="px-6 py-3 text-xs font-semibold text-[#8B939A] uppercase tracking-wider"
                     >
                       {col.header}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-[#F2F3F4]">
                 {data.slice(0, maxRows).map((row, i, array) => {
 
                   // Vérifie si c'est la première ligne du groupe
@@ -86,7 +86,7 @@ export default function DataTable({
                   return (
                     <tr
                       key={row.id || i}
-                      className="hover:bg-gray-50/50 transition-colors"
+                      className="hover:bg-[#F2F3F4]/50 transition-colors"
                     >
 
                       {columns.map((col, j) => {
@@ -102,7 +102,7 @@ export default function DataTable({
                               key={j}
                               rowSpan={rowSpanCount}
                               className={`px-6 py-4  ${
-                                col.className || 'text-sm text-gray-900'
+                                col.className || 'text-sm text-[#3A3F44]'
                               }`}
                             >
                               {row.reference}
@@ -115,7 +115,7 @@ export default function DataTable({
                           <td
                             key={j}
                             className={`px-6 py-4 ${
-                              col.className || 'text-sm text-gray-900'
+                              col.className || 'text-sm text-[#3A3F44]'
                             }`}
                           >
                             {col.render ? col.render(row) : row[col.key]}
@@ -131,15 +131,15 @@ export default function DataTable({
           
           {/* Pagination simplifiée */}
           {data.length > maxRows && (
-            <div className="px-6 py-3 border-t border-gray-100 flex justify-between items-center">
-              <p className="text-sm text-gray-500">
+            <div className="px-6 py-3 border-t border-[#F2F3F4] flex justify-between items-center">
+              <p className="text-sm text-[#8B939A]">
                 Affichage de 1-{maxRows} sur {data.length}
               </p>
               <div className="flex gap-2">
-                <button className="p-1 rounded-lg hover:bg-gray-100 text-gray-400">
+                <button className="p-1 rounded-lg hover:bg-[#F2F3F4] text-[#8B939A]">
                   <ChevronLeft className="w-4 h-4" />
                 </button>
-                <button className="p-1 rounded-lg hover:bg-gray-100 text-gray-600">
+                <button className="p-1 rounded-lg hover:bg-[#F2F3F4] text-[#3A3F44]">
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>

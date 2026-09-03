@@ -48,10 +48,10 @@ export default function MaterielAdmin() {
                 </div>
                 <button
                   onClick={() => setShowForm(!showForm)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg flex items-center gap-2 hover:bg-blue-700"
+                  className="inline-flex h-10 min-w-30 items-center justify-center gap-2 rounded-lg bg-[#0D3056] px-4 text-sm font-medium text-white transition-colors hover:bg-[#1e4e7e]"
                 >
                   <Plus className="w-4 h-4" />
-                  Nouveau
+                  Nouveau matériel
                 </button>
               </div>
 
@@ -70,7 +70,7 @@ export default function MaterielAdmin() {
         
               {showForm && <CategorieForm />} 
         
-              {/* ─── DEUX COLONNES CÔTE À CÔTE ───────────────── */}
+              {/* Deux colonnes côte à côte */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 
                 {/* ═══ COLONNE GAUCHE : CATÉGORIES ═══ */}

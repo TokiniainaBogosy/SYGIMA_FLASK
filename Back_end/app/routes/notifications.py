@@ -116,7 +116,7 @@ def create_notification_for_responsable():
         room = f"user_{departement.responsable_id}"
         socketio.emit('new_notification', notification_dict, room=room)
         
-        print(f'Notification envoyée de {user.username} → responsable (user {departement.responsable_id})')
+        print(f'Notification envoyée de {user.username} au responsable (user {departement.responsable_id})')
         
         return jsonify({
             'success': True,

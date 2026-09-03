@@ -15,25 +15,25 @@ export default function AdminDashBoard() {
     {
       label: 'Matériels en stock',
       value: 156,
-      // icon: '📦',
+      // icon: 'package',
       color: 'bg-blue-500',
     },
     {
       label: 'Demandes en cours',
       value: 12,
-      // icon: '📋',
+      // icon: 'clipboard',
       color: 'bg-orange-500',
     },
     {
       label: 'Demandes approuvées',
       value: 45,
-      // icon: '✅',
+      // icon: 'check',
       color: 'bg-green-500',
     },
     {
       label: 'Alertes stock',
       value: 3,
-      // icon: '⚠️',
+      // icon: 'warning',
       color: 'bg-red-500',
     },
   ]

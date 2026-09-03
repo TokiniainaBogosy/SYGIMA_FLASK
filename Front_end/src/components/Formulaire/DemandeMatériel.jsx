@@ -8,7 +8,7 @@ const ligneParcDefaut = {
 
 
 
-function DemandeMateriel() {
+function DemandeMateriel({refetchDemandes}) {
   const [entete, setEntete] = useState({
     date_souhaitee: '',
     justification: ''
@@ -42,9 +42,13 @@ const handleSubmit = async (e) => {
   e.preventDefault()
   try {
     const result = await post('demande/', { ...entete, lignes })
-    setMessage({ type: 'succes', texte: `Demande envoyée ! Votre numéro : ${result.numero_demande}` })
+    const numeroDemande = result.numero_demande || result.reference || 'inconnu'
+    setMessage({ type: 'succes', texte: `Demande envoyée ! Votre numéro : ${numeroDemande}` })
     setEntete({ date_souhaitee: '', justification: '' })
     setLignes([{ ...ligneParcDefaut }])
+    if (typeof refetchDemandes === 'function') {
+      refetchDemandes()
+    }
   } catch (error) {
     setMessage({ type: 'erreur', texte: "Erreur lors de l'envoi. Réessayez." })
   }
@@ -70,7 +74,7 @@ const handleSubmit = async (e) => {
 
         <form onSubmit={handleSubmit} className="space-y-8">
 
-          {/* ── EN-TÊTE ── */}
+          {/* En-tête */}
           <div>
             <h3 className="text-sm font-semibold text-blue-600 uppercase tracking-wide mb-4">
               Détails de la demande
@@ -105,7 +109,7 @@ const handleSubmit = async (e) => {
             </div>
           </div>
 
-          {/* ── LIGNES ── */}
+          {/* Lignes */}
           <div>
             <h3 className="text-sm font-semibold text-blue-600 uppercase tracking-wide mb-4">
               Matériel demandé
@@ -192,7 +196,7 @@ const handleSubmit = async (e) => {
 
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition-colors duration-200"
+            className="w-full bg-[#0D3056] hover:bg-[#155191] text-white font-semibold py-2.5 rounded-lg transition-colors duration-200"
           >
             Envoyer la demande
           </button>

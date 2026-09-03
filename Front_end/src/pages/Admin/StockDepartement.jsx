@@ -15,7 +15,7 @@ const StockDepartement = () => {
   const { user } = useAuth()
 
   const { data: stocklist, loading: stocklistLoading, error: stocklistError, refetch } =
-    useApi('materiel/inventaire')  // ← refetch extrait du hook
+    useApi('materiel/inventaire')
 
   const materiels = stocklist?.filter(stock => stock.sous_categorie == "equipement") || []
 
@@ -64,7 +64,7 @@ const StockDepartement = () => {
 
   const getQuantiteStyle = (quantite) => {
     if (quantite <= 0) return 'text-red-600 font-bold'
-    return 'text-green-600 font-bold'
+    return 'text-[#58B2B0] font-bold'
   }
 
   const filteredMateriels = materiels.filter((mat) => {
@@ -105,7 +105,7 @@ const StockDepartement = () => {
             onClick={() => {
               handleExportInventairePdf();
             }}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+              className="inline-flex h-10 min-w-30 items-center justify-center gap-2 px-4 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
               <Download className="w-4 h-4" /> 
               Exporter
           </button>
@@ -126,7 +126,7 @@ const StockDepartement = () => {
           ))}
         </select>
 
-        {user?.role === 'admin' && (
+        {user?.role?.toUpperCase?.() === 'ADMIN' && (
           <select
             value={searchDepartement}
             onChange={(e) => setSearchDepartement(e.target.value)}
@@ -155,7 +155,7 @@ const StockDepartement = () => {
           setSelectedStock={setSelectedStock}
           mode="reduire"
           onSuccess={() => {
-            refetch()              // ← rafraîchit la liste
+            refetch()
             setSelectedStock(null)
           }}
         />
@@ -188,15 +188,15 @@ const StockDepartement = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {filteredMateriels.map((mat) => (  // ← key sur mat.id, pas l'index
+              {filteredMateriels?.map((mat) => (
                 <tr key={mat.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm font-medium text-blue-600">{mat.reference}</td>
+                  <td className="px-6 py-4 text-sm font-medium text-[#0D3056]">{mat.reference}</td>
                   <td className="px-6 py-4 text-sm text-gray-900">{mat.designation}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{mat.categorie}</td>
                   <td className="px-6 py-4 text-sm text-gray-900">{mat.employe_prenom} {mat.employe_nom}</td>
                   <td className={`px-6 py-4 text-sm ${getQuantiteStyle(mat.quantite)}`}>
                     {mat.quantite}
-                    {mat.quantite <= 0 && ' ⚠️'}
+                    {mat.quantite <= 0 && ' (quantité épuisée)'}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">{mat.unite}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{mat.departement}</td>

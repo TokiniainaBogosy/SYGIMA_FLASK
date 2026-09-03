@@ -22,7 +22,7 @@ def update_stock(stock_id: int, data: dict):
 
     # 3. Vérifier qu'on ne dépasse pas le stock disponible (cas réduction)
     if nouvelle_quantite > db_obj.quantite_actuelle:
-        # C'est une addition → OK
+        # C'est une addition.
         pass
     elif nouvelle_quantite < 0:
         abort(400, description="Stock insuffisant.")

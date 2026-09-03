@@ -43,8 +43,8 @@ const DetailDemandes = ({ getStatutStyle, reference, demandeur, materiel, justif
                     <div className="space-y-4 border-t md:border-t-0 md:border-l border-slate-100 pt-4 md:pt-0 md:pl-6 bg-slate-50/50 p-3 rounded-xl">
                         <div>
                             <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Statut Logistique</label>
-                            <p className="text-sm text-emerald-700 font-medium mt-1 flex items-center gap-1.5">
-                                <span className="h-2 w-2 rounded-full bg-emerald-500"></span> {qte_disponible} unités disponibles
+                            <p className="text-sm text-[#58B2B0] font-medium mt-1 flex items-center gap-1.5">
+                                <span className="h-2 w-2 rounded-full bg-[#58B2B0]"></span> {qte_disponible} unités disponibles
                             </p>
                         </div>
                         <div>
@@ -53,7 +53,7 @@ const DetailDemandes = ({ getStatutStyle, reference, demandeur, materiel, justif
                                 <span className="font-bold text-slate-700 block">Responsable :</span>
                                 {motif_rejet}
                             </div>
-                            <input type="text" placeholder="Répondre..." className="w-full mt-2 p-2 text-xs border border-slate-200 rounded focus:outline-none focus:border-blue-500 bg-white"/>
+                            {/* <input type="text" placeholder="Répondre..." className="w-full mt-2 p-2 text-xs border border-slate-200 rounded focus:outline-none focus:border-blue-500 bg-white"/> */}
                         </div>
                     </div>
                 </div>   
@@ -65,7 +65,7 @@ const DetailDemandes = ({ getStatutStyle, reference, demandeur, materiel, justif
                     className="px-4 py-2 text-sm font-medium text-rose-600 hover:bg-rose-50 rounded-lg transition">Refuser</button>
                     <button 
                     onClick={() =>  handleAction(reference,ligne_id,'APPROUVEE')}
-                    className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition shadow-sm">Approuver la demande</button>
+                    className="px-4 py-2 text-sm font-medium text-white bg-[#0D3056] hover:bg-[#155191] rounded-lg transition shadow-sm">Approuver la demande</button>
                 </div>
                 )
                 }

@@ -2,7 +2,7 @@ import Navbar from './NavBar2'
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { Shield, FileText, Mail } from 'lucide-react'
+import { Mail } from 'lucide-react'
 import { NotificationProvider } from '../../context/NotificationContext'
 
 export default function Layout({ children }) {
@@ -35,7 +35,7 @@ export default function Layout({ children }) {
       {/* ═══ FOOTER ═══════════════════════════════════ */}
       <footer className="bg-gray-900 text-gray-400 py-8 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             
             {/* Colonne 1 : Logo + description */}
             <div className="col-span-1 md:col-span-2">
@@ -70,36 +70,6 @@ export default function Layout({ children }) {
               </ul>
             </div>
 
-            {/* Colonne 3 : Légal + Admin */}
-            <div>
-              <h4 className="text-white font-semibold text-sm uppercase tracking-wider mb-3">
-                Informations
-              </h4>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <Link to="/conditions" className="hover:text-white transition-colors flex items-center gap-1.5">
-                    <FileText className="w-3.5 h-3.5" />
-                    Conditions d'utilisation
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/confidentialite" className="hover:text-white transition-colors flex items-center gap-1.5">
-                    <Shield className="w-3.5 h-3.5" />
-                    Politique de confidentialité
-                  </Link>
-                </li>
-                
-                {/* Lien Admin visible seulement si admin */}
-                {user?.role === 'Admin' && (
-                  <li>
-                    <Link to="/admin" className="hover:text-white transition-colors flex items-center gap-1.5 text-yellow-400">
-                      <Shield className="w-3.5 h-3.5" />
-                      Accès Administrateur
-                    </Link>
-                  </li>
-                )}
-              </ul>
-            </div>
           </div>
 
           {/* Ligne basse */}

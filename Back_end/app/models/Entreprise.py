@@ -1,10 +1,10 @@
 from sqlalchemy import Boolean, Column, DateTime, Integer, String, func
 from sqlalchemy.orm import relationship
 
-from app.database import db  # ← changement
+from app.database import db
 
 
-class Entreprise(db.Model):  # ← changement
+class Entreprise(db.Model):
     __tablename__ = "entreprises"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
